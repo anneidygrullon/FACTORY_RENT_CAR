@@ -21,7 +21,7 @@ public class MainLayoutController implements Initializable {
     // ── TOP BAR ──────────────────────────────────────────────
     @FXML private Label sectionTitle;
 
-    // ── SIDEBAR — menú items ──────────────────────────────────
+    // ── SIDEBAR — menú items (principales) ───────────────────
     @FXML private HBox menuInicio;
     @FXML private HBox menuReservacion;
     @FXML private HBox menuEntregas;
@@ -35,7 +35,7 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox menuGps;
     @FXML private HBox menuRegistros;
     @FXML private HBox menuClientes;
-    @FXML private HBox menuSuplidores;   // nuevo
+    @FXML private HBox menuSuplidores;
 
     // ── SUBMENÚ RESERVACIÓN ──────────────────────────────────
     @FXML private VBox subMenuReservacion;
@@ -43,33 +43,29 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox subMenuReservaVehiculo;
     @FXML private HBox subMenuReservaObjeto;
 
+    // ── SUBMENÚ VEHÍCULOS ────────────────────────────────────
+    @FXML private VBox subMenuVehiculos;
+    @FXML private Label vehiculosArrow;
+    @FXML private HBox subMenuVehiculoConsulta;
+    @FXML private HBox subMenuVehiculoRegistro;
+
+    // ── SUBMENÚ REGISTROS (nuevo) ─────────────────────────────
+    @FXML private VBox subMenuRegistros;
+    @FXML private Label registrosArrow;
+    @FXML private HBox subMenuEmpleadoConsulta;
+    @FXML private HBox subMenuEmpleadoRegistro;
+
     // ── BUSCADOR ─────────────────────────────────────────────
     @FXML private TextField searchField;
 
     // ── CONTENIDO PRINCIPAL ──────────────────────────────────
     @FXML private StackPane contentArea;
 
-    private void activarMenu(HBox nuevoActivo) {
-        if (menuActivo != null && menuActivo != nuevoActivo) {
-            menuActivo.setStyle(
-                    "-fx-background-color: transparent;" +
-                            "-fx-padding: 11 14 11 16;" +
-                            "-fx-cursor: hand;"
-            );
-        }
-        menuActivo = nuevoActivo;
-        nuevoActivo.setStyle(
-                "-fx-background-color: #0a1540;" +
-                        "-fx-border-color: transparent transparent transparent #4a9eff;" +
-                        "-fx-border-width: 0 0 0 3;" +
-                        "-fx-padding: 13 14 13 13;" +
-                        "-fx-cursor: hand;"
-        );
-    }
-
     // ── Estado ───────────────────────────────────────────────
     private HBox menuActivo;
     private boolean subMenuReservacionVisible = false;
+    private boolean subMenuVehiculosVisible = false;
+    private boolean subMenuRegistrosVisible = false;
 
     private static final String BASE = "/com/example/factory_rent_car/";
 
@@ -78,6 +74,15 @@ public class MainLayoutController implements Initializable {
         subMenuReservacion.setVisible(false);
         subMenuReservacion.setManaged(false);
         reservacionArrow.setText("❯");
+
+        subMenuVehiculos.setVisible(false);
+        subMenuVehiculos.setManaged(false);
+        vehiculosArrow.setText("❯");
+
+        subMenuRegistros.setVisible(false);
+        subMenuRegistros.setManaged(false);
+        registrosArrow.setText("❯");
+
         activarMenu(menuInicio);
         mostrarHome();
     }
@@ -89,6 +94,7 @@ public class MainLayoutController implements Initializable {
         mostrarHome();
     }
 
+    // Submenú Reservación
     @FXML private void toggleSubMenuReservacion(MouseEvent e) {
         subMenuReservacionVisible = !subMenuReservacionVisible;
         subMenuReservacion.setVisible(subMenuReservacionVisible);
@@ -100,80 +106,136 @@ public class MainLayoutController implements Initializable {
         activarMenu(menuReservacion);
         sectionTitle.setText("Reservación de Vehículos");
         cargarFxml("Reserva.fxml");
-        cerrarSubMenu();
+        cerrarSubMenuReservacion();
     }
 
     @FXML private void handleSubMenuReservaObjeto(MouseEvent e) {
         activarMenu(menuReservacion);
         sectionTitle.setText("Reservación de Objetos");
         cargarFxml("ReservacionObjeto.fxml");
-        cerrarSubMenu();
+        cerrarSubMenuReservacion();
     }
 
-    private void cerrarSubMenu() {
+    private void cerrarSubMenuReservacion() {
         subMenuReservacionVisible = false;
         subMenuReservacion.setVisible(false);
         subMenuReservacion.setManaged(false);
         reservacionArrow.setText("❯");
     }
 
+    // Submenú Vehículos
+    @FXML private void toggleSubMenuVehiculos(MouseEvent e) {
+        subMenuVehiculosVisible = !subMenuVehiculosVisible;
+        subMenuVehiculos.setVisible(subMenuVehiculosVisible);
+        subMenuVehiculos.setManaged(subMenuVehiculosVisible);
+        vehiculosArrow.setText(subMenuVehiculosVisible ? "❯" : "❮");
+    }
+
+    @FXML private void handleSubMenuVehiculoConsulta(MouseEvent e) {
+        activarMenu(menuVehiculos);
+        sectionTitle.setText("Consulta de Vehículos");
+        cargarFxml("VehiculoConsulta.fxml");
+        cerrarSubMenuVehiculos();
+    }
+
+    @FXML private void handleSubMenuVehiculoRegistro(MouseEvent e) {
+        activarMenu(menuVehiculos);
+        sectionTitle.setText("Registro de Vehículos");
+        cargarFxml("VehiculoRegistro.fxml");
+        cerrarSubMenuVehiculos();
+    }
+
+    private void cerrarSubMenuVehiculos() {
+        subMenuVehiculosVisible = false;
+        subMenuVehiculos.setVisible(false);
+        subMenuVehiculos.setManaged(false);
+        vehiculosArrow.setText("❯");
+    }
+
+    // Submenú Registros (con empleados)
+    @FXML private void toggleSubMenuRegistros(MouseEvent e) {
+        subMenuRegistrosVisible = !subMenuRegistrosVisible;
+        subMenuRegistros.setVisible(subMenuRegistrosVisible);
+        subMenuRegistros.setManaged(subMenuRegistrosVisible);
+        registrosArrow.setText(subMenuRegistrosVisible ? "❯" : "❮");
+    }
+
+    @FXML private void handleSubMenuEmpleadoConsulta(MouseEvent e) {
+        activarMenu(menuRegistros);
+        sectionTitle.setText("Consulta de Empleados");
+        cargarFxml("EmpleadoConsulta.fxml");
+        cerrarSubMenuRegistros();
+    }
+
+    @FXML private void handleSubMenuEmpleadoRegistro(MouseEvent e) {
+        activarMenu(menuRegistros);
+        sectionTitle.setText("Registro de Empleados");
+        cargarFxml("EmpleadoRegistro.fxml");
+        cerrarSubMenuRegistros();
+    }
+
+    private void cerrarSubMenuRegistros() {
+        subMenuRegistrosVisible = false;
+        subMenuRegistros.setVisible(false);
+        subMenuRegistros.setManaged(false);
+        registrosArrow.setText("❯");
+    }
+
+    // Otros menús (sin submenú)
     @FXML private void handleMenuEntregas(MouseEvent e) {
         activarMenu(menuEntregas);
-        sectionTitle.setText("Entregas");
-        cargarFxml("Entregas.fxml");
+        sectionTitle.setText("Entrega de Vehículos");
+        cargarFxml("EntregaVehiculo.fxml");
     }
+
     @FXML private void handleMenuDevolucion(MouseEvent e) {
         activarMenu(menuDevolucion);
-        sectionTitle.setText("Devolución");
-        cargarFxml("Devolucion.fxml");
+        sectionTitle.setText("Devolución de Vehículos");
+        cargarFxml("DevolucionVehiculo.fxml");
     }
+
     @FXML private void handleMenuPagos(MouseEvent e) {
         activarMenu(menuPagos);
         sectionTitle.setText("Pagos");
         cargarFxml("Pagos.fxml");
     }
-    @FXML private void handleMenuVehiculos(MouseEvent e) {
-        activarMenu(menuVehiculos);
-        sectionTitle.setText("Vehículos");
-        cargarFxml("Vehiculos.fxml");
-    }
+
     @FXML private void handleMenuMantenimiento(MouseEvent e) {
         activarMenu(menuMantenimiento);
         sectionTitle.setText("Mantenimiento");
         cargarFxml("Mantenimiento.fxml");
     }
+
     @FXML private void handleMenuLimpieza(MouseEvent e) {
         activarMenu(menuLimpieza);
         sectionTitle.setText("Limpieza");
         cargarFxml("Limpieza.fxml");
     }
+
     @FXML private void handleMenuIncidencias(MouseEvent e) {
         activarMenu(menuIncidencias);
         sectionTitle.setText("Incidencias");
         cargarFxml("Incidencias.fxml");
     }
+
     @FXML private void handleMenuCompras(MouseEvent e) {
         activarMenu(menuCompras);
         sectionTitle.setText("Compras");
         cargarFxml("Compras.fxml");
     }
+
     @FXML private void handleMenuGps(MouseEvent e) {
         activarMenu(menuGps);
         sectionTitle.setText("GPS");
         cargarFxml("Gps.fxml");
     }
-    @FXML private void handleMenuRegistros(MouseEvent e) {
-        activarMenu(menuRegistros);
-        sectionTitle.setText("Registros");
-        cargarFxml("Registros.fxml");
-    }
+
     @FXML private void handleMenuClientes(MouseEvent e) {
         activarMenu(menuClientes);
         sectionTitle.setText("Clientes");
         cargarFxml("Clientes.fxml");
     }
 
-    // NUEVO HANDLER PARA SUPLIDORES
     @FXML private void handleMenuSuplidores(MouseEvent e) {
         activarMenu(menuSuplidores);
         sectionTitle.setText("Suplidores");
@@ -189,15 +251,18 @@ public class MainLayoutController implements Initializable {
             item.setStyle(estilo + " -fx-background-color: rgba(255,255,255,0.06);");
         }
     }
+
     @FXML private void onMenuExit(MouseEvent e) {
         HBox item = (HBox) e.getSource();
         if (item == menuActivo) return;
         item.setStyle(item.getStyle().replace(" -fx-background-color: rgba(255,255,255,0.06);", ""));
     }
+
     @FXML private void onSubMenuEnter(MouseEvent e) {
         HBox item = (HBox) e.getSource();
         item.setStyle("-fx-background-color: rgba(255,255,255,0.08); -fx-padding: 8 14 8 16; -fx-cursor: hand;");
     }
+
     @FXML private void onSubMenuExit(MouseEvent e) {
         HBox item = (HBox) e.getSource();
         item.setStyle("-fx-padding: 8 14 8 16; -fx-cursor: hand;");
@@ -257,7 +322,26 @@ public class MainLayoutController implements Initializable {
         cargarFxml(fxmlName);
     }
 
-    // Getters para los menús (opcional)
+    // ── ACTIVAR MENÚ (estilo) ────────────────────────────────
+    private void activarMenu(HBox nuevoActivo) {
+        if (menuActivo != null && menuActivo != nuevoActivo) {
+            menuActivo.setStyle(
+                    "-fx-background-color: transparent;" +
+                            "-fx-padding: 11 14 11 16;" +
+                            "-fx-cursor: hand;"
+            );
+        }
+        menuActivo = nuevoActivo;
+        nuevoActivo.setStyle(
+                "-fx-background-color: #0a1540;" +
+                        "-fx-border-color: transparent transparent transparent #4a9eff;" +
+                        "-fx-border-width: 0 0 0 3;" +
+                        "-fx-padding: 13 14 13 13;" +
+                        "-fx-cursor: hand;"
+        );
+    }
+
+    // ── GETTERS PARA LOS MENÚS (opcional) ────────────────────
     public HBox getMenuInicio()        { return menuInicio; }
     public HBox getMenuReservacion()   { return menuReservacion; }
     public HBox getMenuEntregas()      { return menuEntregas; }

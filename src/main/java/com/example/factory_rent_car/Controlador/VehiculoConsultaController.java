@@ -34,7 +34,7 @@ public class VehiculoConsultaController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas con enlace directo
+        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idVehiculoProperty().asObject());
         colMarca.setCellValueFactory(c -> c.getValue().marcaProperty());
         colModelo.setCellValueFactory(c -> c.getValue().modeloProperty());
@@ -45,6 +45,8 @@ public class VehiculoConsultaController {
         colPasajeros.setCellValueFactory(c -> c.getValue().maxPasajerosProperty().asObject());
         colEstado.setCellValueFactory(c -> c.getValue().estadoProperty());
         colPrecio.setCellValueFactory(c -> c.getValue().precioPorDiaProperty().asObject());
+
+        cmbEstado.getItems().addAll("Disponible", "Reservado", "En Mantenimiento", "En Limpieza", "No Apto");
 
         tablaVehiculos.setItems(listaVehiculos);
         tablaVehiculos.getSelectionModel().selectedItemProperty().addListener(
@@ -80,7 +82,8 @@ public class VehiculoConsultaController {
                         rs.getString("estado"),
                         rs.getDouble("precio_x_dia"),
                         rs.getInt("fk_id_poliza"),
-                        rs.getInt("fk_pk_id_compra")
+                        rs.getInt("fk_pk_id_compra"),
+                        null  // ← campo foto (no se usa en consulta)
                 );
                 listaVehiculos.add(v);
             }
