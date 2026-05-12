@@ -75,6 +75,16 @@
                        -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-border-width: 1;
                        -fx-cursor: hand; -fx-padding: 8 16 8 16;" />
 
+            <!-- Botón para ocultar/mostrar tabla -->
+            <Button fx:id="btnToggleTable" onAction="#toggleTableVisibility"
+                    text="📋 Ocultar Tabla"
+                    style="-fx-background-color: #F1F5F9;
+                       -fx-text-fill: #475569;
+                       -fx-font-size: 12px; -fx-font-weight: bold;
+                       -fx-background-radius: 8;
+                       -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-border-width: 1;
+                       -fx-cursor: hand; -fx-padding: 8 16 8 16;" />
+
             <!-- Badge estado -->
             <Label fx:id="lblEstado"
                    text="Sin selección"
@@ -87,9 +97,10 @@
         </HBox>
 
         <!-- ══════════════════════════════════════════════
-             TABLA
+             TABLA (CONTAINER OCULTABLE CON ALTURA MÁXIMA)
         ══════════════════════════════════════════════ -->
-        <VBox VBox.vgrow="ALWAYS" spacing="0"
+        <VBox fx:id="tableContainer" spacing="0"
+              maxHeight="400"
               style="-fx-background-color: #FFFFFF;">
             <VBox.margin><Insets top="16" left="16" right="16" bottom="0"/></VBox.margin>
 
@@ -135,7 +146,7 @@
                 </HBox>
             </HBox>
 
-            <!-- Tabla de datos -->
+            <!-- Tabla de datos (se expande dentro del maxHeight) -->
             <TableView fx:id="tablaReservaciones"
                        VBox.vgrow="ALWAYS"
                        style="-fx-background-color: transparent;

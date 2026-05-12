@@ -3,16 +3,15 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.shape.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.factory_rent_car.MainLayoutController"
+            fx:controller="com.example.factory_rent_car.Controlador.MainLayoutController"
             prefWidth="1100" prefHeight="700">
 
     <!-- ═══════════════════════════════════════════════════════
-         TOP BAR
+         TOP BAR (sin cambios)
     ══════════════════════════════════════════════════════════ -->
     <top>
         <HBox prefHeight="58" alignment="CENTER_LEFT"
@@ -23,7 +22,6 @@
                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 8, 0, 0, 3);">
 
             <HBox alignment="CENTER_LEFT" spacing="10" HBox.hgrow="ALWAYS">
-                <!-- Icono casa SVG blanco -->
                 <SVGPath content="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"
                          fill="white" scaleX="1.1" scaleY="1.1"/>
                 <Label fx:id="sectionTitle" text="Inicio"
@@ -32,14 +30,11 @@
             </HBox>
 
             <HBox alignment="CENTER_RIGHT" spacing="10">
-                <!-- Campana SVG blanco -->
                 <SVGPath content="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
                          fill="white" style="-fx-cursor: hand;"/>
 
-                <!-- Avatar circular -->
                 <StackPane>
                     <Circle radius="21" fill="#1b3264" stroke="#3a5898" strokeWidth="2"/>
-                    <!-- Icono persona SVG blanco -->
                     <SVGPath content="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
                              fill="white" scaleX="0.9" scaleY="0.9"/>
                 </StackPane>
@@ -57,20 +52,19 @@
     </top>
 
     <!-- ═══════════════════════════════════════════════════════
-         SIDEBAR
+         SIDEBAR CON SCROLL
     ══════════════════════════════════════════════════════════ -->
     <left>
         <VBox prefWidth="248"
               style="-fx-background-color: #112060;
                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 4, 0);">
 
-            <!-- LOGO -->
+            <!-- LOGO (fijo) -->
             <VBox alignment="CENTER" spacing="4"
                   style="-fx-background-color: #0a1540;
                          -fx-padding: 20 16 16 16;
                          -fx-border-color: transparent transparent #1e3a7a transparent;
                          -fx-border-width: 0 0 1 0;">
-                <!-- Icono carro SVG blanco -->
                 <SVGPath content="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"
                          fill="white" scaleX="1.6" scaleY="1.6"/>
                 <Label text="FACTORY"
@@ -85,7 +79,7 @@
                 </HBox>
             </VBox>
 
-            <!-- ══ INICIO — Opción D ══ -->
+            <!-- INICIO (fijo) -->
             <HBox fx:id="menuInicio" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
                   style="-fx-background-color: #0a1540;
                          -fx-border-color: transparent transparent transparent #4a9eff;
@@ -102,207 +96,240 @@
 
             <Region prefHeight="1" style="-fx-background-color: rgba(255,255,255,0.07);"/>
 
-            <!-- MENÚ -->
-            <VBox VBox.vgrow="ALWAYS" style="-fx-background-color: #112060;">
+            <!-- SCROLL PARA EL MENÚ PRINCIPAL -->
+            <ScrollPane fitToWidth="true" vbarPolicy="AS_NEEDED" hbarPolicy="NEVER"
+                        style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                <VBox style="-fx-background-color: #112060;" VBox.vgrow="ALWAYS">
 
-                <!-- RESERVACIÓN — icono calendario -->
-                <HBox fx:id="menuReservacion" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuReservacion"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Reservación" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- RESERVACIÓN (con submenú) -->
+                    <VBox spacing="0">
+                        <HBox fx:id="menuReservacion" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                              style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                              onMouseClicked="#toggleSubMenuReservacion"
+                              onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                            <StackPane minWidth="26">
+                                <SVGPath content="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"
+                                         fill="white" scaleX="0.9" scaleY="0.9"/>
+                            </StackPane>
+                            <Label text="Reservación" HBox.hgrow="ALWAYS"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                            <Label fx:id="reservacionArrow" text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;"/>
+                        </HBox>
+                        <VBox fx:id="subMenuReservacion" spacing="0" managed="false" visible="false"
+                              style="-fx-background-color: #0a1540; -fx-padding: 0 0 0 40;">
+                            <HBox fx:id="subMenuReservaVehiculo" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuReservaVehiculo"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="🚗 Reserva de Vehículos" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                            <HBox fx:id="subMenuReservaObjeto" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuReservaObjeto"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="📦 Reserva de Objetos" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
 
-                <!-- ENTREGAS — icono llave -->
-                <HBox fx:id="menuEntregas" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuEntregas"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Entregas" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- ENTREGAS -->
+                    <HBox fx:id="menuEntregas" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuEntregas"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Entregas" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- DEVOLUCIÓN — icono flecha circular -->
-                <HBox fx:id="menuDevolucion" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuDevolucion"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Devolución" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- DEVOLUCIÓN -->
+                    <HBox fx:id="menuDevolucion" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuDevolucion"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Devolución" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- PAGOS — icono tarjeta -->
-                <HBox fx:id="menuPagos" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuPagos"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Pagos" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- PAGOS -->
+                    <HBox fx:id="menuPagos" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuPagos"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Pagos" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- VEHÍCULOS — icono carro -->
-                <HBox fx:id="menuVehiculos" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuVehiculos"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Vehículos" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- VEHÍCULOS -->
+                    <HBox fx:id="menuVehiculos" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuVehiculos"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Vehículos" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- MANTENIMIENTO — icono llave inglesa -->
-                <HBox fx:id="menuMantenimiento" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuMantenimiento"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Mantenimiento" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- MANTENIMIENTO -->
+                    <HBox fx:id="menuMantenimiento" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuMantenimiento"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Mantenimiento" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- LIMPIEZA — icono estrella/diamante -->
-                <HBox fx:id="menuLimpieza" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuLimpieza"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Limpieza" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- LIMPIEZA -->
+                    <HBox fx:id="menuLimpieza" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuLimpieza"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Limpieza" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- INCIDENCIAS — icono advertencia -->
-                <HBox fx:id="menuIncidencias" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuIncidencias"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Incidencias" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- INCIDENCIAS -->
+                    <HBox fx:id="menuIncidencias" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuIncidencias"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Incidencias" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- COMPRAS — icono carrito -->
-                <HBox fx:id="menuCompras" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuCompras"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 6.9 18 9 18h12v-2H9.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0023.45 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Compras" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- COMPRAS -->
+                    <HBox fx:id="menuCompras" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuCompras"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 6.9 18 9 18h12v-2H9.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0023.45 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Compras" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- GPS — icono pin ubicación -->
-                <HBox fx:id="menuGps" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuGps"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="GPS" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- GPS -->
+                    <HBox fx:id="menuGps" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuGps"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="GPS" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- REGISTROS — icono persona con lápiz -->
-                <HBox fx:id="menuRegistros" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuRegistros"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Registros" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- REGISTROS -->
+                    <HBox fx:id="menuRegistros" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuRegistros"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Registros" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-                <!-- CLIENTES — icono grupo personas -->
-                <HBox fx:id="menuClientes" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                      style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                      onMouseClicked="#handleMenuClientes"
-                      onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                    <StackPane minWidth="26">
-                        <SVGPath content="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
-                                 fill="white" scaleX="0.9" scaleY="0.9"/>
-                    </StackPane>
-                    <Label text="Clientes" HBox.hgrow="ALWAYS"
-                           style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                    <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                          -fx-background-color: rgba(255,255,255,0.08);
-                                          -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                </HBox>
+                    <!-- CLIENTES -->
+                    <HBox fx:id="menuClientes" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuClientes"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Clientes" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-            </VBox>
+                    <!-- SUPLIDORES -->
+                    <HBox fx:id="menuSuplidores" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                          onMouseClicked="#handleMenuSuplidores"
+                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                        <StackPane minWidth="26">
+                            <SVGPath content="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                                     fill="white" scaleX="0.9" scaleY="0.9"/>
+                        </StackPane>
+                        <Label text="Suplidores" HBox.hgrow="ALWAYS"
+                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
+                                              -fx-background-color: rgba(255,255,255,0.08);
+                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
+                    </HBox>
 
-            <!-- Separador -->
+                </VBox>
+            </ScrollPane>
+
+            <!-- Separador y buscador (fijos) -->
             <Region prefHeight="1" style="-fx-background-color: rgba(255,255,255,0.08);"/>
 
-            <!-- BUSCADOR -->
             <HBox spacing="6" alignment="CENTER_LEFT"
                   style="-fx-padding: 10 12 10 12; -fx-background-color: #112060;">
                 <TextField fx:id="searchField" promptText="Search"
@@ -336,9 +363,7 @@
         </VBox>
     </left>
 
-    <!-- ═══════════════════════════════════════════════════════
-         CONTENIDO PRINCIPAL
-    ══════════════════════════════════════════════════════════ -->
+    <!-- CONTENIDO PRINCIPAL (sin cambios) -->
     <center>
         <StackPane fx:id="contentArea" style="-fx-background-color: #eef2f8;"/>
     </center>

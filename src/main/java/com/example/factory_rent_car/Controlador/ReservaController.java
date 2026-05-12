@@ -6,10 +6,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 
 public class ReservaController {
@@ -34,7 +38,7 @@ public class ReservaController {
     @FXML private Label            lblConteo;
     @FXML private Label            lblTituloFormulario;
 
-    // ── Tabla ─────────────────────────────────────────────────────────────
+    // ── Tabla y Contenedor ────────────────────────────────────────────────
     @FXML private TableView<Reservacion>           tablaReservaciones;
     @FXML private TableColumn<Reservacion, Number> colId;
     @FXML private TableColumn<Reservacion, String> colCliente;
@@ -44,17 +48,21 @@ public class ReservaController {
     @FXML private TableColumn<Reservacion, Number> colMontoTotal;
     @FXML private TableColumn<Reservacion, Number> colPendiente;
     @FXML private TableColumn<Reservacion, String> colEstado;
+    @FXML private VBox tableContainer;  // 🔄 Contenedor de toda la tabla (cabecera + tabla + pie)
+    @FXML private Button btnToggleTable;
 
     // ── Datos internos ────────────────────────────────────────────────────
     private final ObservableList<Reservacion>    listaReservaciones    = FXCollections.observableArrayList();
     private int                                  idReservaSeleccionada = -1;
-    private final LinkedHashMap<String, Integer> mapaSeguros           = new LinkedHashMap<>();
+    private int                                  idVehiculoOriginal    = -1; // para edición
+    private final LinkedHashMap<String, Integer> mapaSegurosId         = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Double>  mapaSegurosCosto      = new LinkedHashMap<>();
 
     // ── Inicializar ───────────────────────────────────────────────────────
     @FXML
     public void initialize() {
-        dpFechaInicio.setValue(java.time.LocalDate.now());
-        dpFechaDevolucion.setValue(java.time.LocalDate.now().plusDays(1));
+        dpFechaInicio.setValue(LocalDate.now());
+        dpFechaDevolucion.setValue(LocalDate.now().plusDays(1));
 
         colId.setCellValueFactory(c -> c.getValue().idReservaProperty());
         colCliente.setCellValueFactory(c -> c.getValue().clienteProperty());
@@ -65,7 +73,6 @@ public class ReservaController {
         colPendiente.setCellValueFactory(c -> c.getValue().montoPendienteProperty());
         colEstado.setCellValueFactory(c -> c.getValue().estadoProperty());
 
-        // Colores de estado en la tabla
         colEstado.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -82,12 +89,10 @@ public class ReservaController {
         });
 
         tablaReservaciones.setItems(listaReservaciones);
-
-        // Selección en tabla → carga formulario
         tablaReservaciones.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSel, newSel) -> { if (newSel != null) cargarEnFormulario(newSel); });
 
-        // Recalculo automático al cambiar fechas/seguro/montos
+        // Eventos de recálculo
         dpFechaInicio.valueProperty().addListener((o, ov, nv) -> recalcularMonto());
         dpFechaDevolucion.valueProperty().addListener((o, ov, nv) -> recalcularMonto());
         cmbSeguro.valueProperty().addListener((o, ov, nv) -> recalcularMonto());
@@ -96,28 +101,36 @@ public class ReservaController {
 
         cargarSeguros();
         cargarReservaciones();
+
+        // Por defecto tabla visible
+        tableContainer.setVisible(true);
+        btnToggleTable.setText("📋 Ocultar Tabla");
     }
 
-    // ── Cargar seguros desde BD ───────────────────────────────────────────
+    // ── Cargar seguros con costo diario ───────────────────────────────────
     private void cargarSeguros() {
-        mapaSeguros.clear();
+        mapaSegurosId.clear();
+        mapaSegurosCosto.clear();
         cmbSeguro.getItems().clear();
         String sql = "SELECT pk_id_seguro, nombre, costo FROM TBL_PLAN_SEGURO ORDER BY nombre";
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
+                int id = rs.getInt("pk_id_seguro");
+                double costo = rs.getDouble("costo");
                 String label = rs.getString("nombre") +
-                        " (RD$ " + String.format("%.2f", rs.getDouble("costo")) + "/día)";
-                mapaSeguros.put(label, rs.getInt("pk_id_seguro"));
+                        " (RD$ " + String.format("%.2f", costo) + "/día)";
+                mapaSegurosId.put(label, id);
+                mapaSegurosCosto.put(label, costo);
                 cmbSeguro.getItems().add(label);
             }
         } catch (SQLException e) {
-            cmbSeguro.getItems().add("Sin seguros registrados");
+            cmbSeguro.getItems().add("⚠ Error cargando seguros");
         }
     }
 
-    // ── Buscar cliente por ID ─────────────────────────────────────────────
+    // ── Buscar cliente ────────────────────────────────────────────────────
     @FXML
     public void onBuscarCliente(ActionEvent ignored) {
         if (txtIdCliente.getText().isBlank()) {
@@ -137,21 +150,29 @@ public class ReservaController {
         }
     }
 
-    // ── Buscar vehículo por ID ────────────────────────────────────────────
+    // ── Buscar vehículo con validación de disponibilidad ──────────────────
     @FXML
     public void onBuscarVehiculo(ActionEvent ignored) {
         if (txtIdVehiculo.getText().isBlank()) {
             JOptionPane.showMessageDialog(null, "Ingresa el ID del vehículo."); return;
         }
+        int idVehiculo = Integer.parseInt(txtIdVehiculo.getText().trim());
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(
                      "SELECT marca, modelo, estado, precio_x_dia FROM TBL_VEHICULO WHERE id_vehiculo = ?")) {
-            ps.setInt(1, Integer.parseInt(txtIdVehiculo.getText().trim()));
+            ps.setInt(1, idVehiculo);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                String estado = rs.getString("estado");
+                // Permitir si es el mismo vehículo en edición
+                if (!"Disponible".equals(estado) && (idReservaSeleccionada == -1 || idVehiculo != idVehiculoOriginal)) {
+                    JOptionPane.showMessageDialog(null, "Vehículo no disponible (estado: " + estado + ")");
+                    txtInfoVehiculo.clear();
+                    return;
+                }
                 txtInfoVehiculo.setText(
                         rs.getString("marca") + " " + rs.getString("modelo") +
-                                " — " + rs.getString("estado") +
+                                " — " + estado +
                                 " | RD$ " + String.format("%.2f", rs.getDouble("precio_x_dia")) + "/día");
                 recalcularMonto();
             } else {
@@ -165,13 +186,12 @@ public class ReservaController {
         }
     }
 
-    // ── Recalcular montos en tiempo real ──────────────────────────────────
+    // ── Recálculo total incluyendo seguro diario ──────────────────────────
     private void recalcularMonto() {
         if (dpFechaInicio.getValue() == null || dpFechaDevolucion.getValue() == null) return;
-        if (txtIdVehiculo.getText().isBlank()) return;
+        if (txtIdVehiculo.getText().isBlank() || cmbSeguro.getValue() == null) return;
 
-        long dias = java.time.temporal.ChronoUnit.DAYS.between(
-                dpFechaInicio.getValue(), dpFechaDevolucion.getValue());
+        long dias = ChronoUnit.DAYS.between(dpFechaInicio.getValue(), dpFechaDevolucion.getValue());
         if (dias <= 0) {
             lblDias.setText("⚠ Fechas inválidas");
             lblDias.setStyle("-fx-text-fill: #C62828;");
@@ -186,23 +206,33 @@ public class ReservaController {
             ps.setInt(1, Integer.parseInt(txtIdVehiculo.getText().trim()));
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) return;
-            double subtotal  = rs.getDouble("precio_x_dia") * dias;
-            double total     = subtotal - subtotal * (parseDouble(txtDescuento.getText()) / 100.0);
-            double pendiente = Math.max(0, total - parseDouble(txtMontoApartado.getText()));
+
+            double precioVehiculo = rs.getDouble("precio_x_dia");
+            double costoSeguro = mapaSegurosCosto.getOrDefault(cmbSeguro.getValue(), 0.0);
+            double subtotal = (precioVehiculo + costoSeguro) * dias;
+            double descuentoPorc = parseDouble(txtDescuento.getText());
+            double total = subtotal - subtotal * (descuentoPorc / 100.0);
+            double apartado = parseDouble(txtMontoApartado.getText());
+            double pendiente = Math.max(0, total - apartado);
+
             lblMontoTotal.setText("RD$ " + String.format("%.2f", total));
             lblMontoPendiente.setText("RD$ " + String.format("%.2f", pendiente));
+
             actualizarEtiquetaEstado(pendiente, dpFechaDevolucion.getValue().toString());
-        } catch (SQLException | NumberFormatException ignored2) { /* silencioso */ }
+
+        } catch (SQLException | NumberFormatException ignored) {
+            // silencioso
+        }
     }
 
-    // ── Cargar tabla de reservaciones ─────────────────────────────────────
+    // ── Cargar todas las reservas ─────────────────────────────────────────
     @FXML
     public void cargarReservaciones() {
         listaReservaciones.clear();
         idReservaSeleccionada = -1;
         String sql =
                 "SELECT r.pk_id_reserva, " +
-                        "CONVERT(VARCHAR(10), r.fecha_inicio,    120) AS fecha_inicio, " +
+                        "CONVERT(VARCHAR(10), r.fecha_inicio, 120) AS fecha_inicio, " +
                         "CONVERT(VARCHAR(10), r.fech_devolucion, 120) AS fecha_devolucion, " +
                         "r.monto_total, r.monto_apartado, r.monto_pendiente, " +
                         "ISNULL(r.descuento, 0) AS descuento, " +
@@ -221,7 +251,7 @@ public class ReservaController {
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                listaReservaciones.add(new Reservacion(
+                Reservacion res = new Reservacion(
                         rs.getInt("pk_id_reserva"),
                         rs.getString("fecha_inicio"),
                         rs.getString("fecha_devolucion"),
@@ -236,7 +266,8 @@ public class ReservaController {
                         rs.getInt("fk_pk_id_seguro"),
                         rs.getInt("fk_pk_id_contrato"),
                         rs.getInt("fk_id_vehiculo")
-                ));
+                );
+                listaReservaciones.add(res);
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error al cargar reservaciones: " + e.getMessage());
@@ -244,11 +275,15 @@ public class ReservaController {
         actualizarConteo();
     }
 
-    // ── Buscar / filtrar en tabla ─────────────────────────────────────────
+    // ── Filtrar / Buscar ──────────────────────────────────────────────────
     @FXML
     public void fnBuscar(ActionEvent ignored) {
         String busqueda = txtBuscar.getText().trim().toLowerCase();
-        if (busqueda.isEmpty()) { tablaReservaciones.setItems(listaReservaciones); actualizarConteo(); return; }
+        if (busqueda.isEmpty()) {
+            tablaReservaciones.setItems(listaReservaciones);
+            actualizarConteo();
+            return;
+        }
         ObservableList<Reservacion> filtradas = FXCollections.observableArrayList();
         for (Reservacion r : listaReservaciones) {
             if (r.getCliente().toLowerCase().contains(busqueda)
@@ -261,7 +296,6 @@ public class ReservaController {
         actualizarConteo();
     }
 
-    // ── Filtros rápidos por estado ────────────────────────────────────────
     @FXML public void filtrarTodas(ActionEvent ignored)      { tablaReservaciones.setItems(listaReservaciones); actualizarConteo(); }
     @FXML public void filtrarActivas(ActionEvent ignored)    { filtrarPorEstado("Activa"); }
     @FXML public void filtrarVencidas(ActionEvent ignored)   { filtrarPorEstado("Vencida"); }
@@ -281,32 +315,33 @@ public class ReservaController {
             lblConteo.setText(tablaReservaciones.getItems().size() + " registro(s)");
     }
 
-    // ── Guardar nueva reservación ─────────────────────────────────────────
+    // ── Guardar nueva reserva ─────────────────────────────────────────────
     @FXML
     public void onGuardarReserva(ActionEvent ignored) {
         if (!validarFormulario()) return;
         try {
-            int    idCliente  = Integer.parseInt(txtIdCliente.getText().trim());
-            int    idVehiculo = Integer.parseInt(txtIdVehiculo.getText().trim());
-            int    idSeguro   = mapaSeguros.getOrDefault(cmbSeguro.getValue(), 1);
-            double descPct    = parseDouble(txtDescuento.getText());
-            long   dias       = java.time.temporal.ChronoUnit.DAYS.between(
-                    dpFechaInicio.getValue(), dpFechaDevolucion.getValue());
+            int idCliente  = Integer.parseInt(txtIdCliente.getText().trim());
+            int idVehiculo = Integer.parseInt(txtIdVehiculo.getText().trim());
+            String seguroLabel = cmbSeguro.getValue();
+            int idSeguro   = mapaSegurosId.getOrDefault(seguroLabel, 1);
+            double costoSeguro = mapaSegurosCosto.getOrDefault(seguroLabel, 0.0);
+            double descPct = parseDouble(txtDescuento.getText());
+            long   dias    = ChronoUnit.DAYS.between(dpFechaInicio.getValue(), dpFechaDevolucion.getValue());
 
             try (Connection con = conexion.establecerConexion()) {
-
                 // 1. Precio del vehículo
                 PreparedStatement psVeh = con.prepareStatement(
                         "SELECT precio_x_dia FROM TBL_VEHICULO WHERE id_vehiculo = ?");
                 psVeh.setInt(1, idVehiculo);
                 ResultSet rsVeh = psVeh.executeQuery();
                 if (!rsVeh.next()) { JOptionPane.showMessageDialog(null, "Vehículo no encontrado."); return; }
-                double subtotal  = rsVeh.getDouble("precio_x_dia") * dias;
-                double total     = subtotal - subtotal * (descPct / 100.0);
-                double apartado  = parseDouble(txtMontoApartado.getText());
+                double precioVehiculo = rsVeh.getDouble("precio_x_dia");
+                double subtotal = (precioVehiculo + costoSeguro) * dias;
+                double total    = subtotal - subtotal * (descPct / 100.0);
+                double apartado = parseDouble(txtMontoApartado.getText());
                 double pendiente = Math.max(0, total - apartado);
 
-                // 2. Crear contrato básico
+                // 2. Crear contrato
                 PreparedStatement psCon = con.prepareStatement(
                         "INSERT INTO TBL_CONTRATO (fecha, condicion) VALUES (?, ?)",
                         Statement.RETURN_GENERATED_KEYS);
@@ -317,7 +352,7 @@ public class ReservaController {
                 ResultSet kc = psCon.getGeneratedKeys();
                 if (kc.next()) idContrato = kc.getInt(1);
 
-                // 3. Próximo ID manual (tabla sin IDENTITY)
+                // 3. Siguiente ID manual
                 PreparedStatement psMaxId = con.prepareStatement(
                         "SELECT ISNULL(MAX(pk_id_reserva), 0) + 1 AS next_id FROM TBL_RESERVACION");
                 ResultSet rsMaxId = psMaxId.executeQuery();
@@ -342,7 +377,7 @@ public class ReservaController {
                 psRes.setInt(10, idCliente);
                 psRes.executeUpdate();
 
-                // 5. Vincular vehículo a la reserva
+                // 5. Vincular vehículo
                 PreparedStatement psRV = con.prepareStatement(
                         "INSERT INTO TBL_RESERVA_VEHI (cantidad, fk_pk_id_reserva, fk_id_vehiculo) VALUES (1,?,?)");
                 psRV.setInt(1, nextId);
@@ -369,7 +404,7 @@ public class ReservaController {
         }
     }
 
-    // ── Editar reservación seleccionada ───────────────────────────────────
+    // ── Editar reserva (incluyendo cambio de vehículo) ─────────────────---
     @FXML
     public void onEditarReserva(ActionEvent ignored) {
         if (idReservaSeleccionada == -1) {
@@ -377,38 +412,70 @@ public class ReservaController {
         }
         if (!validarFormulario()) return;
         try {
-            int    idSeguro  = mapaSeguros.getOrDefault(cmbSeguro.getValue(), 1);
-            double descPct   = parseDouble(txtDescuento.getText());
-            long   dias      = java.time.temporal.ChronoUnit.DAYS.between(
-                    dpFechaInicio.getValue(), dpFechaDevolucion.getValue());
+            int nuevoIdVehiculo = Integer.parseInt(txtIdVehiculo.getText().trim());
+            int idCliente = Integer.parseInt(txtIdCliente.getText().trim());
+            String seguroLabel = cmbSeguro.getValue();
+            int idSeguro = mapaSegurosId.getOrDefault(seguroLabel, 1);
+            double costoSeguro = mapaSegurosCosto.getOrDefault(seguroLabel, 0.0);
+            double descPct = parseDouble(txtDescuento.getText());
+            long dias = ChronoUnit.DAYS.between(dpFechaInicio.getValue(), dpFechaDevolucion.getValue());
 
             try (Connection con = conexion.establecerConexion()) {
+                // Precio vehículo
                 PreparedStatement psVeh = con.prepareStatement(
                         "SELECT precio_x_dia FROM TBL_VEHICULO WHERE id_vehiculo = ?");
-                psVeh.setInt(1, Integer.parseInt(txtIdVehiculo.getText().trim()));
+                psVeh.setInt(1, nuevoIdVehiculo);
                 ResultSet rsVeh = psVeh.executeQuery();
                 if (!rsVeh.next()) { JOptionPane.showMessageDialog(null, "Vehículo no encontrado."); return; }
-                double subtotal  = rsVeh.getDouble("precio_x_dia") * dias;
-                double total     = subtotal - subtotal * (descPct / 100.0);
-                double apartado  = parseDouble(txtMontoApartado.getText());
+                double precioVehiculo = rsVeh.getDouble("precio_x_dia");
+                double subtotal = (precioVehiculo + costoSeguro) * dias;
+                double total = subtotal - subtotal * (descPct / 100.0);
+                double apartado = parseDouble(txtMontoApartado.getText());
                 double pendiente = Math.max(0, total - apartado);
 
-                PreparedStatement ps = con.prepareStatement(
-                        "UPDATE TBL_RESERVACION SET " +
-                                "fecha_inicio=?, fech_devolucion=?, monto_total=?, " +
+                // Actualizar reservación
+                PreparedStatement psUpd = con.prepareStatement(
+                        "UPDATE TBL_RESERVACION SET fecha_inicio=?, fech_devolucion=?, monto_total=?, " +
                                 "monto_apartado=?, monto_pendiente=?, descuento=?, " +
-                                "fk_pk_id_seguro=?, fk_pk_id_cliente=? " +
-                                "WHERE pk_id_reserva=?");
-                ps.setDate(1, Date.valueOf(dpFechaInicio.getValue()));
-                ps.setDate(2, Date.valueOf(dpFechaDevolucion.getValue()));
-                ps.setDouble(3, total);
-                ps.setDouble(4, apartado);
-                ps.setDouble(5, pendiente);
-                ps.setDouble(6, descPct);
-                ps.setInt(7, idSeguro);
-                ps.setInt(8, Integer.parseInt(txtIdCliente.getText().trim()));
-                ps.setInt(9, idReservaSeleccionada);
-                ps.executeUpdate();
+                                "fk_pk_id_seguro=?, fk_pk_id_cliente=? WHERE pk_id_reserva=?");
+                psUpd.setDate(1, Date.valueOf(dpFechaInicio.getValue()));
+                psUpd.setDate(2, Date.valueOf(dpFechaDevolucion.getValue()));
+                psUpd.setDouble(3, total);
+                psUpd.setDouble(4, apartado);
+                psUpd.setDouble(5, pendiente);
+                psUpd.setDouble(6, descPct);
+                psUpd.setInt(7, idSeguro);
+                psUpd.setInt(8, idCliente);
+                psUpd.setInt(9, idReservaSeleccionada);
+                psUpd.executeUpdate();
+
+                // Manejar cambio de vehículo
+                if (nuevoIdVehiculo != idVehiculoOriginal) {
+                    // Liberar vehículo anterior
+                    PreparedStatement psOldVeh = con.prepareStatement(
+                            "SELECT fk_id_vehiculo FROM TBL_RESERVA_VEHI WHERE fk_pk_id_reserva = ?");
+                    psOldVeh.setInt(1, idReservaSeleccionada);
+                    ResultSet rsOld = psOldVeh.executeQuery();
+                    if (rsOld.next()) {
+                        int oldVeh = rsOld.getInt("fk_id_vehiculo");
+                        PreparedStatement psLib = con.prepareStatement(
+                                "UPDATE TBL_VEHICULO SET estado = 'Disponible' WHERE id_vehiculo = ?");
+                        psLib.setInt(1, oldVeh);
+                        psLib.executeUpdate();
+                    }
+                    // Actualizar TBL_RESERVA_VEHI
+                    PreparedStatement psUpdVeh = con.prepareStatement(
+                            "UPDATE TBL_RESERVA_VEHI SET fk_id_vehiculo = ? WHERE fk_pk_id_reserva = ?");
+                    psUpdVeh.setInt(1, nuevoIdVehiculo);
+                    psUpdVeh.setInt(2, idReservaSeleccionada);
+                    psUpdVeh.executeUpdate();
+
+                    // Reservar nuevo vehículo
+                    PreparedStatement psReserv = con.prepareStatement(
+                            "UPDATE TBL_VEHICULO SET estado = 'Reservado' WHERE id_vehiculo = ?");
+                    psReserv.setInt(1, nuevoIdVehiculo);
+                    psReserv.executeUpdate();
+                }
 
                 JOptionPane.showMessageDialog(null,
                         "✔ Reservación #" + idReservaSeleccionada + " actualizada correctamente.");
@@ -420,7 +487,7 @@ public class ReservaController {
         }
     }
 
-    // ── Eliminar reservación seleccionada ─────────────────────────────────
+    // ── Eliminar reserva ──────────────────────────────────────────────────
     @FXML
     public void onEliminarReserva(ActionEvent ignored) {
         if (idReservaSeleccionada == -1) {
@@ -432,8 +499,7 @@ public class ReservaController {
         if (confirm != JOptionPane.YES_OPTION) return;
 
         try (Connection con = conexion.establecerConexion()) {
-
-            // Liberar vehículo vinculado
+            // Liberar vehículo
             PreparedStatement psVehId = con.prepareStatement(
                     "SELECT fk_id_vehiculo FROM TBL_RESERVA_VEHI WHERE fk_pk_id_reserva = ?");
             psVehId.setInt(1, idReservaSeleccionada);
@@ -445,7 +511,7 @@ public class ReservaController {
                 psLib.executeUpdate();
             }
 
-            // Borrar en orden por FK
+            // Borrar en orden FK
             String[] sqlsEliminar = {
                     "DELETE FROM TBL_RESERVA_VEHI WHERE fk_pk_id_reserva = ?",
                     "DELETE FROM TBL_OBJ_RESERVA  WHERE fk_pk_id_reserva = ?",
@@ -466,6 +532,15 @@ public class ReservaController {
         }
     }
 
+    // ── Toggle Mostrar/Ocultar Tabla ──────────────────────────────────────
+    @FXML
+    public void toggleTableVisibility(ActionEvent event) {
+        boolean visible = tableContainer.isVisible();
+        tableContainer.setVisible(!visible);
+        tableContainer.setManaged(!visible);
+        btnToggleTable.setText(visible ? "📋 Mostrar Tabla" : "📋 Ocultar Tabla");
+    }
+
     // ── Limpiar formulario ────────────────────────────────────────────────
     @FXML
     public void limpiar() {
@@ -477,20 +552,25 @@ public class ReservaController {
         txtMontoApartado.clear();
         txtBuscar.clear();
         cmbSeguro.setValue(null);
-        dpFechaInicio.setValue(java.time.LocalDate.now());
-        dpFechaDevolucion.setValue(java.time.LocalDate.now().plusDays(1));
+        dpFechaInicio.setValue(LocalDate.now());
+        dpFechaDevolucion.setValue(LocalDate.now().plusDays(1));
         lblMontoTotal.setText("RD$ 0.00");
         lblMontoPendiente.setText("RD$ 0.00");
         lblDias.setText("—");
-        if (lblEstado != null) { lblEstado.setText(""); lblEstado.setStyle(""); }
+        lblEstado.setText("");
+        lblTituloFormulario.setText("Nueva Reservación");
         idReservaSeleccionada = -1;
+        idVehiculoOriginal = -1;
         tablaReservaciones.getSelectionModel().clearSelection();
         tablaReservaciones.setItems(listaReservaciones);
     }
 
-    // ── Cargar fila seleccionada en el formulario ─────────────────────────
+    // ── Cargar fila seleccionada al formulario (edición) ──────────────────
     private void cargarEnFormulario(Reservacion r) {
         idReservaSeleccionada = r.getIdReserva();
+        idVehiculoOriginal = r.getIdVehiculo();
+        lblTituloFormulario.setText("✏ Editando Reservación #" + idReservaSeleccionada);
+
         txtIdCliente.setText(String.valueOf(r.getIdCliente()));
         txtNombreCliente.setText(r.getCliente());
         txtIdVehiculo.setText(r.getIdVehiculo() > 0 ? String.valueOf(r.getIdVehiculo()) : "");
@@ -499,13 +579,19 @@ public class ReservaController {
         txtMontoApartado.setText(String.format("%.2f", r.getMontoApartado()));
         lblMontoTotal.setText("RD$ " + String.format("%.2f", r.getMontoTotal()));
         lblMontoPendiente.setText("RD$ " + String.format("%.2f", r.getMontoPendiente()));
-        for (String key : mapaSeguros.keySet()) {
-            if (mapaSeguros.get(key).equals(r.getIdSeguro())) { cmbSeguro.setValue(key); break; }
+
+        for (String key : mapaSegurosId.keySet()) {
+            if (mapaSegurosId.get(key).equals(r.getIdSeguro())) {
+                cmbSeguro.setValue(key);
+                break;
+            }
         }
+
         try {
-            dpFechaInicio.setValue(java.time.LocalDate.parse(r.getFechaInicio().substring(0, 10)));
-            dpFechaDevolucion.setValue(java.time.LocalDate.parse(r.getFechaDevolucion().substring(0, 10)));
-        } catch (Exception ignored2) { /* fecha inválida — ignorar */ }
+            dpFechaInicio.setValue(LocalDate.parse(r.getFechaInicio().substring(0, 10)));
+            dpFechaDevolucion.setValue(LocalDate.parse(r.getFechaDevolucion().substring(0, 10)));
+        } catch (Exception ignored) { }
+
         actualizarEtiquetaEstado(r.getMontoPendiente(), r.getFechaDevolucion());
     }
 
@@ -513,8 +599,8 @@ public class ReservaController {
     private void actualizarEtiquetaEstado(double pendiente, String fechaDev) {
         if (lblEstado == null) return;
         try {
-            java.time.LocalDate dev = java.time.LocalDate.parse(fechaDev.substring(0, 10));
-            boolean vencida = dev.isBefore(java.time.LocalDate.now());
+            LocalDate dev = LocalDate.parse(fechaDev.substring(0, 10));
+            boolean vencida = dev.isBefore(LocalDate.now());
             boolean saldada = pendiente <= 0.001;
             if (saldada)      { lblEstado.setText("● Completada"); lblEstado.setStyle("-fx-text-fill: #2E7D32; -fx-font-weight: bold;"); }
             else if (vencida) { lblEstado.setText("● Vencida");    lblEstado.setStyle("-fx-text-fill: #C62828; -fx-font-weight: bold;"); }
