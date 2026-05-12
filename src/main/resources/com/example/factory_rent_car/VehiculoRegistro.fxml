@@ -12,10 +12,24 @@
 
     <VBox spacing="16" style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
 
-        <Label text="Registro de Nuevo Vehículo" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <Label text="Registro y Edición de Vehículos" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+        <!-- Buscador por ID -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Buscar por ID:" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+            <TextField fx:id="txtBuscarId" promptText="ID del vehículo" prefWidth="100"/>
+            <Button text="Buscar" onAction="#buscarVehiculo"
+                    style="-fx-background-color: #1E293B; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 16;"/>
+            <Label fx:id="lblInfo" text="" style="-fx-text-fill: #1565C0; -fx-font-style: italic;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Nuevo Registro" onAction="#limpiar"
+                    style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 6 16;"/>
+        </HBox>
 
         <!-- Formulario -->
         <VBox spacing="12" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 16;">
+            <Label fx:id="lblTitulo" text="Nuevo Vehículo" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+
             <GridPane hgap="12" vgap="10">
                 <columnConstraints>
                     <ColumnConstraints percentWidth="20"/>
@@ -43,32 +57,13 @@
                 <TextField fx:id="txtKilometraje" GridPane.columnIndex="3" GridPane.rowIndex="2" promptText="0.0"/>
 
                 <Label text="Combustible *" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <ComboBox fx:id="cmbCombustible" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Seleccione">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Gasolina"/>
-                            <String fx:value="Diesel"/>
-                            <String fx:value="Eléctrico"/>
-                            <String fx:value="Híbrido"/>
-                        </FXCollections>
-                    </items>
-                </ComboBox>
+                <ComboBox fx:id="cmbCombustible" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Seleccione"/>
 
                 <Label text="Máx. Pasajeros *" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
                 <TextField fx:id="txtMaxPasajeros" GridPane.columnIndex="3" GridPane.rowIndex="3" promptText="5"/>
 
                 <Label text="Estado inicial *" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <ComboBox fx:id="cmbEstado" GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="Seleccione">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Disponible"/>
-                            <String fx:value="Reservado"/>
-                            <String fx:value="En Mantenimiento"/>
-                            <String fx:value="En Limpieza"/>
-                            <String fx:value="No Apto"/>
-                        </FXCollections>
-                    </items>
-                </ComboBox>
+                <ComboBox fx:id="cmbEstado" GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="Seleccione"/>
 
                 <Label text="Precio por día (RD$) *" GridPane.columnIndex="2" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
                 <TextField fx:id="txtPrecio" GridPane.columnIndex="3" GridPane.rowIndex="4" promptText="0.00"/>
@@ -81,10 +76,12 @@
             </GridPane>
 
             <HBox alignment="CENTER_RIGHT" spacing="12">
-                <Button text="Limpiar" onAction="#limpiar"
+                <Button text="Cancelar" onAction="#limpiar"
                         style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
-                <Button text="Registrar Vehículo" onAction="#registrarVehiculo"
+                <Button text="Guardar" onAction="#guardarVehiculo"
                         style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
+                <Button text="Eliminar" onAction="#eliminarVehiculo"
+                        style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20;"/>
             </HBox>
         </VBox>
     </VBox>

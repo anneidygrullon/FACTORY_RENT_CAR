@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.factory_rent_car.Controlador.EmpleadoRegistroController"
+            style="-fx-background-color: #F8FAFC; -fx-background: #F8FAFC; -fx-border-color: transparent;">
+
+    <VBox spacing="16" style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
+
+        <Label text="Registro de Nuevo Empleado" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+        <VBox spacing="12" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 16;">
+            <GridPane hgap="12" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="30"/>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="30"/>
+                </columnConstraints>
+
+                <Label text="Nombre *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtNombre" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Teléfono *" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtTelefono" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <Label text="Cédula *" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtCedula" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Fecha Nacimiento *" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <DatePicker fx:id="dpFechaNacimiento" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                <Label text="Nacionalidad *" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtNacionalidad" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Edad (calculada)" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtEdad" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+
+                <Label text="Fecha Contratación *" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <DatePicker fx:id="dpFechaContratacion" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                <Label text="Puesto *" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="cmbPuesto" GridPane.columnIndex="3" GridPane.rowIndex="3" promptText="Seleccione"/>
+
+                <Label text="Dirección *" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="cmbDireccion" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.columnSpan="3" promptText="Seleccione una dirección"/>
+            </GridPane>
+
+            <HBox alignment="CENTER_RIGHT" spacing="12">
+                <Button text="Limpiar" onAction="#limpiar"
+                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+                <Button text="Registrar Empleado" onAction="#registrarEmpleado"
+                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>

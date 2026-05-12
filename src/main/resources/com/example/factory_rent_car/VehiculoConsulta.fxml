@@ -49,17 +49,7 @@
             <Label text="Cambiar Estado del Vehículo Seleccionado" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
             <HBox spacing="12" alignment="CENTER_LEFT">
                 <Label text="Nuevo estado:" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <ComboBox fx:id="cmbEstado" prefWidth="180">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Disponible" />
-                            <String fx:value="Reservado" />
-                            <String fx:value="En Mantenimiento" />
-                            <String fx:value="En Limpieza" />
-                            <String fx:value="No Apto" />
-                        </FXCollections>
-                    </items>
-                </ComboBox>
+                <ComboBox fx:id="cmbEstado" prefWidth="180" promptText="Seleccione estado"/>
                 <Button text="Actualizar Estado" onAction="#actualizarEstado"
                         style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 16;"/>
             </HBox>
