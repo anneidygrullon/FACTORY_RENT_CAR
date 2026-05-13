@@ -10,7 +10,7 @@
             fx:controller="com.example.factory_rent_car.Controlador.MainLayoutController"
             prefWidth="1100" prefHeight="700">
 
-    <!-- TOP BAR (sin cambios) -->
+    <!-- TOP BAR -->
     <top>
         <HBox prefHeight="58" alignment="CENTER_LEFT"
               style="-fx-background-color: #0d0d1a;
