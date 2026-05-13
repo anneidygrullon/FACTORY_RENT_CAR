@@ -200,11 +200,13 @@ public class MainLayoutController implements Initializable {
         cargarFxml("Pagos.fxml");
     }
 
+    //  MÉTODO  PARA MANTENIMIENTO
     @FXML private void handleMenuMantenimiento(MouseEvent e) {
         activarMenu(menuMantenimiento);
         sectionTitle.setText("Mantenimiento");
         cargarFxml("Mantenimiento.fxml");
     }
+    //  FIN MÉTODO AGREGADO }
 
     @FXML private void handleMenuLimpieza(MouseEvent e) {
         activarMenu(menuLimpieza);
