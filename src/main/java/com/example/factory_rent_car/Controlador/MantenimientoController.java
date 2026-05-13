@@ -18,7 +18,6 @@ public class MantenimientoController {
 
     Conexion conexion = new Conexion();
 
-    // Componentes de búsqueda y tabla
     @FXML private TextField txtBuscar;
     @FXML private TableView<Mantenimiento> tablaMantenimientos;
     @FXML private TableColumn<Mantenimiento, Integer> colId;
@@ -32,8 +31,6 @@ public class MantenimientoController {
 
     @FXML private VBox tableContainer;
     @FXML private Button btnToggleTable;
-
-    // Componentes del formulario
     @FXML private Label lblTitulo;
     @FXML private TextField txtIdMantenimiento;
     @FXML private TextField txtIdVehiculo;
@@ -43,8 +40,6 @@ public class MantenimientoController {
     @FXML private TextField txtDias;
     @FXML private TextField txtCosto;
     @FXML private TextArea txtDescripcion;
-
-    // RadioButtons
     @FXML private RadioButton rbMotivo;
     @FXML private RadioButton rbIncidencia;
     @FXML private RadioButton rbRevision;
@@ -80,6 +75,14 @@ public class MantenimientoController {
         dpFechaIngreso.valueProperty().addListener((obs, old, newVal) -> calcularDias());
         dpFechaSalida.valueProperty().addListener((obs, old, newVal) -> calcularDias());
 
+        // Inicializar ToggleGroup
+        tipoGroup = new ToggleGroup();
+        rbMotivo.setToggleGroup(tipoGroup);
+        rbIncidencia.setToggleGroup(tipoGroup);
+        rbRevision.setToggleGroup(tipoGroup);
+        rbGarantia.setToggleGroup(tipoGroup);
+        rbDiagnostico.setToggleGroup(tipoGroup);
+
         cargarMantenimientos();
     }
 
@@ -100,9 +103,13 @@ public class MantenimientoController {
                 "FROM TBL_MANTENIMIENTO m " +
                 "LEFT JOIN TBL_VEHICULO v ON v.id_vehiculo = m.fk_id_vehiculo " +
                 "ORDER BY m.pk_id_mantenimiento DESC";
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection con = conexion.establecerConexion()) {
+            if (con == null) {
+                JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
+                return;
+            }
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Mantenimiento m = new Mantenimiento(
                         rs.getInt("pk_id_mantenimiento"),
@@ -120,6 +127,7 @@ public class MantenimientoController {
             tablaMantenimientos.refresh();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error cargando mantenimientos: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -133,7 +141,6 @@ public class MantenimientoController {
         txtCosto.setText(String.valueOf(m.getCosto()));
         txtDescripcion.setText(m.getDescripcion());
 
-        // Seleccionar RadioButton según el tipo
         String tipo = m.getTipo();
         if (tipo != null) {
             switch (tipo) {
@@ -163,8 +170,12 @@ public class MantenimientoController {
             return;
         }
         String sql = "SELECT marca, modelo, num_placa FROM TBL_VEHICULO WHERE id_vehiculo = ?";
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = conexion.establecerConexion()) {
+            if (con == null) {
+                JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
+                return;
+            }
+            PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -199,27 +210,28 @@ public class MantenimientoController {
         String descripcion = txtDescripcion.getText().trim();
         String tipo = getTipoSeleccionado();
 
-        // Primero, crear historial de mantenimiento (si no existe o usar existente)
-        int idHistMantenimiento = -1;
-        String sqlHist = "INSERT INTO TBL_HISTORIAL_MANTENIMIENTO (fecha, descripcion) VALUES (?, ?)";
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement(sqlHist, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setDate(1, Date.valueOf(fechaIngreso));
-            ps.setString(2, descripcion);
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) idHistMantenimiento = rs.getInt(1);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al crear historial: " + e.getMessage());
-            return;
-        }
+        try (Connection con = conexion.establecerConexion()) {
+            if (con == null) {
+                JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
+                return;
+            }
+            con.setAutoCommit(false);
 
-        if (mantenimientoSeleccionado == null) {
-            // INSERT
-            String sql = "INSERT INTO TBL_MANTENIMIENTO (costo, fecha_salida, fecha_ingreso, tipo, descripcion, fk_id_vehiculo, fk_pk_id_hist_mantenimiento) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
-            try (Connection con = conexion.establecerConexion();
-                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            // Insertar historial
+            int idHistMantenimiento = -1;
+            String sqlHist = "INSERT INTO TBL_HISTORIAL_MANTENIMIENTO (fecha, descripcion) VALUES (?, ?)";
+            PreparedStatement psHist = con.prepareStatement(sqlHist, Statement.RETURN_GENERATED_KEYS);
+            psHist.setDate(1, Date.valueOf(fechaIngreso));
+            psHist.setString(2, descripcion);
+            psHist.executeUpdate();
+            ResultSet rsHist = psHist.getGeneratedKeys();
+            if (rsHist.next()) idHistMantenimiento = rsHist.getInt(1);
+            psHist.close();
+
+            if (mantenimientoSeleccionado == null) {
+                String sql = "INSERT INTO TBL_MANTENIMIENTO (costo, fecha_salida, fecha_ingreso, tipo, descripcion, fk_id_vehiculo, fk_pk_id_hist_mantenimiento) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setDouble(1, costo);
                 ps.setDate(2, Date.valueOf(fechaSalida));
                 ps.setDate(3, Date.valueOf(fechaIngreso));
@@ -232,18 +244,11 @@ public class MantenimientoController {
                 if (rs.next()) {
                     JOptionPane.showMessageDialog(null, "Mantenimiento registrado con ID: " + rs.getInt(1));
                 }
-                limpiar(event);
-                cargarMantenimientos();
-                // Actualizar estado del vehículo a "En Mantenimiento"
-                actualizarEstadoVehiculo(idVehiculo, "En Mantenimiento");
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
-            }
-        } else {
-            // UPDATE
-            String sql = "UPDATE TBL_MANTENIMIENTO SET costo=?, fecha_salida=?, fecha_ingreso=?, tipo=?, descripcion=?, fk_id_vehiculo=? WHERE pk_id_mantenimiento=?";
-            try (Connection con = conexion.establecerConexion();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.close();
+                actualizarEstadoVehiculo(con, idVehiculo, "En Mantenimiento");
+            } else {
+                String sql = "UPDATE TBL_MANTENIMIENTO SET costo=?, fecha_salida=?, fecha_ingreso=?, tipo=?, descripcion=?, fk_id_vehiculo=? WHERE pk_id_mantenimiento=?";
+                PreparedStatement ps = con.prepareStatement(sql);
                 ps.setDouble(1, costo);
                 ps.setDate(2, Date.valueOf(fechaSalida));
                 ps.setDate(3, Date.valueOf(fechaIngreso));
@@ -252,25 +257,25 @@ public class MantenimientoController {
                 ps.setInt(6, idVehiculo);
                 ps.setInt(7, mantenimientoSeleccionado.getIdMantenimiento());
                 ps.executeUpdate();
+                ps.close();
                 JOptionPane.showMessageDialog(null, "Mantenimiento actualizado.");
-                limpiar(event);
-                cargarMantenimientos();
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
             }
+            con.commit();
+            limpiar();
+            cargarMantenimientos();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void actualizarEstadoVehiculo(int idVehiculo, String estado) {
+    private void actualizarEstadoVehiculo(Connection con, int idVehiculo, String estado) throws SQLException {
         String sql = "UPDATE TBL_VEHICULO SET estado = ? WHERE id_vehiculo = ?";
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, estado);
-            ps.setInt(2, idVehiculo);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("No se pudo actualizar estado del vehículo: " + e.getMessage());
-        }
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, estado);
+        ps.setInt(2, idVehiculo);
+        ps.executeUpdate();
+        ps.close();
     }
 
     @FXML
@@ -285,14 +290,18 @@ public class MantenimientoController {
         if (confirm != JOptionPane.YES_OPTION) return;
 
         int idVehiculo = mantenimientoSeleccionado.getIdVehiculo();
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement("DELETE FROM TBL_MANTENIMIENTO WHERE pk_id_mantenimiento = ?")) {
+        try (Connection con = conexion.establecerConexion()) {
+            if (con == null) {
+                JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
+                return;
+            }
+            PreparedStatement ps = con.prepareStatement("DELETE FROM TBL_MANTENIMIENTO WHERE pk_id_mantenimiento = ?");
             ps.setInt(1, mantenimientoSeleccionado.getIdMantenimiento());
             ps.executeUpdate();
+            ps.close();
             JOptionPane.showMessageDialog(null, "Mantenimiento eliminado.");
-            // Devolver vehículo a estado "Disponible" o mantener el que tenía
-            actualizarEstadoVehiculo(idVehiculo, "Disponible");
-            limpiar(event);
+            actualizarEstadoVehiculo(con, idVehiculo, "Disponible");
+            limpiar();
             cargarMantenimientos();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error al eliminar: " + e.getMessage());
@@ -333,7 +342,7 @@ public class MantenimientoController {
     }
 
     @FXML
-    private void limpiar(ActionEvent event) {
+    private void limpiar() {
         mantenimientoSeleccionado = null;
         txtIdMantenimiento.clear();
         txtIdVehiculo.clear();

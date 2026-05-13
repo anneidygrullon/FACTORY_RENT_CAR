@@ -92,21 +92,11 @@
             <VBox spacing="6">
                 <Label text="Tipo de Mantenimiento *" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
                 <HBox spacing="20" alignment="CENTER_LEFT">
-                    <RadioButton fx:id="rbMotivo" text="Motivo de mantenimiento">
-                        <toggleGroup><ToggleGroup fx:id="tipoGroup"/></toggleGroup>
-                    </RadioButton>
-                    <RadioButton fx:id="rbIncidencia" text="Incidencia">
-                        <toggleGroup><ToggleGroup fx:id="tipoGroup"/></toggleGroup>
-                    </RadioButton>
-                    <RadioButton fx:id="rbRevision" text="Revisión">
-                        <toggleGroup><ToggleGroup fx:id="tipoGroup"/></toggleGroup>
-                    </RadioButton>
-                    <RadioButton fx:id="rbGarantia" text="Garantía">
-                        <toggleGroup><ToggleGroup fx:id="tipoGroup"/></toggleGroup>
-                    </RadioButton>
-                    <RadioButton fx:id="rbDiagnostico" text="Diagnóstico preventivo">
-                        <toggleGroup><ToggleGroup fx:id="tipoGroup"/></toggleGroup>
-                    </RadioButton>
+                    <RadioButton fx:id="rbMotivo" text="Motivo de mantenimiento"/>
+                    <RadioButton fx:id="rbIncidencia" text="Incidencia"/>
+                    <RadioButton fx:id="rbRevision" text="Revisión"/>
+                    <RadioButton fx:id="rbGarantia" text="Garantía"/>
+                    <RadioButton fx:id="rbDiagnostico" text="Diagnóstico preventivo"/>
                 </HBox>
             </VBox>
 
