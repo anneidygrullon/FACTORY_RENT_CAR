@@ -9,7 +9,7 @@ public class Conexion {
         String usuario = "Anneidy3";
         String contrase = "Anthony";
         String db = "FACTORYY";
-        String server = "localhost";
+        String server = "26.32.251.97";
         String puerto = "1433";
 
         public Connection establecerConexion() {
