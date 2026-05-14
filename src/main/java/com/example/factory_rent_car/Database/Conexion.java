@@ -9,7 +9,7 @@ public class Conexion {
     private String usuario = "Anneidy3";
     private String contrase = "Anthony";
     private String db = "FACTORYY";
-    private String server = "26.32.251.97";
+    private String server = "26.32.251.97";  // Ejemplo: IP de la PC servidor
     private String puerto = "1433";
 
     public Connection establecerConexion() {
