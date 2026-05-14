@@ -194,19 +194,18 @@ public class MainLayoutController implements Initializable {
         cargarFxml("DevolucionVehiculo.fxml");
     }
 
+    // CORRECCIÓN: El archivo se llama "Pago.fxml" (singular) no "Pagos.fxml"
     @FXML private void handleMenuPagos(MouseEvent e) {
         activarMenu(menuPagos);
         sectionTitle.setText("Pagos");
-        cargarFxml("Pagos.fxml");
+        cargarFxml("Pago.fxml");
     }
 
-    //  MÉTODO  PARA MANTENIMIENTO
     @FXML private void handleMenuMantenimiento(MouseEvent e) {
         activarMenu(menuMantenimiento);
         sectionTitle.setText("Mantenimiento");
         cargarFxml("Mantenimiento.fxml");
     }
-    //  FIN MÉTODO AGREGADO }
 
     @FXML private void handleMenuLimpieza(MouseEvent e) {
         activarMenu(menuLimpieza);
