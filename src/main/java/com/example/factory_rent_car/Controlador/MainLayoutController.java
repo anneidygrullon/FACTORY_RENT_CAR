@@ -427,7 +427,7 @@ public class MainLayoutController implements Initializable {
         searchField.requestFocus();
     }
 
-    // ── CARGA DE VISTAS ──────────────────────────────────────
+    // ── CARGA DE VISTAS (incluyendo Home con referencia al controlador) ──
     private void cargarFxml(String fxmlName) {
         try {
             URL resource = getClass().getResource(BASE + fxmlName);
@@ -451,7 +451,29 @@ public class MainLayoutController implements Initializable {
     }
 
     private void mostrarHome() {
-        cargarFxml("Home.fxml");
+        try {
+            URL resource = getClass().getResource(BASE + "Home.fxml");
+            if (resource == null) {
+                mostrarPlaceholder("No se encontró Home.fxml");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(resource);
+            Node home = loader.load();
+
+            // Inyectar referencia del MainLayoutController al HomeController
+            HomeController homeController = loader.getController();
+            homeController.setMainController(this);
+
+            contentArea.getChildren().setAll(home);
+            if (home instanceof Region region) {
+                region.prefWidthProperty().bind(contentArea.widthProperty());
+                region.prefHeightProperty().bind(contentArea.heightProperty());
+            }
+            System.out.println("Home cargado correctamente");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            mostrarPlaceholder("Error cargando Home");
+        }
     }
 
     private void mostrarPlaceholder(String mensaje) {
@@ -494,7 +516,7 @@ public class MainLayoutController implements Initializable {
         );
     }
 
-    // ── GETTERS PARA LOS MENÚS (opcional) ────────────────────
+    // ── GETTERS PARA LOS MENÚS (necesarios para navegación desde Home) ──
     public HBox getMenuInicio()        { return menuInicio; }
     public HBox getMenuReservacion()   { return menuReservacion; }
     public HBox getMenuEntregas()      { return menuEntregas; }
