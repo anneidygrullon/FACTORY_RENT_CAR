@@ -254,21 +254,36 @@
                                               -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
                     </HBox>
 
-                    <!-- INCIDENCIAS -->
-                    <HBox fx:id="menuIncidencias" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                          onMouseClicked="#handleMenuIncidencias"
-                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                        <StackPane minWidth="26">
-                            <SVGPath content="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
-                                     fill="white" scaleX="0.9" scaleY="0.9"/>
-                        </StackPane>
-                        <Label text="Incidencias" HBox.hgrow="ALWAYS"
-                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                              -fx-background-color: rgba(255,255,255,0.08);
-                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                    </HBox>
+                    <!-- INCIDENCIAS (submenú) -->
+                    <VBox spacing="0">
+                        <HBox fx:id="menuIncidencias" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                              style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                              onMouseClicked="#toggleSubMenuIncidencias"
+                              onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                            <StackPane minWidth="26">
+                                <SVGPath content="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
+                                         fill="white" scaleX="0.9" scaleY="0.9"/>
+                            </StackPane>
+                            <Label text="Incidencias" HBox.hgrow="ALWAYS"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                            <Label fx:id="incidenciasArrow" text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;"/>
+                        </HBox>
+                        <VBox fx:id="subMenuIncidencias" spacing="0" managed="false" visible="false"
+                              style="-fx-background-color: #0a1540; -fx-padding: 0 0 0 40;">
+                            <HBox fx:id="subMenuIncidenciaConsulta" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuIncidenciaConsulta"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="📋 Consulta de Incidencias" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                            <HBox fx:id="subMenuIncidenciaRegistro" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuIncidenciaRegistro"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="➕ Registro de Incidencia" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
 
                     <!-- COMPRAS (submenú) -->
                     <VBox spacing="0">

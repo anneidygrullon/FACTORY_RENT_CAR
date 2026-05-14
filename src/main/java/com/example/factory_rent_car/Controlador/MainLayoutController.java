@@ -75,6 +75,12 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox subMenuReclamoConsulta;
     @FXML private HBox subMenuReclamoRegistro;
 
+    // ── SUBMENÚ INCIDENCIAS ──────────────────────────────────
+    @FXML private VBox subMenuIncidencias;
+    @FXML private Label incidenciasArrow;
+    @FXML private HBox subMenuIncidenciaConsulta;
+    @FXML private HBox subMenuIncidenciaRegistro;
+
     // ── BUSCADOR ─────────────────────────────────────────────
     @FXML private TextField searchField;
 
@@ -89,6 +95,7 @@ public class MainLayoutController implements Initializable {
     private boolean subMenuEntregasVisible = false;
     private boolean subMenuComprasVisible = false;
     private boolean subMenuReclamosVisible = false;
+    private boolean subMenuIncidenciasVisible = false;
 
     private static final String BASE = "/com/example/factory_rent_car/";
 
@@ -118,6 +125,10 @@ public class MainLayoutController implements Initializable {
         subMenuReclamos.setVisible(false);
         subMenuReclamos.setManaged(false);
         reclamosArrow.setText("❯");
+
+        subMenuIncidencias.setVisible(false);
+        subMenuIncidencias.setManaged(false);
+        incidenciasArrow.setText("❯");
 
         activarMenu(menuInicio);
         mostrarHome();
@@ -318,6 +329,35 @@ public class MainLayoutController implements Initializable {
         reclamosArrow.setText("❯");
     }
 
+    // ================= Submenú Incidencias =================
+    @FXML private void toggleSubMenuIncidencias(MouseEvent e) {
+        subMenuIncidenciasVisible = !subMenuIncidenciasVisible;
+        subMenuIncidencias.setVisible(subMenuIncidenciasVisible);
+        subMenuIncidencias.setManaged(subMenuIncidenciasVisible);
+        incidenciasArrow.setText(subMenuIncidenciasVisible ? "❯" : "❮");
+    }
+
+    @FXML private void handleSubMenuIncidenciaConsulta(MouseEvent e) {
+        activarMenu(menuIncidencias);
+        sectionTitle.setText("Consulta de Incidencias");
+        cargarFxml("IncidenciaConsulta.fxml");
+        cerrarSubMenuIncidencias();
+    }
+
+    @FXML private void handleSubMenuIncidenciaRegistro(MouseEvent e) {
+        activarMenu(menuIncidencias);
+        sectionTitle.setText("Registro de Incidencia");
+        cargarFxml("IncidenciaRegistro.fxml");
+        cerrarSubMenuIncidencias();
+    }
+
+    private void cerrarSubMenuIncidencias() {
+        subMenuIncidenciasVisible = false;
+        subMenuIncidencias.setVisible(false);
+        subMenuIncidencias.setManaged(false);
+        incidenciasArrow.setText("❯");
+    }
+
     // ================= Otros menús (sin submenú) =================
     @FXML private void handleMenuDevolucion(MouseEvent e) {
         activarMenu(menuDevolucion);
@@ -341,12 +381,6 @@ public class MainLayoutController implements Initializable {
         activarMenu(menuLimpieza);
         sectionTitle.setText("Limpieza");
         cargarFxml("Limpieza.fxml");
-    }
-
-    @FXML private void handleMenuIncidencias(MouseEvent e) {
-        activarMenu(menuIncidencias);
-        sectionTitle.setText("Incidencias");
-        cargarFxml("Incidencias.fxml");
     }
 
     @FXML private void handleMenuClientes(MouseEvent e) {
