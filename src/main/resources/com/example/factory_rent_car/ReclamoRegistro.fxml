@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.factory_rent_car.Controlador.ReclamoRegistroController"
+            style="-fx-background-color: #F8FAFC; -fx-background: #F8FAFC; -fx-border-color: transparent;">
+
+    <VBox spacing="16" style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
+
+        <Label text="Registro de Reclamo" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+        <VBox spacing="12" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 16;">
+            <GridPane hgap="12" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="30"/>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="30"/>
+                </columnConstraints>
+
+                <Label text="Cliente *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <HBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <TextField fx:id="txtIdCliente" promptText="ID de cliente" HBox.hgrow="ALWAYS"/>
+                    <Button text="Buscar" onAction="#buscarCliente"
+                            style="-fx-background-color: #1E293B; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 4 10;"/>
+                </HBox>
+                <TextField fx:id="txtCliente" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <Label text="Empleado *" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <HBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <TextField fx:id="txtIdEmpleado" promptText="ID de empleado" HBox.hgrow="ALWAYS"/>
+                    <Button text="Buscar" onAction="#buscarEmpleado"
+                            style="-fx-background-color: #1E293B; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 4 10;"/>
+                </HBox>
+                <TextField fx:id="txtEmpleado" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                <Label text="Motivo *" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtMotivo" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3"/>
+
+                <Label text="Descripción" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextArea fx:id="txtDescripcion" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="3" prefHeight="80" wrapText="true"/>
+
+                <Label text="Estado inicial" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="cmbEstado" GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="Seleccione"/>
+            </GridPane>
+
+            <HBox alignment="CENTER_RIGHT" spacing="12">
+                <Button text="Limpiar" onAction="#limpiar"
+                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+                <Button text="Registrar Reclamo" onAction="#registrarReclamo"
+                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>

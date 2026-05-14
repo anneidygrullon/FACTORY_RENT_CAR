@@ -32,7 +32,7 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox menuLimpieza;
     @FXML private HBox menuIncidencias;
     @FXML private HBox menuCompras;
-    @FXML private HBox menuGps;
+    @FXML private HBox menuReclamos;        // Reemplaza a GPS
     @FXML private HBox menuRegistros;
     @FXML private HBox menuClientes;
     @FXML private HBox menuSuplidores;
@@ -54,7 +54,7 @@ public class MainLayoutController implements Initializable {
     @FXML private Label registrosArrow;
     @FXML private HBox subMenuEmpleadoConsulta;
     @FXML private HBox subMenuEmpleadoRegistro;
-    @FXML private HBox subMenuConsultaDepartamento;  // NUEVO
+    @FXML private HBox subMenuConsultaDepartamento;
 
     // ── SUBMENÚ ENTREGAS ─────────────────────────────────────
     @FXML private VBox subMenuEntregas;
@@ -69,6 +69,12 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox subMenuConsultaObjetos;
     @FXML private HBox subMenuCompraVehiculo;
 
+    // ── SUBMENÚ RECLAMOS ─────────────────────────────────────
+    @FXML private VBox subMenuReclamos;
+    @FXML private Label reclamosArrow;
+    @FXML private HBox subMenuReclamoConsulta;
+    @FXML private HBox subMenuReclamoRegistro;
+
     // ── BUSCADOR ─────────────────────────────────────────────
     @FXML private TextField searchField;
 
@@ -82,6 +88,7 @@ public class MainLayoutController implements Initializable {
     private boolean subMenuRegistrosVisible = false;
     private boolean subMenuEntregasVisible = false;
     private boolean subMenuComprasVisible = false;
+    private boolean subMenuReclamosVisible = false;
 
     private static final String BASE = "/com/example/factory_rent_car/";
 
@@ -107,6 +114,10 @@ public class MainLayoutController implements Initializable {
         subMenuCompras.setVisible(false);
         subMenuCompras.setManaged(false);
         comprasArrow.setText("❯");
+
+        subMenuReclamos.setVisible(false);
+        subMenuReclamos.setManaged(false);
+        reclamosArrow.setText("❯");
 
         activarMenu(menuInicio);
         mostrarHome();
@@ -228,7 +239,6 @@ public class MainLayoutController implements Initializable {
         cerrarSubMenuRegistros();
     }
 
-    // NUEVO HANDLER PARA CONSULTA DE DEPARTAMENTOS
     @FXML private void handleSubMenuConsultaDepartamento(MouseEvent e) {
         activarMenu(menuRegistros);
         sectionTitle.setText("Consulta de Departamentos");
@@ -279,6 +289,35 @@ public class MainLayoutController implements Initializable {
         comprasArrow.setText("❯");
     }
 
+    // ================= Submenú Reclamos =================
+    @FXML private void toggleSubMenuReclamos(MouseEvent e) {
+        subMenuReclamosVisible = !subMenuReclamosVisible;
+        subMenuReclamos.setVisible(subMenuReclamosVisible);
+        subMenuReclamos.setManaged(subMenuReclamosVisible);
+        reclamosArrow.setText(subMenuReclamosVisible ? "❯" : "❮");
+    }
+
+    @FXML private void handleSubMenuReclamoConsulta(MouseEvent e) {
+        activarMenu(menuReclamos);
+        sectionTitle.setText("Consulta de Reclamos");
+        cargarFxml("ReclamoConsulta.fxml");
+        cerrarSubMenuReclamos();
+    }
+
+    @FXML private void handleSubMenuReclamoRegistro(MouseEvent e) {
+        activarMenu(menuReclamos);
+        sectionTitle.setText("Registro de Reclamo");
+        cargarFxml("ReclamoRegistro.fxml");
+        cerrarSubMenuReclamos();
+    }
+
+    private void cerrarSubMenuReclamos() {
+        subMenuReclamosVisible = false;
+        subMenuReclamos.setVisible(false);
+        subMenuReclamos.setManaged(false);
+        reclamosArrow.setText("❯");
+    }
+
     // ================= Otros menús (sin submenú) =================
     @FXML private void handleMenuDevolucion(MouseEvent e) {
         activarMenu(menuDevolucion);
@@ -308,12 +347,6 @@ public class MainLayoutController implements Initializable {
         activarMenu(menuIncidencias);
         sectionTitle.setText("Incidencias");
         cargarFxml("Incidencias.fxml");
-    }
-
-    @FXML private void handleMenuGps(MouseEvent e) {
-        activarMenu(menuGps);
-        sectionTitle.setText("GPS");
-        cargarFxml("Gps.fxml");
     }
 
     @FXML private void handleMenuClientes(MouseEvent e) {
@@ -438,7 +471,7 @@ public class MainLayoutController implements Initializable {
     public HBox getMenuLimpieza()      { return menuLimpieza; }
     public HBox getMenuIncidencias()   { return menuIncidencias; }
     public HBox getMenuCompras()       { return menuCompras; }
-    public HBox getMenuGps()           { return menuGps; }
+    public HBox getMenuReclamos()      { return menuReclamos; }
     public HBox getMenuRegistros()     { return menuRegistros; }
     public HBox getMenuClientes()      { return menuClientes; }
     public HBox getMenuSuplidores()    { return menuSuplidores; }

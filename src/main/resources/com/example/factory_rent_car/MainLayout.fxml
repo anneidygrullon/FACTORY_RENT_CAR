@@ -307,21 +307,36 @@
                         </VBox>
                     </VBox>
 
-                    <!-- GPS -->
-                    <HBox fx:id="menuGps" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                          onMouseClicked="#handleMenuGps"
-                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                        <StackPane minWidth="26">
-                            <SVGPath content="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                                     fill="white" scaleX="0.9" scaleY="0.9"/>
-                        </StackPane>
-                        <Label text="GPS" HBox.hgrow="ALWAYS"
-                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                              -fx-background-color: rgba(255,255,255,0.08);
-                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                    </HBox>
+                    <!-- RECLAMOS (submenú) - reemplaza a GPS -->
+                    <VBox spacing="0">
+                        <HBox fx:id="menuReclamos" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                              style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                              onMouseClicked="#toggleSubMenuReclamos"
+                              onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                            <StackPane minWidth="26">
+                                <SVGPath content="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
+                                         fill="white" scaleX="0.9" scaleY="0.9"/>
+                            </StackPane>
+                            <Label text="Reclamos" HBox.hgrow="ALWAYS"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                            <Label fx:id="reclamosArrow" text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;"/>
+                        </HBox>
+                        <VBox fx:id="subMenuReclamos" spacing="0" managed="false" visible="false"
+                              style="-fx-background-color: #0a1540; -fx-padding: 0 0 0 40;">
+                            <HBox fx:id="subMenuReclamoConsulta" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuReclamoConsulta"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="📋 Consulta de Reclamos" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                            <HBox fx:id="subMenuReclamoRegistro" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuReclamoRegistro"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="➕ Registro de Reclamo" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
 
                     <!-- REGISTROS (submenú con Empleados y Departamentos) -->
                     <VBox spacing="0">
