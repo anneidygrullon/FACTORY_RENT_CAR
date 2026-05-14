@@ -3,28 +3,51 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-            style="-fx-background-color: #F8FAFC; -fx-background: #F8FAFC; -fx-border-color: transparent;"
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.factory_rent_car.Controlador.SuministradorController">
+            fx:controller="com.example.factory_rent_car.Controlador.SuministradorController"
+            style="-fx-background-color: #eef2f8; -fx-background: #eef2f8; -fx-border-color: transparent;">
 
-    <VBox spacing="16" style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
+    <VBox spacing="24" style="-fx-background-color: #eef2f8; -fx-padding: 30 35 35 35;">
 
-        <HBox spacing="12" alignment="CENTER_LEFT">
-            <Label text="Buscar:" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-            <TextField fx:id="txtBuscar" promptText="Nombre, RNC, correo..." HBox.hgrow="ALWAYS"
-                       style="-fx-background-radius: 6; -fx-border-color: #E2E8F0; -fx-border-radius: 6; -fx-padding: 6 10;"/>
-            <Button text="Buscar" onAction="#buscar"
-                    style="-fx-background-color: #1E293B; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 16;"/>
-            <Button text="Limpiar filtro" onAction="#limpiarFiltro"
-                    style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 6 16;"/>
+        <!-- Title section -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <StackPane prefWidth="32" prefHeight="32"
+                       style="-fx-background-color: #1565C0; -fx-background-radius: 8; -fx-padding: 0;">
+                <Label text="🏢" style="-fx-font-size: 16px;"/>
+            </StackPane>
+            <VBox spacing="2">
+                <Label text="Suplidores" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                <Label text="Gestiona los suplidores registrados" style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
+            </VBox>
         </HBox>
 
-        <VBox spacing="8" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12;">
-            <Label text="Lista de Suplidores" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
-            <TableView fx:id="tablaSuministradores" prefHeight="350">
+        <!-- Search bar card -->
+        <HBox spacing="12" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2); -fx-padding: 14 18;">
+            <Label text="🔍" style="-fx-font-size: 16px;"/>
+            <TextField fx:id="txtBuscar" promptText="Nombre, RNC, correo..." HBox.hgrow="ALWAYS"
+                       style="-fx-background-radius: 8; -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-padding: 8 14; -fx-font-size: 13px;"/>
+            <Button text="Buscar" onAction="#buscar"
+                    style="-fx-background-color: #1E293B; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20; -fx-cursor: hand;"/>
+            <Button text="Limpiar" onAction="#limpiarFiltro"
+                    style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 8; -fx-padding: 8 20; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>
+        </HBox>
+
+        <!-- Table card -->
+        <VBox spacing="0"
+              style="-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3); -fx-padding: 0;">
+            <HBox alignment="CENTER_LEFT" spacing="8"
+                  style="-fx-padding: 16 20; -fx-border-color: transparent transparent #F1F5F9 transparent; -fx-border-width: 0 0 1 0;">
+                <Label text="📋" style="-fx-font-size: 16px;"/>
+                <Label text="Lista de Suplidores" style="-fx-text-fill: #0F172A; -fx-font-size: 15px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <TableView fx:id="tablaSuministradores" prefHeight="350"
+                       style="-fx-background-color: transparent; -fx-border-color: transparent;">
                 <columns>
                     <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
                     <TableColumn fx:id="colTipo" text="Tipo" prefWidth="100"/>
@@ -39,51 +62,66 @@
             </TableView>
         </VBox>
 
-        <VBox spacing="12" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 16;">
-            <Label fx:id="lblTituloFormulario" text="Nuevo Suplidor" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
-
-            <GridPane hgap="12" vgap="10">
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="15"/>
-                    <ColumnConstraints percentWidth="35"/>
-                    <ColumnConstraints percentWidth="15"/>
-                    <ColumnConstraints percentWidth="35"/>
-                </columnConstraints>
-
-                <Label text="Tipo *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtTipo" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="Ej: Empresa, Persona..."/>
-
-                <Label text="Nombre *" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtNombre" GridPane.columnIndex="3" GridPane.rowIndex="0" promptText="Razón social"/>
-
-                <Label text="Correo *" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtCorreo" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="correo@proveedor.com"/>
-
-                <Label text="Teléfono *" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtTelefono" GridPane.columnIndex="3" GridPane.rowIndex="1" promptText="809-555-1234"/>
-
-                <Label text="RNC" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtRnc" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="Opcional"/>
-
-                <Label text="ID Dirección *" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <HBox spacing="6" GridPane.columnIndex="3" GridPane.rowIndex="2">
-                    <TextField fx:id="txtIdDireccion" promptText="ID de dirección existente" HBox.hgrow="ALWAYS"/>
-                    <Button text="Verificar" onAction="#verificarDireccion" style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                </HBox>
-
-                <Label text="Dirección (vista)" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtDireccionVista" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="3"
-                           style="-fx-background-color: #F8FAFC; -fx-border-color: #E2E8F0; -fx-border-radius: 6; -fx-padding: 6 10;"/>
-            </GridPane>
-
-            <HBox alignment="CENTER_RIGHT" spacing="12">
-                <Button text="Limpiar" onAction="#limpiarFormulario"
-                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
-                <Button fx:id="btnGuardar" text="Guardar" onAction="#guardarSuministrador"
-                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
-                <Button fx:id="btnEliminar" text="Eliminar" onAction="#eliminarSuministrador"
-                        style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+        <!-- Form card -->
+        <VBox spacing="0"
+              style="-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);">
+            <HBox alignment="CENTER_LEFT" spacing="8"
+                  style="-fx-background-color: #F8FAFC; -fx-background-radius: 14 14 0 0; -fx-padding: 16 20; -fx-border-color: transparent transparent #E2E8F0 transparent; -fx-border-width: 0 0 1 0;">
+                <Label fx:id="lblTituloFormulario" text="Nuevo Suplidor" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="* Campos obligatorios" style="-fx-text-fill: #94A3B8; -fx-font-size: 10px;"/>
             </HBox>
+            <VBox spacing="16" style="-fx-padding: 20 24;">
+                <GridPane hgap="16" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="15"/>
+                        <ColumnConstraints percentWidth="35"/>
+                        <ColumnConstraints percentWidth="15"/>
+                        <ColumnConstraints percentWidth="35"/>
+                    </columnConstraints>
+
+                    <Label text="Tipo *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtTipo" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="Ej: Empresa, Persona..."
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="Nombre *" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtNombre" GridPane.columnIndex="3" GridPane.rowIndex="0" promptText="Razón social"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="Correo *" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtCorreo" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="correo@proveedor.com"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="Teléfono *" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtTelefono" GridPane.columnIndex="3" GridPane.rowIndex="1" promptText="809-555-1234"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="RNC" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtRnc" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="Opcional"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="ID Dirección *" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <HBox spacing="6" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                        <TextField fx:id="txtIdDireccion" promptText="ID de dirección existente" HBox.hgrow="ALWAYS"
+                                   style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                        <Button text="Verificar" onAction="#verificarDireccion"
+                                style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 14; -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <Label text="Dirección (vista)" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtDireccionVista" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="3"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px; -fx-background-color: #F8FAFC;"/>
+                </GridPane>
+
+                <HBox alignment="CENTER_RIGHT" spacing="12" style="-fx-padding: 4 0 0 0;">
+                    <Button text="Limpiar" onAction="#limpiarFormulario"
+                            style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>
+                    <Button fx:id="btnGuardar" text="Guardar" onAction="#guardarSuministrador"
+                            style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 32; -fx-cursor: hand;"/>
+                    <Button fx:id="btnEliminar" text="Eliminar" onAction="#eliminarSuministrador"
+                            style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
         </VBox>
     </VBox>
 </ScrollPane>

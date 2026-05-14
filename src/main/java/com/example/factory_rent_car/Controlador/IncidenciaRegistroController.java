@@ -11,12 +11,18 @@ import java.time.LocalDate;
 
 public class IncidenciaRegistroController {
 
+    private MainLayoutController mainController;
+
+    public void setMainController(MainLayoutController mainController) {
+        this.mainController = mainController;
+    }
+
     Conexion conexion = new Conexion();
 
     @FXML private TextField txtIdReserva;
-    @FXML private TextField txtReservaInfo;
+    @FXML private Label lblReservaInfo;
     @FXML private TextField txtIdEmpleado;
-    @FXML private TextField txtEmpleadoInfo;
+    @FXML private Label lblEmpleadoInfo;
     @FXML private ComboBox<String> cmbTipo;
     @FXML private TextField txtMonto;
     @FXML private DatePicker dpFecha;
@@ -49,10 +55,10 @@ public class IncidenciaRegistroController {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                txtReservaInfo.setText("Reserva #" + id + " - Cliente: " + rs.getString("cliente"));
+                lblReservaInfo.setText("Reserva #" + id + " - Cliente: " + rs.getString("cliente"));
             } else {
                 JOptionPane.showMessageDialog(null, "Reserva no encontrada.");
-                txtReservaInfo.clear();
+                lblReservaInfo.setText("");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
@@ -79,10 +85,10 @@ public class IncidenciaRegistroController {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                txtEmpleadoInfo.setText(rs.getString("nombre"));
+                lblEmpleadoInfo.setText(rs.getString("nombre"));
             } else {
                 JOptionPane.showMessageDialog(null, "Empleado no encontrado.");
-                txtEmpleadoInfo.clear();
+                lblEmpleadoInfo.setText("");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
@@ -103,7 +109,6 @@ public class IncidenciaRegistroController {
         try (Connection con = conexion.establecerConexion()) {
             con.setAutoCommit(false);
 
-            // Insertar historial de incidencia (sin estado inicial, pero la BD puede tener default)
             int idHistorial = -1;
             String sqlHistorial = "INSERT INTO TBL_HISTORIAL_INCIDENCIA (fecha, descripcion) VALUES (?, ?)";
             PreparedStatement psHist = con.prepareStatement(sqlHistorial, Statement.RETURN_GENERATED_KEYS);
@@ -114,7 +119,6 @@ public class IncidenciaRegistroController {
             if (rsHist.next()) idHistorial = rsHist.getInt(1);
             psHist.close();
 
-            // Insertar incidencia
             String sqlIncidencia = "INSERT INTO TBL_INCIDENCIA (tipo, monto, fecha, descripcion, " +
                     "fk_pk_id_reserva, fk_pk_id_hist_incidencia, fk_pk_id_empleado) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -144,9 +148,9 @@ public class IncidenciaRegistroController {
     @FXML
     private void limpiar(ActionEvent event) {
         txtIdReserva.clear();
-        txtReservaInfo.clear();
+        lblReservaInfo.setText("");
         txtIdEmpleado.clear();
-        txtEmpleadoInfo.clear();
+        lblEmpleadoInfo.setText("");
         cmbTipo.setValue(null);
         txtMonto.clear();
         dpFecha.setValue(LocalDate.now());

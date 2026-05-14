@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import javax.swing.*;
@@ -17,6 +18,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 
 public class ReservaController {
+
+    private MainLayoutController mainController;
+
+    public void setMainController(MainLayoutController mainController) {
+        this.mainController = mainController;
+    }
 
     Conexion conexion = new Conexion();
 
@@ -639,5 +646,37 @@ public class ReservaController {
         if (txt == null || txt.isBlank()) return 0;
         try { return Double.parseDouble(txt.trim()); }
         catch (NumberFormatException e) { return 0; }
+    }
+
+    // ── NAVEGACIÓN RÁPIDA ──────────────────────────────────────────────
+    @FXML
+    private void irAReservaVehiculo(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Reservación de Vehículos", mainController.getMenuReservacion(), "Reserva.fxml");
+    }
+    @FXML
+    private void irAReservaObjeto(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Reservación de Objetos", mainController.getMenuReservacion(), "ReservacionObjeto.fxml");
+    }
+    @FXML
+    private void irAIncidencias(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Registro de Incidencia", mainController.getMenuIncidencias(), "IncidenciaRegistro.fxml");
+    }
+    @FXML
+    private void irAClientes(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Clientes", mainController.getMenuClientes(), "Clientes.fxml");
+    }
+
+    // ── EFECTOS HOVER ──────────────────────────────────────────────────
+    @FXML
+    private void onCardEnter(MouseEvent event) {
+        VBox card = (VBox) event.getSource();
+        card.setStyle(card.getStyle() + " -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 20, 0, 0, 8); -fx-scale-x: 1.02; -fx-scale-y: 1.02;");
+        card.setCursor(javafx.scene.Cursor.HAND);
+    }
+    @FXML
+    private void onCardExit(MouseEvent event) {
+        VBox card = (VBox) event.getSource();
+        card.setStyle(card.getStyle().replace("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 20, 0, 0, 8); -fx-scale-x: 1.02; -fx-scale-y: 1.02;", ""));
+        card.setCursor(javafx.scene.Cursor.DEFAULT);
     }
 }

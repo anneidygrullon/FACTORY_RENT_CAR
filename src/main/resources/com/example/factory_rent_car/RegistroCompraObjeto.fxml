@@ -8,52 +8,101 @@
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.factory_rent_car.Controlador.RegistroCompraObjetoController"
-            style="-fx-background-color: #F8FAFC; -fx-background: #F8FAFC; -fx-border-color: transparent;">
+            style="-fx-background-color: #eef2f8; -fx-background: #eef2f8; -fx-border-color: transparent;">
 
-    <VBox spacing="16" style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
+    <VBox spacing="24" style="-fx-background-color: #eef2f8; -fx-padding: 30 35 35 35;">
 
-        <Label text="Registro de Compra de Objetos" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <!-- Title Section -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <StackPane prefWidth="32" prefHeight="32"
+                       style="-fx-background-color: #1565C0; -fx-background-radius: 8;">
+                <Label text="📦" style="-fx-font-size: 16px;"/>
+            </StackPane>
+            <VBox spacing="2">
+                <Label text="Registro de Compra - Objetos"
+                       style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                <Label text="Registra la compra de nuevos objetos"
+                       style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
+            </VBox>
+        </HBox>
 
-        <VBox spacing="12" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 16;">
-            <GridPane hgap="12" vgap="10">
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="20"/>
-                    <ColumnConstraints percentWidth="30"/>
-                    <ColumnConstraints percentWidth="20"/>
-                    <ColumnConstraints percentWidth="30"/>
-                </columnConstraints>
-
-                <Label text="Nombre del Objeto *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtNombre" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                <Label text="Marca" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtMarca" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-
-                <Label text="Precio Unitario *" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtPrecio" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="0.00"/>
-
-                <Label text="Cantidad *" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtCantidad" GridPane.columnIndex="3" GridPane.rowIndex="1" promptText="1"/>
-
-                <Label text="Tipo de Objeto *" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <ComboBox fx:id="cmbTipo" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="Seleccione"/>
-
-                <Label text="Suplidor *" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <ComboBox fx:id="cmbSuplidor" GridPane.columnIndex="3" GridPane.rowIndex="2" promptText="Seleccione"/>
-
-                <Label text="Fecha de Compra *" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <DatePicker fx:id="dpFecha" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                <Label text="Monto Total:" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtMontoTotal" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="3" style="-fx-background-color: #F8FAFC;"/>
-            </GridPane>
-
-            <HBox alignment="CENTER_RIGHT" spacing="12">
-                <Button text="Limpiar" onAction="#limpiar"
-                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
-                <Button text="Registrar Compra" onAction="#registrarCompra"
-                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
+        <!-- Form Card -->
+        <VBox spacing="0"
+              style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: transparent;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);">
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="0"
+                  style="-fx-background-color: #F8FAFC; -fx-background-radius: 14 14 0 0; -fx-padding: 16 20;
+                         -fx-border-color: transparent transparent #E2E8F0 transparent; -fx-border-width: 0 0 1 0;">
+                <Label text="Datos de la Compra"
+                       style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="* Campos obligatorios"
+                       style="-fx-text-fill: #94A3B8; -fx-font-size: 10px;"/>
             </HBox>
+            <!-- Content -->
+            <VBox spacing="16" style="-fx-padding: 20 24;">
+                <GridPane hgap="16" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="20"/>
+                        <ColumnConstraints percentWidth="30"/>
+                        <ColumnConstraints percentWidth="20"/>
+                        <ColumnConstraints percentWidth="30"/>
+                    </columnConstraints>
+
+                    <!-- Row 0 -->
+                    <Label text="Nombre del Objeto *" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtNombre" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                    <Label text="Marca" GridPane.columnIndex="2" GridPane.rowIndex="0"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtMarca" GridPane.columnIndex="3" GridPane.rowIndex="0"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <!-- Row 1 -->
+                    <Label text="Precio Unitario *" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtPrecio" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                               promptText="0.00"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                    <Label text="Cantidad *" GridPane.columnIndex="2" GridPane.rowIndex="1"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtCantidad" GridPane.columnIndex="3" GridPane.rowIndex="1"
+                               promptText="1"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <!-- Row 2 -->
+                    <Label text="Tipo de Objeto *" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cmbTipo" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                              promptText="Seleccione" maxWidth="Infinity"
+                              style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7;"/>
+                    <Label text="Suplidor *" GridPane.columnIndex="2" GridPane.rowIndex="2"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cmbSuplidor" GridPane.columnIndex="3" GridPane.rowIndex="2"
+                              promptText="Seleccione" maxWidth="Infinity"
+                              style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7;"/>
+
+                    <!-- Row 3 -->
+                    <Label text="Fecha de Compra *" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <DatePicker fx:id="dpFecha" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                                style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7;"/>
+                    <Label text="Monto Total" GridPane.columnIndex="2" GridPane.rowIndex="3"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtMontoTotal" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="3"
+                               style="-fx-background-color: #F8FAFC; -fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                </GridPane>
+
+                <!-- Buttons -->
+                <HBox alignment="CENTER_RIGHT" spacing="12" style="-fx-padding: 4 0 0 0;">
+                    <Button text="Limpiar" onAction="#limpiar"
+                            style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>
+                    <Button text="Registrar Compra" onAction="#registrarCompra"
+                            style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 32; -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
         </VBox>
     </VBox>
 </ScrollPane>

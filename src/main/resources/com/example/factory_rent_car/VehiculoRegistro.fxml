@@ -8,81 +8,122 @@
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.factory_rent_car.Controlador.VehiculoRegistroController"
-            style="-fx-background-color: #F8FAFC; -fx-background: #F8FAFC; -fx-border-color: transparent;">
+            style="-fx-background-color: #eef2f8; -fx-background: #eef2f8; -fx-border-color: transparent;">
 
-    <VBox spacing="16" style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
+    <VBox spacing="24" style="-fx-background-color: #eef2f8; -fx-padding: 30 35 35 35;">
 
-        <Label text="Registro y Edición de Vehículos" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
-
-        <!-- Buscador por ID -->
-        <HBox spacing="12" alignment="CENTER_LEFT">
-            <Label text="Buscar por ID:" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-            <TextField fx:id="txtBuscarId" promptText="ID del vehículo" prefWidth="100"/>
-            <Button text="Buscar" onAction="#buscarVehiculo"
-                    style="-fx-background-color: #1E293B; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 16;"/>
-            <Label fx:id="lblInfo" text="" style="-fx-text-fill: #1565C0; -fx-font-style: italic;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Nuevo Registro" onAction="#limpiar"
-                    style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 6 16;"/>
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <StackPane minWidth="32" maxWidth="32" minHeight="32" maxHeight="32"
+                       style="-fx-background-color: #1565C0; -fx-background-radius: 8;">
+                <Label text="🚗" style="-fx-font-size: 16px;"/>
+            </StackPane>
+            <VBox spacing="2">
+                <Label text="Registro de Vehículos"
+                       style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                <Label text="Registra y edita la información de los vehículos"
+                       style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
+            </VBox>
         </HBox>
 
-        <!-- Formulario -->
-        <VBox spacing="12" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 16;">
-            <Label fx:id="lblTitulo" text="Nuevo Vehículo" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+        <HBox spacing="14" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2); -fx-padding: 12 18;">
+            <Label text="🔍" style="-fx-font-size: 16px;"/>
+            <Label text="Buscar por ID:" style="-fx-text-fill: #475569; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+            <TextField fx:id="txtBuscarId" prefWidth="120" promptText="ID del vehículo"
+                       style="-fx-background-radius: 8; -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-padding: 7 12; -fx-font-size: 13px;"/>
+            <Button text="Buscar" onAction="#buscarVehiculo"
+                    style="-fx-background-color: #1E293B; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 7 18; -fx-cursor: hand;"/>
+            <Label fx:id="lblInfo" text=""
+                   style="-fx-text-fill: #1565C0; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="+ Nuevo Registro" onAction="#limpiar"
+                    style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 7 16; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>
+        </HBox>
 
-            <GridPane hgap="12" vgap="10">
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="20"/>
-                    <ColumnConstraints percentWidth="30"/>
-                    <ColumnConstraints percentWidth="20"/>
-                    <ColumnConstraints percentWidth="30"/>
-                </columnConstraints>
-
-                <Label text="Marca *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtMarca" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                <Label text="Modelo *" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtModelo" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-
-                <Label text="Serie" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtSerie" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                <Label text="Placa *" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtPlaca" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-
-                <Label text="Color" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtColor" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-                <Label text="Kilometraje" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtKilometraje" GridPane.columnIndex="3" GridPane.rowIndex="2" promptText="0.0"/>
-
-                <Label text="Combustible *" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <ComboBox fx:id="cmbCombustible" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Seleccione"/>
-
-                <Label text="Máx. Pasajeros *" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtMaxPasajeros" GridPane.columnIndex="3" GridPane.rowIndex="3" promptText="5"/>
-
-                <Label text="Estado inicial *" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <ComboBox fx:id="cmbEstado" GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="Seleccione"/>
-
-                <Label text="Precio por día (RD$) *" GridPane.columnIndex="2" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtPrecio" GridPane.columnIndex="3" GridPane.rowIndex="4" promptText="0.00"/>
-
-                <Label text="ID Póliza *" GridPane.columnIndex="0" GridPane.rowIndex="5" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtIdPoliza" GridPane.columnIndex="1" GridPane.rowIndex="5" promptText="ID de la póliza"/>
-
-                <Label text="ID Compra *" GridPane.columnIndex="2" GridPane.rowIndex="5" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtIdCompra" GridPane.columnIndex="3" GridPane.rowIndex="5" promptText="ID del pedido de compra"/>
-            </GridPane>
-
-            <HBox alignment="CENTER_RIGHT" spacing="12">
-                <Button text="Cancelar" onAction="#limpiar"
-                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
-                <Button text="Guardar" onAction="#guardarVehiculo"
-                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
-                <Button text="Eliminar" onAction="#eliminarVehiculo"
-                        style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+        <VBox spacing="0"
+              style="-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);">
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color: #F8FAFC; -fx-background-radius: 14 14 0 0; -fx-padding: 16 20; -fx-border-color: transparent transparent #E2E8F0 transparent; -fx-border-width: 0 0 1 0;">
+                <Label fx:id="lblTitulo" text="Datos del Vehículo"
+                       style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="* Campos obligatorios"
+                       style="-fx-text-fill: #94A3B8; -fx-font-size: 10px;"/>
             </HBox>
+
+            <VBox spacing="16" style="-fx-padding: 20 24;">
+                <GridPane hgap="16" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="18"/>
+                        <ColumnConstraints percentWidth="32"/>
+                        <ColumnConstraints percentWidth="18"/>
+                        <ColumnConstraints percentWidth="32"/>
+                    </columnConstraints>
+
+                    <Label text="Marca *" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtMarca" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="Ej: Toyota"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                    <Label text="Modelo *" GridPane.columnIndex="2" GridPane.rowIndex="0"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtModelo" GridPane.columnIndex="3" GridPane.rowIndex="0" promptText="Ej: Corolla"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="Serie" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtSerie" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="Número de serie"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                    <Label text="Placa *" GridPane.columnIndex="2" GridPane.rowIndex="1"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtPlaca" GridPane.columnIndex="3" GridPane.rowIndex="1" promptText="Ej: ABC-123"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="Color" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtColor" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="Ej: Rojo"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                    <Label text="Kilometraje" GridPane.columnIndex="2" GridPane.rowIndex="2"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtKilometraje" GridPane.columnIndex="3" GridPane.rowIndex="2" promptText="0.0 km"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="Combustible *" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cmbCombustible" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                              promptText="Seleccione tipo" maxWidth="1.7976931348623157E308"/>
+                    <Label text="Máx. Pasajeros *" GridPane.columnIndex="2" GridPane.rowIndex="3"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtMaxPasajeros" GridPane.columnIndex="3" GridPane.rowIndex="3" promptText="5"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="Estado inicial *" GridPane.columnIndex="0" GridPane.rowIndex="4"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cmbEstado" GridPane.columnIndex="1" GridPane.rowIndex="4"
+                              promptText="Seleccione estado" maxWidth="1.7976931348623157E308"/>
+                    <Label text="Precio x día (RD$) *" GridPane.columnIndex="2" GridPane.rowIndex="4"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtPrecio" GridPane.columnIndex="3" GridPane.rowIndex="4" promptText="0.00"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+
+                    <Label text="ID Póliza *" GridPane.columnIndex="0" GridPane.rowIndex="5"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtIdPoliza" GridPane.columnIndex="1" GridPane.rowIndex="5" promptText="ID de la póliza"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                    <Label text="ID Compra *" GridPane.columnIndex="2" GridPane.rowIndex="5"
+                           style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtIdCompra" GridPane.columnIndex="3" GridPane.rowIndex="5" promptText="ID del pedido de compra"
+                               style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                </GridPane>
+
+                <HBox alignment="CENTER_RIGHT" spacing="12" style="-fx-padding: 4 0 0 0;">
+                    <Button text="Cancelar" onAction="#limpiar"
+                            style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>
+                    <Button text="Guardar" onAction="#guardarVehiculo"
+                            style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 32; -fx-cursor: hand;"/>
+                    <Button text="Eliminar" onAction="#eliminarVehiculo"
+                            style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
         </VBox>
     </VBox>
 </ScrollPane>

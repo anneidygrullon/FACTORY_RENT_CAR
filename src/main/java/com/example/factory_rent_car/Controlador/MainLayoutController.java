@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.Region;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -427,7 +428,19 @@ public class MainLayoutController implements Initializable {
         searchField.requestFocus();
     }
 
-    // ── CARGA DE VISTAS (incluyendo Home con referencia al controlador) ──
+    // ── Inyecta el MainLayoutController en los controladores que lo necesiten ──
+    private void injectMainController(Object controller) {
+        try {
+            Method method = controller.getClass().getMethod("setMainController", MainLayoutController.class);
+            method.invoke(controller, this);
+        } catch (NoSuchMethodException e) {
+            // El controlador no necesita inyección
+        } catch (Exception e) {
+            System.err.println("Error inyectando MainController: " + e.getMessage());
+        }
+    }
+
+    // ── CARGA DE VISTAS (con inyección automática del controlador principal) ──
     private void cargarFxml(String fxmlName) {
         try {
             URL resource = getClass().getResource(BASE + fxmlName);
@@ -438,6 +451,7 @@ public class MainLayoutController implements Initializable {
             }
             FXMLLoader loader = new FXMLLoader(resource);
             Node vista = loader.load();
+            injectMainController(loader.getController());
             contentArea.getChildren().setAll(vista);
             if (vista instanceof Region region) {
                 region.prefWidthProperty().bind(contentArea.widthProperty());
