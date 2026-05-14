@@ -128,21 +128,36 @@
                         </VBox>
                     </VBox>
 
-                    <!-- ENTREGAS -->
-                    <HBox fx:id="menuEntregas" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                          onMouseClicked="#handleMenuEntregas"
-                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                        <StackPane minWidth="26">
-                            <SVGPath content="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"
-                                     fill="white" scaleX="0.9" scaleY="0.9"/>
-                        </StackPane>
-                        <Label text="Entregas" HBox.hgrow="ALWAYS"
-                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                              -fx-background-color: rgba(255,255,255,0.08);
-                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                    </HBox>
+                    <!-- ENTREGAS (submenú) -->
+                    <VBox spacing="0">
+                        <HBox fx:id="menuEntregas" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                              style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                              onMouseClicked="#toggleSubMenuEntregas"
+                              onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                            <StackPane minWidth="26">
+                                <SVGPath content="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"
+                                         fill="white" scaleX="0.9" scaleY="0.9"/>
+                            </StackPane>
+                            <Label text="Entregas" HBox.hgrow="ALWAYS"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                            <Label fx:id="entregasArrow" text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;"/>
+                        </HBox>
+                        <VBox fx:id="subMenuEntregas" spacing="0" managed="false" visible="false"
+                              style="-fx-background-color: #0a1540; -fx-padding: 0 0 0 40;">
+                            <HBox fx:id="subMenuRegistroEntrega" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuRegistroEntrega"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="🚚 Registro de Entrega" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                            <HBox fx:id="subMenuRegistroDireccion" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuRegistroDireccion"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="📍 Registro de Dirección" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
 
                     <!-- DEVOLUCIÓN -->
                     <HBox fx:id="menuDevolucion" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
@@ -255,21 +270,42 @@
                                               -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
                     </HBox>
 
-                    <!-- COMPRAS -->
-                    <HBox fx:id="menuCompras" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
-                          style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
-                          onMouseClicked="#handleMenuCompras"
-                          onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
-                        <StackPane minWidth="26">
-                            <SVGPath content="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 6.9 18 9 18h12v-2H9.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0023.45 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"
-                                     fill="white" scaleX="0.9" scaleY="0.9"/>
-                        </StackPane>
-                        <Label text="Compras" HBox.hgrow="ALWAYS"
-                               style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
-                        <Label text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;
-                                              -fx-background-color: rgba(255,255,255,0.08);
-                                              -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
-                    </HBox>
+                    <!-- COMPRAS (submenú) -->
+                    <VBox spacing="0">
+                        <HBox fx:id="menuCompras" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
+                              style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
+                              onMouseClicked="#toggleSubMenuCompras"
+                              onMouseEntered="#onMenuEnter" onMouseExited="#onMenuExit">
+                            <StackPane minWidth="26">
+                                <SVGPath content="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 6.9 18 9 18h12v-2H9.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0023.45 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"
+                                         fill="white" scaleX="0.9" scaleY="0.9"/>
+                            </StackPane>
+                            <Label text="Compras" HBox.hgrow="ALWAYS"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #c8d8f0;"/>
+                            <Label fx:id="comprasArrow" text="❯" style="-fx-font-size: 10px; -fx-text-fill: #4a6aaa;"/>
+                        </HBox>
+                        <VBox fx:id="subMenuCompras" spacing="0" managed="false" visible="false"
+                              style="-fx-background-color: #0a1540; -fx-padding: 0 0 0 40;">
+                            <HBox fx:id="subMenuCompraObjeto" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuCompraObjeto"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="📦 Registrar Objeto" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                            <HBox fx:id="subMenuConsultaObjetos" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuConsultaObjetos"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="🔍 Consulta de Objetos" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                            <HBox fx:id="subMenuCompraVehiculo" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuCompraVehiculo"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="🚗 Registrar Vehículo" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
 
                     <!-- GPS -->
                     <HBox fx:id="menuGps" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
@@ -287,7 +323,7 @@
                                               -fx-background-radius: 50%; -fx-padding: 3 5 3 5;"/>
                     </HBox>
 
-                    <!-- REGISTROS (submenú con Empleados) -->
+                    <!-- REGISTROS (submenú con Empleados y Departamentos) -->
                     <VBox spacing="0">
                         <HBox fx:id="menuRegistros" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
                               style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"
@@ -314,6 +350,12 @@
                                   onMouseClicked="#handleSubMenuEmpleadoRegistro"
                                   onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
                                 <Label text="➕ Registro de Empleados" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
+                            </HBox>
+                            <HBox fx:id="subMenuConsultaDepartamento" spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-padding: 8 14 8 16; -fx-cursor: hand;"
+                                  onMouseClicked="#handleSubMenuConsultaDepartamento"
+                                  onMouseEntered="#onSubMenuEnter" onMouseExited="#onSubMenuExit">
+                                <Label text="🏢 Consulta de Departamentos" style="-fx-text-fill: #c8d8f0; -fx-font-size: 12px;"/>
                             </HBox>
                         </VBox>
                     </VBox>

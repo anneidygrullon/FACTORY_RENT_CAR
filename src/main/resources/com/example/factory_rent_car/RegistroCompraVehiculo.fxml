@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.factory_rent_car.Controlador.RegistroCompraVehiculoController"
+            style="-fx-background-color: #F8FAFC; -fx-background: #F8FAFC; -fx-border-color: transparent;">
+
+    <VBox spacing="16" style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
+
+        <Label text="Registro de Compra de Vehículo" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+        <VBox spacing="12" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 16;">
+            <GridPane hgap="12" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="30"/>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="30"/>
+                </columnConstraints>
+
+                <Label text="Marca *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtMarca" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Modelo *" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtModelo" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <Label text="Serie" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtSerie" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Placa *" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtPlaca" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                <Label text="Color" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtColor" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Kilometraje" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtKilometraje" GridPane.columnIndex="3" GridPane.rowIndex="2" promptText="0.0"/>
+
+                <Label text="Combustible *" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="cmbCombustible" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Seleccione"/>
+
+                <Label text="Máx. Pasajeros *" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtMaxPasajeros" GridPane.columnIndex="3" GridPane.rowIndex="3" promptText="5"/>
+
+                <Label text="Precio por día (RD$) *" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtPrecioPorDia" GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="0.00"/>
+
+                <Label text="ID Póliza *" GridPane.columnIndex="2" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtIdPoliza" GridPane.columnIndex="3" GridPane.rowIndex="4" promptText="ID de la póliza"/>
+
+                <Label text="Precio de Compra *" GridPane.columnIndex="0" GridPane.rowIndex="5" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtPrecioCompra" GridPane.columnIndex="1" GridPane.rowIndex="5" promptText="0.00"/>
+
+                <Label text="Suplidor *" GridPane.columnIndex="2" GridPane.rowIndex="5" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="cmbSuplidor" GridPane.columnIndex="3" GridPane.rowIndex="5" promptText="Seleccione"/>
+
+                <Label text="Fecha de Compra *" GridPane.columnIndex="0" GridPane.rowIndex="6" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <DatePicker fx:id="dpFechaCompra" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+
+                <Label text="Cantidad *" GridPane.columnIndex="2" GridPane.rowIndex="6" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtCantidad" GridPane.columnIndex="3" GridPane.rowIndex="6" promptText="1"/>
+            </GridPane>
+
+            <HBox alignment="CENTER_RIGHT" spacing="12">
+                <Button text="Limpiar" onAction="#limpiar"
+                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+                <Button text="Registrar Compra" onAction="#registrarCompra"
+                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>

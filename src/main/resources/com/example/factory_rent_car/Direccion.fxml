@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.factory_rent_car.Controlador.DireccionController"
+            style="-fx-background-color: #F8FAFC; -fx-background: #F8FAFC; -fx-border-color: transparent;">
+
+    <VBox spacing="16" style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
+
+        <!-- Barra de búsqueda -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Buscar:" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+            <TextField fx:id="txtBuscar" promptText="Calle, ciudad, código postal..." HBox.hgrow="ALWAYS"
+                       style="-fx-background-radius: 6; -fx-border-color: #E2E8F0; -fx-border-radius: 6; -fx-padding: 6 10;"/>
+            <Button text="Buscar" onAction="#buscar"
+                    style="-fx-background-color: #1E293B; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 16;"/>
+            <Button text="Limpiar filtro" onAction="#limpiarFiltro"
+                    style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 6 16;"/>
+        </HBox>
+
+        <!-- Tabla de direcciones (ocultable) -->
+        <VBox fx:id="tableContainer" spacing="8" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12;">
+            <HBox alignment="CENTER_LEFT">
+                <Label text="Lista de Direcciones" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnToggleTable" text="📋 Ocultar Tabla" onAction="#toggleTableVisibility"
+                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 4 12; -fx-cursor: hand;"/>
+            </HBox>
+            <TableView fx:id="tablaDirecciones" prefHeight="350">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="colCalle" text="Calle / Avenida" prefWidth="200"/>
+                    <TableColumn fx:id="colNumero" text="Número" prefWidth="80"/>
+                    <TableColumn fx:id="colCiudad" text="Ciudad" prefWidth="150"/>
+                    <TableColumn fx:id="colCodigoPostal" text="Código Postal" prefWidth="100"/>
+                    <TableColumn fx:id="colReferencia" text="Referencia" prefWidth="250"/>
+                </columns>
+                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                <placeholder><Label text="No hay direcciones registradas"/></placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- Formulario de registro / edición -->
+        <VBox spacing="12" style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 16;">
+            <Label fx:id="lblTitulo" text="Registro de Dirección" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+            <GridPane hgap="12" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="30"/>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="30"/>
+                </columnConstraints>
+
+                <Label text="ID Dirección:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtIdDireccion" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Calle / Avenida *" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtCalle" GridPane.columnIndex="3" GridPane.rowIndex="0" promptText="Ej: Av. Independencia"/>
+
+                <Label text="Número / Edificio" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtNumero" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="Ej: 123, Edif. Torre"/>
+
+                <Label text="Ciudad *" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="cmbCiudad" GridPane.columnIndex="3" GridPane.rowIndex="1" promptText="Seleccione una ciudad"/>
+
+                <Label text="Código Postal" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtCodigoPostal" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="Ej: 10101"/>
+
+                <Label text="Referencia" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+                <TextArea fx:id="txtReferencia" GridPane.columnIndex="3" GridPane.rowIndex="2" prefHeight="60" wrapText="true" promptText="Punto de referencia..."/>
+            </GridPane>
+
+            <HBox alignment="CENTER_RIGHT" spacing="12">
+                <Button text="Limpiar" onAction="#limpiar"
+                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+                <Button text="Guardar" onAction="#guardarDireccion"
+                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
+                <Button text="Eliminar" onAction="#eliminarDireccion"
+                        style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>

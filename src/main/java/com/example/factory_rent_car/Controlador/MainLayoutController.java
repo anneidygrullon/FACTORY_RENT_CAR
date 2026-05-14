@@ -49,11 +49,25 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox subMenuVehiculoConsulta;
     @FXML private HBox subMenuVehiculoRegistro;
 
-    // ── SUBMENÚ REGISTROS (nuevo) ─────────────────────────────
+    // ── SUBMENÚ REGISTROS ────────────────────────────────────
     @FXML private VBox subMenuRegistros;
     @FXML private Label registrosArrow;
     @FXML private HBox subMenuEmpleadoConsulta;
     @FXML private HBox subMenuEmpleadoRegistro;
+    @FXML private HBox subMenuConsultaDepartamento;  // NUEVO
+
+    // ── SUBMENÚ ENTREGAS ─────────────────────────────────────
+    @FXML private VBox subMenuEntregas;
+    @FXML private Label entregasArrow;
+    @FXML private HBox subMenuRegistroEntrega;
+    @FXML private HBox subMenuRegistroDireccion;
+
+    // ── SUBMENÚ COMPRAS ──────────────────────────────────────
+    @FXML private VBox subMenuCompras;
+    @FXML private Label comprasArrow;
+    @FXML private HBox subMenuCompraObjeto;
+    @FXML private HBox subMenuConsultaObjetos;
+    @FXML private HBox subMenuCompraVehiculo;
 
     // ── BUSCADOR ─────────────────────────────────────────────
     @FXML private TextField searchField;
@@ -66,11 +80,14 @@ public class MainLayoutController implements Initializable {
     private boolean subMenuReservacionVisible = false;
     private boolean subMenuVehiculosVisible = false;
     private boolean subMenuRegistrosVisible = false;
+    private boolean subMenuEntregasVisible = false;
+    private boolean subMenuComprasVisible = false;
 
     private static final String BASE = "/com/example/factory_rent_car/";
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Inicializar submenús cerrados
         subMenuReservacion.setVisible(false);
         subMenuReservacion.setManaged(false);
         reservacionArrow.setText("❯");
@@ -83,6 +100,14 @@ public class MainLayoutController implements Initializable {
         subMenuRegistros.setManaged(false);
         registrosArrow.setText("❯");
 
+        subMenuEntregas.setVisible(false);
+        subMenuEntregas.setManaged(false);
+        entregasArrow.setText("❯");
+
+        subMenuCompras.setVisible(false);
+        subMenuCompras.setManaged(false);
+        comprasArrow.setText("❯");
+
         activarMenu(menuInicio);
         mostrarHome();
     }
@@ -94,7 +119,7 @@ public class MainLayoutController implements Initializable {
         mostrarHome();
     }
 
-    // Submenú Reservación
+    // ================= Submenú Reservación =================
     @FXML private void toggleSubMenuReservacion(MouseEvent e) {
         subMenuReservacionVisible = !subMenuReservacionVisible;
         subMenuReservacion.setVisible(subMenuReservacionVisible);
@@ -123,7 +148,36 @@ public class MainLayoutController implements Initializable {
         reservacionArrow.setText("❯");
     }
 
-    // Submenú Vehículos
+    // ================= Submenú Entregas =================
+    @FXML private void toggleSubMenuEntregas(MouseEvent e) {
+        subMenuEntregasVisible = !subMenuEntregasVisible;
+        subMenuEntregas.setVisible(subMenuEntregasVisible);
+        subMenuEntregas.setManaged(subMenuEntregasVisible);
+        entregasArrow.setText(subMenuEntregasVisible ? "❯" : "❮");
+    }
+
+    @FXML private void handleSubMenuRegistroEntrega(MouseEvent e) {
+        activarMenu(menuEntregas);
+        sectionTitle.setText("Registro de Entrega");
+        cargarFxml("EntregaVehiculo.fxml");
+        cerrarSubMenuEntregas();
+    }
+
+    @FXML private void handleSubMenuRegistroDireccion(MouseEvent e) {
+        activarMenu(menuEntregas);
+        sectionTitle.setText("Registro de Dirección");
+        cargarFxml("Direccion.fxml");
+        cerrarSubMenuEntregas();
+    }
+
+    private void cerrarSubMenuEntregas() {
+        subMenuEntregasVisible = false;
+        subMenuEntregas.setVisible(false);
+        subMenuEntregas.setManaged(false);
+        entregasArrow.setText("❯");
+    }
+
+    // ================= Submenú Vehículos =================
     @FXML private void toggleSubMenuVehiculos(MouseEvent e) {
         subMenuVehiculosVisible = !subMenuVehiculosVisible;
         subMenuVehiculos.setVisible(subMenuVehiculosVisible);
@@ -152,7 +206,7 @@ public class MainLayoutController implements Initializable {
         vehiculosArrow.setText("❯");
     }
 
-    // Submenú Registros (con empleados)
+    // ================= Submenú Registros =================
     @FXML private void toggleSubMenuRegistros(MouseEvent e) {
         subMenuRegistrosVisible = !subMenuRegistrosVisible;
         subMenuRegistros.setVisible(subMenuRegistrosVisible);
@@ -174,6 +228,14 @@ public class MainLayoutController implements Initializable {
         cerrarSubMenuRegistros();
     }
 
+    // NUEVO HANDLER PARA CONSULTA DE DEPARTAMENTOS
+    @FXML private void handleSubMenuConsultaDepartamento(MouseEvent e) {
+        activarMenu(menuRegistros);
+        sectionTitle.setText("Consulta de Departamentos");
+        cargarFxml("ConsultaDepartamento.fxml");
+        cerrarSubMenuRegistros();
+    }
+
     private void cerrarSubMenuRegistros() {
         subMenuRegistrosVisible = false;
         subMenuRegistros.setVisible(false);
@@ -181,20 +243,49 @@ public class MainLayoutController implements Initializable {
         registrosArrow.setText("❯");
     }
 
-    // Otros menús (sin submenú)
-    @FXML private void handleMenuEntregas(MouseEvent e) {
-        activarMenu(menuEntregas);
-        sectionTitle.setText("Entrega de Vehículos");
-        cargarFxml("EntregaVehiculo.fxml");
+    // ================= Submenú Compras =================
+    @FXML private void toggleSubMenuCompras(MouseEvent e) {
+        subMenuComprasVisible = !subMenuComprasVisible;
+        subMenuCompras.setVisible(subMenuComprasVisible);
+        subMenuCompras.setManaged(subMenuComprasVisible);
+        comprasArrow.setText(subMenuComprasVisible ? "❯" : "❮");
     }
 
+    @FXML private void handleSubMenuCompraObjeto(MouseEvent e) {
+        activarMenu(menuCompras);
+        sectionTitle.setText("Registro de Compra - Objetos");
+        cargarFxml("RegistroCompraObjeto.fxml");
+        cerrarSubMenuCompras();
+    }
+
+    @FXML private void handleSubMenuConsultaObjetos(MouseEvent e) {
+        activarMenu(menuCompras);
+        sectionTitle.setText("Consulta de Objetos");
+        cargarFxml("ConsultaObjetos.fxml");
+        cerrarSubMenuCompras();
+    }
+
+    @FXML private void handleSubMenuCompraVehiculo(MouseEvent e) {
+        activarMenu(menuCompras);
+        sectionTitle.setText("Registro de Compra - Vehículos");
+        cargarFxml("RegistroCompraVehiculo.fxml");
+        cerrarSubMenuCompras();
+    }
+
+    private void cerrarSubMenuCompras() {
+        subMenuComprasVisible = false;
+        subMenuCompras.setVisible(false);
+        subMenuCompras.setManaged(false);
+        comprasArrow.setText("❯");
+    }
+
+    // ================= Otros menús (sin submenú) =================
     @FXML private void handleMenuDevolucion(MouseEvent e) {
         activarMenu(menuDevolucion);
         sectionTitle.setText("Devolución de Vehículos");
         cargarFxml("DevolucionVehiculo.fxml");
     }
 
-    // CORRECCIÓN: El archivo se llama "Pago.fxml" (singular) no "Pagos.fxml"
     @FXML private void handleMenuPagos(MouseEvent e) {
         activarMenu(menuPagos);
         sectionTitle.setText("Pagos");
@@ -217,12 +308,6 @@ public class MainLayoutController implements Initializable {
         activarMenu(menuIncidencias);
         sectionTitle.setText("Incidencias");
         cargarFxml("Incidencias.fxml");
-    }
-
-    @FXML private void handleMenuCompras(MouseEvent e) {
-        activarMenu(menuCompras);
-        sectionTitle.setText("Compras");
-        cargarFxml("Compras.fxml");
     }
 
     @FXML private void handleMenuGps(MouseEvent e) {
