@@ -577,12 +577,54 @@ public class MainLayoutController implements Initializable {
     public HBox getMenuSuplidores()    { return menuSuplidores; }
 
     private String nombreUsuario;
+    private String rolUsuario;
 
-    public void setUsuarioActual(String usuario) {
+    public void setUsuarioActual(String usuario, String rol) {
         this.nombreUsuario = usuario;
+        this.rolUsuario = rol;
         lblRol.setText(usuario);
         lblUsuario.setText(usuario);
         cargarFotoPerfil();
+        aplicarPermisos(rol);
+    }
+
+    private void ocultar(Node... nodos) {
+        for (Node n : nodos) {
+            if (n != null) {
+                n.setVisible(false);
+                n.setManaged(false);
+            }
+        }
+    }
+
+    private void aplicarPermisos(String rol) {
+        if (rol == null) rol = "admin";
+        switch (rol) {
+            case "admin":
+            case "gerente":
+                // Acceso completo — no ocultar nada
+                break;
+
+            case "chofer":
+                ocultar(menuPagos, menuMantenimiento, menuLimpieza,
+                        menuCompras, menuRegistros, menuSuplidores);
+                ocultar(subMenuVehiculoRegistro);
+                break;
+
+            case "carwasher":
+                ocultar(menuReservacion, menuEntregas, menuDevolucion, menuPagos,
+                        menuMantenimiento, menuIncidencias, menuCompras,
+                        menuReclamos, menuRegistros, menuClientes, menuSuplidores);
+                ocultar(subMenuVehiculoRegistro);
+                break;
+
+            case "mecanico":
+                ocultar(menuReservacion, menuEntregas, menuDevolucion, menuPagos,
+                        menuLimpieza, menuIncidencias, menuCompras,
+                        menuReclamos, menuRegistros, menuClientes, menuSuplidores);
+                ocultar(subMenuVehiculoRegistro);
+                break;
+        }
     }
 
     @FXML
