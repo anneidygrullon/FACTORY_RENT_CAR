@@ -106,7 +106,9 @@ public class IncidenciaRegistroController {
         LocalDate fecha = dpFecha.getValue();
         String descripcion = txtDescripcion.getText().trim();
 
-        try (Connection con = conexion.establecerConexion()) {
+        Connection con = null;
+        try {
+            con = conexion.establecerConexion();
             con.setAutoCommit(false);
 
             int idHistorial = -1;
@@ -140,8 +142,11 @@ public class IncidenciaRegistroController {
             JOptionPane.showMessageDialog(null, "Incidencia registrada con ID: " + idIncidencia);
             limpiar(event);
         } catch (SQLException e) {
+            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             JOptionPane.showMessageDialog(null, "Error al registrar: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
 

@@ -283,7 +283,9 @@ public class ReservacionObjetoController {
             }
         }
 
-        try (Connection con = conexion.establecerConexion()) {
+        Connection con = null;
+        try {
+            con = conexion.establecerConexion();
             con.setAutoCommit(false);
             PreparedStatement psDelete = con.prepareStatement("DELETE FROM TBL_OBJ_RESERVA WHERE fk_pk_id_reserva = ?");
             psDelete.setInt(1, reservaIdActual);
@@ -304,11 +306,14 @@ public class ReservacionObjetoController {
             cargarObjetosReservados();
             recalcularTotales();
         } catch (SQLException e) {
+            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             JOptionPane.showMessageDialog(null, "Error SQL al guardar: " + e.getMessage() + "\nCódigo: " + e.getErrorCode());
             e.printStackTrace();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error inesperado: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
 

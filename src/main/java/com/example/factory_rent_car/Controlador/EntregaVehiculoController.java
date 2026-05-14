@@ -246,13 +246,13 @@ public class EntregaVehiculoController {
             return;
         }
 
-        String sqlUpdate = "UPDATE TBL_VEHICULO SET estado = 'Reservado' WHERE id_vehiculo = ?";
+        String sqlUpdate = "UPDATE TBL_VEHICULO SET estado = 'En Uso' WHERE id_vehiculo = ?";
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(sqlUpdate)) {
             ps.setInt(1, idVehiculo);
             int filas = ps.executeUpdate();
             if (filas > 0) {
-                JOptionPane.showMessageDialog(null, "Vehículo marcado como RESERVADO correctamente.");
+                JOptionPane.showMessageDialog(null, "Vehículo marcado como ENTREGADO correctamente.");
             } else {
                 JOptionPane.showMessageDialog(null, "No se pudo actualizar el estado.");
             }

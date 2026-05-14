@@ -32,7 +32,6 @@ public class ConsultaDepartamentoController {
 
     private final ObservableList<Departamento> listaDepartamentos = FXCollections.observableArrayList();
     private Departamento departamentoSeleccionado;
-    private JOptionPane JOptionoean;
 
     @FXML
     public void initialize() {
@@ -196,7 +195,7 @@ public class ConsultaDepartamentoController {
             return false;
         }
         if (txtTelefono.getText().isBlank()) {
-            JOptionoean.showMessageDialog(null, "El teléfono es obligatorio.");
+            JOptionPane.showMessageDialog(null, "El teléfono es obligatorio.");
             return false;
         }
         return true;

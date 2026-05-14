@@ -210,7 +210,9 @@ public class MantenimientoController {
         String descripcion = txtDescripcion.getText().trim();
         String tipo = getTipoSeleccionado();
 
-        try (Connection con = conexion.establecerConexion()) {
+        Connection con = null;
+        try {
+            con = conexion.establecerConexion();
             if (con == null) {
                 JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
                 return;
@@ -264,8 +266,11 @@ public class MantenimientoController {
             limpiar();
             cargarMantenimientos();
         } catch (SQLException e) {
+            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
 

@@ -340,7 +340,9 @@ public class PagoController {
             return;
         }
 
-        try (Connection con = conexion.establecerConexion()) {
+        Connection con = null;
+        try {
+            con = conexion.establecerConexion();
             con.setAutoCommit(false);
 
             // Obtener o crear factura
@@ -372,8 +374,11 @@ public class PagoController {
             cargarPagos();
 
         } catch (SQLException e) {
+            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             JOptionPane.showMessageDialog(null, "Error al registrar pago: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
 
@@ -504,7 +509,9 @@ public class PagoController {
             return;
         }
 
-        try (Connection con = conexion.establecerConexion()) {
+        Connection con = null;
+        try {
+            con = conexion.establecerConexion();
             con.setAutoCommit(false);
 
             // Crear reclamo
@@ -545,8 +552,11 @@ public class PagoController {
             limpiarNota();
             cargarNotasCredito();
         } catch (SQLException e) {
+            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             JOptionPane.showMessageDialog(null, "Error al crear nota de crédito: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
 

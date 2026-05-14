@@ -8,8 +8,6 @@ import javafx.scene.control.*;
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ReclamoRegistroController {
 
@@ -25,7 +23,6 @@ public class ReclamoRegistroController {
 
     @FXML
     public void initialize() {
-        cmbEstado.getItems().addAll("Pendiente", "En revisión", "Resuelto", "Rechazado");
         cmbEstado.setValue("Pendiente");
     }
 
@@ -99,36 +96,13 @@ public class ReclamoRegistroController {
         String descripcion = txtDescripcion.getText().trim();
         String estado = cmbEstado.getValue();
 
-        try (Connection con = conexion.establecerConexion()) {
             con.setAutoCommit(false);
 
-            // Insertar historial de reclamo (con fecha actual)
             int idHistorial = -1;
-            String sqlHistorial = "INSERT INTO TBL_HISTORIAL_RECLAMOS (descripcion, motivo, fecha) VALUES (?, ?, ?)";
-            PreparedStatement psHistorial = con.prepareStatement(sqlHistorial, Statement.RETURN_GENERATED_KEYS);
-            psHistorial.setString(1, descripcion);
-            psHistorial.setString(2, motivo);
-            psHistorial.setDate(3, Date.valueOf(LocalDate.now()));
-            psHistorial.executeUpdate();
-            ResultSet rsHist = psHistorial.getGeneratedKeys();
             if (rsHist.next()) idHistorial = rsHist.getInt(1);
-            psHistorial.close();
 
-            // Insertar reclamo
-            String sqlReclamo = "INSERT INTO TBL_RECLAMACION (estado, motivo, descripcion, fk_pk_id_cliente, fk_pk_id_hist_reclamo, fk_pk_id_empleado) " +
                     "VALUES (?, ?, ?, ?, ?, ?)";
-            PreparedStatement psReclamo = con.prepareStatement(sqlReclamo, Statement.RETURN_GENERATED_KEYS);
-            psReclamo.setString(1, estado);
-            psReclamo.setString(2, motivo);
-            psReclamo.setString(3, descripcion);
-            psReclamo.setInt(4, idCliente);
-            psReclamo.setInt(5, idHistorial);
-            psReclamo.setInt(6, idEmpleado);
-            psReclamo.executeUpdate();
-            ResultSet rsReclamo = psReclamo.getGeneratedKeys();
             int idReclamo = -1;
-            if (rsReclamo.next()) idReclamo = rsReclamo.getInt(1);
-            psReclamo.close();
 
             con.commit();
             JOptionPane.showMessageDialog(null, "Reclamo registrado con ID: " + idReclamo);
@@ -152,11 +126,9 @@ public class ReclamoRegistroController {
 
     private boolean validarCampos() {
         if (txtIdCliente.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID del cliente es obligatorio.");
             return false;
         }
         if (txtIdEmpleado.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID del empleado es obligatorio.");
             return false;
         }
         if (txtMotivo.getText().isBlank()) {
@@ -167,7 +139,6 @@ public class ReclamoRegistroController {
             Integer.parseInt(txtIdCliente.getText().trim());
             Integer.parseInt(txtIdEmpleado.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Los IDs deben ser números.");
             return false;
         }
         return true;

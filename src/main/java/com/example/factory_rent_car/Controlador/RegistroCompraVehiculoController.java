@@ -82,7 +82,9 @@ public class RegistroCompraVehiculoController {
 
         int idSuplidor = mapaSuplidores.get(suplidorNombre);
 
-        try (Connection con = conexion.establecerConexion()) {
+        Connection con = null;
+        try {
+            con = conexion.establecerConexion();
             con.setAutoCommit(false);
 
             // Crear contrato
@@ -135,8 +137,11 @@ public class RegistroCompraVehiculoController {
             JOptionPane.showMessageDialog(null, "Vehículo registrado correctamente.");
             limpiar(event);
         } catch (SQLException e) {
+            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             JOptionPane.showMessageDialog(null, "Error al registrar: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
 
