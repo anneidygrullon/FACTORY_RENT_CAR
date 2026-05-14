@@ -307,7 +307,7 @@
                         </VBox>
                     </VBox>
 
-                    <!-- RECLAMOS (submenú) - reemplaza a GPS -->
+                    <!-- RECLAMOS (submenú) -->
                     <VBox spacing="0">
                         <HBox fx:id="menuReclamos" prefWidth="1e30" spacing="12" alignment="CENTER_LEFT"
                               style="-fx-background-color: transparent; -fx-padding: 11 14 11 16; -fx-cursor: hand;"

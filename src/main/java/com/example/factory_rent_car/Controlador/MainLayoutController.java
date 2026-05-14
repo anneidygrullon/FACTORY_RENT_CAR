@@ -32,7 +32,7 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox menuLimpieza;
     @FXML private HBox menuIncidencias;
     @FXML private HBox menuCompras;
-    @FXML private HBox menuReclamos;        // Reemplaza a GPS
+    @FXML private HBox menuReclamos;
     @FXML private HBox menuRegistros;
     @FXML private HBox menuClientes;
     @FXML private HBox menuSuplidores;
