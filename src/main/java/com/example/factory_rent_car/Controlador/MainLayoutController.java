@@ -4,23 +4,38 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Circle;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ResourceBundle;
 
 public class MainLayoutController implements Initializable {
 
+    private static final String PROFILES_DIR = "profiles";
+
     // ── TOP BAR ──────────────────────────────────────────────
     @FXML private Label sectionTitle;
+    @FXML private Label lblUsuario;
+    @FXML private Label lblRol;
+    @FXML private ImageView profileImageView;
+    @FXML private HBox userArea;
 
     // ── SIDEBAR — menú items (principales) ───────────────────
     @FXML private HBox menuInicio;
@@ -81,9 +96,6 @@ public class MainLayoutController implements Initializable {
     @FXML private Label incidenciasArrow;
     @FXML private HBox subMenuIncidenciaConsulta;
     @FXML private HBox subMenuIncidenciaRegistro;
-
-    // ── BUSCADOR ─────────────────────────────────────────────
-    @FXML private TextField searchField;
 
     // ── CONTENIDO PRINCIPAL ──────────────────────────────────
     @FXML private StackPane contentArea;
@@ -422,10 +434,28 @@ public class MainLayoutController implements Initializable {
         item.setStyle("-fx-padding: 8 14 8 16; -fx-cursor: hand;");
     }
 
-    // ── BUSCADOR ─────────────────────────────────────────────
-    @FXML private void handleClearSearch(MouseEvent e) {
-        searchField.clear();
-        searchField.requestFocus();
+    // ── HOVER TOP BAR ─────────────────────────────────────────
+    @FXML private void onNotificationEnter(MouseEvent e) {
+        StackPane s = (StackPane) e.getSource();
+        s.setStyle("-fx-cursor: hand; -fx-padding: 6; -fx-background-radius: 8; -fx-background-color: rgba(255,255,255,0.1);");
+    }
+    @FXML private void onNotificationExit(MouseEvent e) {
+        StackPane s = (StackPane) e.getSource();
+        s.setStyle("-fx-cursor: hand; -fx-padding: 6; -fx-background-radius: 8; -fx-background-color: rgba(255,255,255,0.05);");
+    }
+    @FXML private void onUserAreaEnter(MouseEvent e) {
+        userArea.setStyle("-fx-cursor: hand; -fx-padding: 4 8 4 4; -fx-background-radius: 10; -fx-background-color: rgba(255,255,255,0.08);");
+    }
+    @FXML private void onUserAreaExit(MouseEvent e) {
+        userArea.setStyle("-fx-cursor: hand; -fx-padding: 4 8 4 4; -fx-background-radius: 10; -fx-background-color: rgba(255,255,255,0.04);");
+    }
+    @FXML private void onLogoutEnter(MouseEvent e) {
+        StackPane s = (StackPane) e.getSource();
+        s.setStyle("-fx-cursor: hand; -fx-padding: 6; -fx-background-radius: 8; -fx-background-color: rgba(255,70,70,0.15);");
+    }
+    @FXML private void onLogoutExit(MouseEvent e) {
+        StackPane s = (StackPane) e.getSource();
+        s.setStyle("-fx-cursor: hand; -fx-padding: 6; -fx-background-radius: 8; -fx-background-color: rgba(255,255,255,0.05);");
     }
 
     // ── Inyecta el MainLayoutController en los controladores que lo necesiten ──
@@ -545,4 +575,80 @@ public class MainLayoutController implements Initializable {
     public HBox getMenuRegistros()     { return menuRegistros; }
     public HBox getMenuClientes()      { return menuClientes; }
     public HBox getMenuSuplidores()    { return menuSuplidores; }
+
+    private String nombreUsuario;
+
+    public void setUsuarioActual(String usuario) {
+        this.nombreUsuario = usuario;
+        lblRol.setText(usuario);
+        lblUsuario.setText(usuario);
+        cargarFotoPerfil();
+    }
+
+    @FXML
+    private void handleUserMenu(MouseEvent e) {
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem cambiarFoto = new MenuItem("Cambiar foto de perfil");
+        cambiarFoto.setStyle("-fx-padding: 8 16 8 16; -fx-font-size: 13px;");
+        cambiarFoto.setOnAction(ev -> cambiarFotoPerfil());
+
+        MenuItem cerrarSesion = new MenuItem("Cerrar sesión");
+        cerrarSesion.setStyle("-fx-padding: 8 16 8 16; -fx-font-size: 13px;");
+        cerrarSesion.setOnAction(ev -> handleLogout(null));
+
+        menu.getItems().addAll(cambiarFoto, new SeparatorMenuItem(), cerrarSesion);
+        menu.show(userArea, e.getScreenX(), e.getScreenY());
+    }
+
+    @FXML
+    private void handleLogout(MouseEvent e) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/factory_rent_car/Login.fxml"));
+            Scene scene = new Scene(loader.load());
+            LoginController loginController = loader.getController();
+            Stage stage = (Stage) userArea.getScene().getWindow();
+            loginController.setStage(stage);
+            stage.setTitle("Factory Rent Car - Iniciar Sesión");
+            stage.setScene(scene);
+            stage.setMaximized(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void cambiarFotoPerfil() {
+        Stage stage = (Stage) userArea.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleccionar foto de perfil");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+        File archivo = fileChooser.showOpenDialog(stage);
+        if (archivo != null) {
+            try {
+                File dir = new File(PROFILES_DIR);
+                if (!dir.exists()) dir.mkdirs();
+                String extension = archivo.getName().substring(archivo.getName().lastIndexOf('.'));
+                File destino = new File(PROFILES_DIR, nombreUsuario + extension);
+                Files.copy(archivo.toPath(), destino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                cargarFotoPerfil();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private void cargarFotoPerfil() {
+        if (nombreUsuario == null) return;
+        File dir = new File(PROFILES_DIR);
+        if (!dir.exists()) return;
+        File[] matching = dir.listFiles((d, name) -> name.startsWith(nombreUsuario + "."));
+        if (matching != null && matching.length > 0) {
+            Image img = new Image(matching[0].toURI().toString(), 36, 36, true, true);
+            profileImageView.setImage(img);
+            Circle clip = new Circle(18, 18, 18);
+            profileImageView.setClip(clip);
+        }
+    }
 }
