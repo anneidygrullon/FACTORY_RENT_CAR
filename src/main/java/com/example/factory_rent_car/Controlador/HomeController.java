@@ -1,6 +1,7 @@
 package com.example.factory_rent_car.Controlador;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
@@ -8,39 +9,37 @@ public class HomeController {
 
     private MainLayoutController mainController;
 
+    @FXML private Label lblUsuario;
+
     public void setMainController(MainLayoutController mainController) {
         this.mainController = mainController;
     }
 
-    @FXML
-    private void irARegistrarCliente(MouseEvent event) {
-        if (mainController != null) {
-            mainController.navegarA("Registro de Cliente", mainController.getMenuClientes(), "Clientes.fxml");
-        }
+    @FXML private void irAClientes(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Clientes", mainController.getMenuClientes(), "Clientes.fxml");
+    }
+    @FXML private void irAReservaVehiculo(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Reservación de Vehículos", mainController.getMenuReservacion(), "Reserva.fxml");
+    }
+    @FXML private void irAReservaObjeto(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Reservación de Objetos", mainController.getMenuReservacion(), "ReservacionObjeto.fxml");
+    }
+    @FXML private void irAIncidencia(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Registro de Incidencia", mainController.getMenuIncidencias(), "IncidenciaRegistro.fxml");
+    }
+    @FXML private void irAEntrega(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Registro de Entrega", mainController.getMenuEntregas(), "EntregaVehiculo.fxml");
+    }
+    @FXML private void irADevolucion(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Devolución de Vehículos", mainController.getMenuDevolucion(), "DevolucionVehiculo.fxml");
+    }
+    @FXML private void irAVehiculos(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Consulta de Vehículos", mainController.getMenuVehiculos(), "VehiculoConsulta.fxml");
+    }
+    @FXML private void irAReclamos(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Registro de Reclamo", mainController.getMenuReclamos(), "ReclamoRegistro.fxml");
     }
 
-    @FXML
-    private void irARegistrarReserva(MouseEvent event) {
-        if (mainController != null) {
-            mainController.navegarA("Reservación de Vehículos", mainController.getMenuReservacion(), "Reserva.fxml");
-        }
-    }
-
-    @FXML
-    private void irARegistrarIncidencia(MouseEvent event) {
-        if (mainController != null) {
-            mainController.navegarA("Registro de Incidencia", mainController.getMenuIncidencias(), "IncidenciaRegistro.fxml");
-        }
-    }
-
-    @FXML
-    private void irARegistrarEntrega(MouseEvent event) {
-        if (mainController != null) {
-            mainController.navegarA("Registro de Entrega", mainController.getMenuEntregas(), "EntregaVehiculo.fxml");
-        }
-    }
-
-    // Efectos hover para las tarjetas
     @FXML
     private void onCardEnter(MouseEvent event) {
         VBox card = (VBox) event.getSource();
