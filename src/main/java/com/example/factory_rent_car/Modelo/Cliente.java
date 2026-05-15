@@ -34,7 +34,6 @@ public class Cliente {
         this.numPasaporte.set(numPasaporte != null ? numPasaporte : "");
     }
 
-    // Propiedades para TableView
     public SimpleIntegerProperty idClienteProperty() { return idCliente; }
     public SimpleStringProperty nombreProperty() { return nombre; }
     public SimpleIntegerProperty edadProperty() { return edad; }
@@ -46,7 +45,6 @@ public class Cliente {
     public SimpleStringProperty nacionalidadProperty() { return nacionalidad; }
     public SimpleStringProperty numPasaporteProperty() { return numPasaporte; }
 
-    // Getters y Setters
     public int getIdCliente() { return idCliente.get(); }
     public void setIdCliente(int v) { idCliente.set(v); }
     public String getNombre() { return nombre.get(); }

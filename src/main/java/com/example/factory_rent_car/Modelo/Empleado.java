@@ -17,7 +17,7 @@ public class Empleado {
     private final SimpleIntegerProperty idDireccion = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idPuesto = new SimpleIntegerProperty();
 
-    // Datos adicionales para mostrar en tabla (JOIN)
+    // Info extra para la tabla (viene de la BD)
     private final SimpleStringProperty nombrePuesto = new SimpleStringProperty();
     private final SimpleStringProperty nombreDepartamento = new SimpleStringProperty();
     private final SimpleDoubleProperty sueldo = new SimpleDoubleProperty();
@@ -45,7 +45,6 @@ public class Empleado {
         this.direccionCompleta.set(direccionCompleta != null ? direccionCompleta : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idEmpleadoProperty() { return idEmpleado; }
     public SimpleStringProperty nombreProperty() { return nombre; }
     public SimpleStringProperty telefonoProperty() { return telefono; }
@@ -61,7 +60,6 @@ public class Empleado {
     public SimpleDoubleProperty sueldoProperty() { return sueldo; }
     public SimpleStringProperty direccionCompletaProperty() { return direccionCompleta; }
 
-    // Getters / Setters
     public int getIdEmpleado() { return idEmpleado.get(); }
     public void setIdEmpleado(int v) { idEmpleado.set(v); }
     public String getNombre() { return nombre.get(); }

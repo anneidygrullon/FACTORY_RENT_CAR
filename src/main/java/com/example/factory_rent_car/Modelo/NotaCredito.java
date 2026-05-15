@@ -13,7 +13,7 @@ public class NotaCredito {
     private final SimpleStringProperty descripcion = new SimpleStringProperty();
     private final SimpleIntegerProperty idDevolucion = new SimpleIntegerProperty();
 
-    // Datos adicionales
+    // Info extra para la tabla
     private final SimpleDoubleProperty monto = new SimpleDoubleProperty();
     private final SimpleStringProperty clienteNombre = new SimpleStringProperty();
     private final SimpleStringProperty reservaInfo = new SimpleStringProperty();
@@ -35,7 +35,6 @@ public class NotaCredito {
         this.usado.set(usado);
     }
 
-    // Propiedades
     public SimpleIntegerProperty idNotaProperty() { return idNota; }
     public SimpleStringProperty tipoProperty() { return tipo; }
     public SimpleStringProperty motivoProperty() { return motivo; }
@@ -47,7 +46,6 @@ public class NotaCredito {
     public SimpleStringProperty reservaInfoProperty() { return reservaInfo; }
     public SimpleBooleanProperty usadoProperty() { return usado; }
 
-    // Getters y Setters
     public int getIdNota() { return idNota.get(); }
     public void setIdNota(int v) { idNota.set(v); }
     public String getTipo() { return tipo.get(); }

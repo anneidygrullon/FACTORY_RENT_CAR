@@ -16,12 +16,10 @@ public class Departamento {
         this.telefono.set(telefono != null ? telefono : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idDepartamentoProperty() { return idDepartamento; }
     public SimpleStringProperty nombreProperty() { return nombre; }
     public SimpleStringProperty telefonoProperty() { return telefono; }
 
-    // Getters y Setters
     public int getIdDepartamento() { return idDepartamento.get(); }
     public void setIdDepartamento(int v) { idDepartamento.set(v); }
     public String getNombre() { return nombre.get(); }

@@ -27,7 +27,6 @@ public class Objeto {
         this.estado.set(estado != null ? estado : (stock > 0 ? "Disponible" : "Agotado"));
     }
 
-    // Propiedades
     public SimpleIntegerProperty idObjetoProperty() { return idObjeto; }
     public SimpleStringProperty nombreProperty() { return nombre; }
     public SimpleStringProperty marcaProperty() { return marca; }
@@ -37,7 +36,6 @@ public class Objeto {
     public SimpleIntegerProperty idCompraProperty() { return idCompra; }
     public SimpleStringProperty estadoProperty() { return estado; }
 
-    // Getters y Setters
     public int getIdObjeto() { return idObjeto.get(); }
     public void setIdObjeto(int v) { idObjeto.set(v); }
     public String getNombre() { return nombre.get(); }

@@ -15,7 +15,7 @@ public class Mantenimiento {
     private final SimpleIntegerProperty idVehiculo = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idHistMantenimiento = new SimpleIntegerProperty();
 
-    // Datos adicionales para mostrar en tabla (JOIN)
+    // Info extra para la tabla (viene de la BD)
     private final SimpleStringProperty vehiculoInfo = new SimpleStringProperty();
     private final SimpleIntegerProperty diasDuracion = new SimpleIntegerProperty();
 
@@ -45,7 +45,6 @@ public class Mantenimiento {
         }
     }
 
-    // Propiedades
     public SimpleIntegerProperty idMantenimientoProperty() { return idMantenimiento; }
     public SimpleDoubleProperty costoProperty() { return costo; }
     public SimpleObjectProperty<LocalDate> fechaSalidaProperty() { return fechaSalida; }
@@ -57,7 +56,6 @@ public class Mantenimiento {
     public SimpleStringProperty vehiculoInfoProperty() { return vehiculoInfo; }
     public SimpleIntegerProperty diasDuracionProperty() { return diasDuracion; }
 
-    // Getters y Setters
     public int getIdMantenimiento() { return idMantenimiento.get(); }
     public void setIdMantenimiento(int v) { idMantenimiento.set(v); }
     public double getCosto() { return costo.get(); }

@@ -14,7 +14,7 @@ public class ControlVehi {
     private final SimpleIntegerProperty idReserva = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idEmpleado = new SimpleIntegerProperty();
 
-    // Datos adicionales para mostrar en la tabla
+    // Info extra para la tabla (viene de la BD)
     private final SimpleStringProperty clienteNombre = new SimpleStringProperty();
     private final SimpleStringProperty vehiculoInfo = new SimpleStringProperty();
     private final SimpleStringProperty empleadoNombre = new SimpleStringProperty();
@@ -22,7 +22,6 @@ public class ControlVehi {
 
     public ControlVehi() {}
 
-    // Constructor completo
     public ControlVehi(int idControl, LocalDate fecha, double nivelCombustible, String tipo,
                        int idDireccion, int idReserva, int idEmpleado,
                        String clienteNombre, String vehiculoInfo, String empleadoNombre, String direccionCompleta) {
@@ -39,7 +38,6 @@ public class ControlVehi {
         this.direccionCompleta.set(direccionCompleta != null ? direccionCompleta : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idControlProperty() { return idControl; }
     public SimpleObjectProperty<LocalDate> fechaProperty() { return fecha; }
     public SimpleDoubleProperty nivelCombustibleProperty() { return nivelCombustible; }
@@ -52,7 +50,6 @@ public class ControlVehi {
     public SimpleStringProperty empleadoNombreProperty() { return empleadoNombre; }
     public SimpleStringProperty direccionCompletaProperty() { return direccionCompleta; }
 
-    // Getters y Setters
     public int getIdControl() { return idControl.get(); }
     public void setIdControl(int v) { idControl.set(v); }
     public LocalDate getFecha() { return fecha.get(); }

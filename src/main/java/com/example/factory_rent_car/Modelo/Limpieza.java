@@ -13,7 +13,7 @@ public class Limpieza {
     private final SimpleIntegerProperty idVehiculo = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idEmpleado = new SimpleIntegerProperty();
 
-    // Datos adicionales para mostrar en tabla (JOIN)
+    // Info extra para la tabla (viene de la BD)
     private final SimpleStringProperty vehiculoInfo = new SimpleStringProperty();
     private final SimpleStringProperty empleadoNombre = new SimpleStringProperty();
 
@@ -31,7 +31,6 @@ public class Limpieza {
         this.empleadoNombre.set(empleadoNombre != null ? empleadoNombre : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idLimpiezaProperty() { return idLimpieza; }
     public SimpleObjectProperty<LocalDate> fechaProperty() { return fecha; }
     public SimpleStringProperty tipoProperty() { return tipo; }
@@ -41,7 +40,6 @@ public class Limpieza {
     public SimpleStringProperty vehiculoInfoProperty() { return vehiculoInfo; }
     public SimpleStringProperty empleadoNombreProperty() { return empleadoNombre; }
 
-    // Getters y Setters
     public int getIdLimpieza() { return idLimpieza.get(); }
     public void setIdLimpieza(int v) { idLimpieza.set(v); }
     public LocalDate getFecha() { return fecha.get(); }

@@ -11,7 +11,7 @@ public class Direccion {
     private final SimpleStringProperty referencia = new SimpleStringProperty();
     private final SimpleIntegerProperty idCiudad = new SimpleIntegerProperty();
 
-    // Datos adicionales para mostrar en tabla
+    // Info extra para la tabla (viene de la BD)
     private final SimpleStringProperty nombreCiudad = new SimpleStringProperty();
 
     public Direccion() {}
@@ -27,7 +27,6 @@ public class Direccion {
         this.nombreCiudad.set(nombreCiudad != null ? nombreCiudad : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idDireccionProperty() { return idDireccion; }
     public SimpleStringProperty calleAvenidaProperty() { return calleAvenida; }
     public SimpleStringProperty numEdificioCasaProperty() { return numEdificioCasa; }
@@ -36,7 +35,6 @@ public class Direccion {
     public SimpleIntegerProperty idCiudadProperty() { return idCiudad; }
     public SimpleStringProperty nombreCiudadProperty() { return nombreCiudad; }
 
-    // Getters y Setters
     public int getIdDireccion() { return idDireccion.get(); }
     public void setIdDireccion(int v) { idDireccion.set(v); }
     public String getCalleAvenida() { return calleAvenida.get(); }
@@ -52,7 +50,7 @@ public class Direccion {
     public String getNombreCiudad() { return nombreCiudad.get(); }
     public void setNombreCiudad(String v) { nombreCiudad.set(v); }
 
-    // Método para obtener dirección completa como String
+    // Devuelve la dirección completa en un solo texto
     public String getDireccionCompleta() {
         String direccion = calleAvenida.get();
         if (numEdificioCasa.get() != null && !numEdificioCasa.get().isEmpty()) {

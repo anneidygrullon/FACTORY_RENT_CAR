@@ -15,10 +15,10 @@ public class Incidencia {
     private final SimpleIntegerProperty idHistorial = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idEmpleado = new SimpleIntegerProperty();
 
-    // Datos adicionales para mostrar en tabla (JOIN)
+    // Info extra para la tabla (viene de la BD)
     private final SimpleStringProperty reservaInfo = new SimpleStringProperty();
     private final SimpleStringProperty empleadoNombre = new SimpleStringProperty();
-    private final SimpleStringProperty estado = new SimpleStringProperty(); // estado desde historial
+    private final SimpleStringProperty estado = new SimpleStringProperty(); // viene del historial
 
     public Incidencia() {}
 
@@ -38,7 +38,6 @@ public class Incidencia {
         this.estado.set(estado != null ? estado : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idIncidenciaProperty() { return idIncidencia; }
     public SimpleStringProperty tipoProperty() { return tipo; }
     public SimpleDoubleProperty montoProperty() { return monto; }
@@ -51,7 +50,6 @@ public class Incidencia {
     public SimpleStringProperty empleadoNombreProperty() { return empleadoNombre; }
     public SimpleStringProperty estadoProperty() { return estado; }
 
-    // Getters y Setters
     public int getIdIncidencia() { return idIncidencia.get(); }
     public void setIdIncidencia(int v) { idIncidencia.set(v); }
     public String getTipo() { return tipo.get(); }
