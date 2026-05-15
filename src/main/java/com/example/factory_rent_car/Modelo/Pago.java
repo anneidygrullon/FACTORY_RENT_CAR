@@ -14,7 +14,7 @@ public class Pago {
     private final SimpleIntegerProperty idMetodoPago = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idCuenta = new SimpleIntegerProperty();
 
-    // Datos adicionales para mostrar en tabla
+    // Info extra para la tabla (viene de la BD)
     private final SimpleStringProperty metodoPagoNombre = new SimpleStringProperty();
     private final SimpleStringProperty cuentaInfo = new SimpleStringProperty();
     private final SimpleStringProperty reservaInfo = new SimpleStringProperty();
@@ -38,7 +38,6 @@ public class Pago {
         this.clienteNombre.set(clienteNombre != null ? clienteNombre : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idPagoProperty() { return idPago; }
     public SimpleObjectProperty<LocalDate> fechaProperty() { return fecha; }
     public SimpleStringProperty tipoProperty() { return tipo; }
@@ -51,7 +50,6 @@ public class Pago {
     public SimpleStringProperty reservaInfoProperty() { return reservaInfo; }
     public SimpleStringProperty clienteNombreProperty() { return clienteNombre; }
 
-    // Getters y Setters
     public int getIdPago() { return idPago.get(); }
     public void setIdPago(int v) { idPago.set(v); }
     public LocalDate getFecha() { return fecha.get(); }

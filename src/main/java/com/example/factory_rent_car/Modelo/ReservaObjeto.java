@@ -37,7 +37,6 @@ public class ReservaObjeto {
         this(0, idReserva, idObjeto, nombreObjeto, marcaObjeto, tipoObjeto, precioUnitario, cantidad);
     }
 
-    // Propiedades
     public SimpleIntegerProperty idRegistroProperty()   { return idRegistro; }
     public SimpleIntegerProperty idReservaProperty()    { return idReserva; }
     public SimpleIntegerProperty idObjetoProperty()     { return idObjeto; }
@@ -48,7 +47,6 @@ public class ReservaObjeto {
     public SimpleIntegerProperty cantidadProperty()     { return cantidad; }
     public SimpleDoubleProperty  subtotalProperty()     { return subtotal; }
 
-    // Getters / Setters
     public int getIdRegistro()   { return idRegistro.get(); }
     public void setIdRegistro(int v) { idRegistro.set(v); }
     public int getIdReserva()    { return idReserva.get(); }

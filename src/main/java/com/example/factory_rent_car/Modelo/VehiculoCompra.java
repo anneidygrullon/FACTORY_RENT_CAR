@@ -20,7 +20,7 @@ public class VehiculoCompra {
     private final SimpleIntegerProperty idPoliza = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idCompra = new SimpleIntegerProperty();
 
-    // Datos de compra
+    // Info de la compra del vehículo
     private final SimpleIntegerProperty cantidad = new SimpleIntegerProperty();
     private final SimpleObjectProperty<LocalDate> fechaCompra = new SimpleObjectProperty<>();
     private final SimpleDoubleProperty precioCompra = new SimpleDoubleProperty();
@@ -51,7 +51,6 @@ public class VehiculoCompra {
         this.suministradorNombre.set(suministradorNombre != null ? suministradorNombre : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idVehiculoProperty() { return idVehiculo; }
     public SimpleStringProperty marcaProperty() { return marca; }
     public SimpleStringProperty modeloProperty() { return modelo; }
@@ -70,7 +69,6 @@ public class VehiculoCompra {
     public SimpleDoubleProperty precioCompraProperty() { return precioCompra; }
     public SimpleStringProperty suministradorNombreProperty() { return suministradorNombre; }
 
-    // Getters y Setters
     public int getIdVehiculo() { return idVehiculo.get(); }
     public void setIdVehiculo(int v) { idVehiculo.set(v); }
     public String getMarca() { return marca.get(); }

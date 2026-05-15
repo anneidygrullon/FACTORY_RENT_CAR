@@ -26,7 +26,6 @@ public class Suministrador {
         this.direccionCompleta.set(direccionCompleta != null ? direccionCompleta : "");
     }
 
-    // Propiedades para TableView
     public SimpleIntegerProperty idSuministradorProperty() { return idSuministrador; }
     public SimpleStringProperty tipoProperty() { return tipo; }
     public SimpleStringProperty nombreProperty() { return nombre; }
@@ -36,7 +35,7 @@ public class Suministrador {
     public SimpleIntegerProperty idDireccionProperty() { return idDireccion; }
     public SimpleStringProperty direccionCompletaProperty() { return direccionCompleta; }
 
-    // Getters estándar (necesarios para PropertyValueFactory si se usa, pero aquí usamos las properties directamente)
+    // Getters para acceso directo a los datos
     public int getIdSuministrador() { return idSuministrador.get(); }
     public String getTipo() { return tipo.get(); }
     public String getNombre() { return nombre.get(); }

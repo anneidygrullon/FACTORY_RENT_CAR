@@ -38,7 +38,6 @@ public class Vehiculo {
         this.idCompra.set(idCompra);
     }
 
-    // Propiedades
     public SimpleIntegerProperty idVehiculoProperty() { return idVehiculo; }
     public SimpleStringProperty marcaProperty() { return marca; }
     public SimpleStringProperty modeloProperty() { return modelo; }
@@ -53,7 +52,6 @@ public class Vehiculo {
     public SimpleIntegerProperty idPolizaProperty() { return idPoliza; }
     public SimpleIntegerProperty idCompraProperty() { return idCompra; }
 
-    // Getters y Setters estándar
     public int getIdVehiculo() { return idVehiculo.get(); }
     public void setIdVehiculo(int v) { idVehiculo.set(v); }
     public String getMarca() { return marca.get(); }

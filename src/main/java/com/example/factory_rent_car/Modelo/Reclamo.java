@@ -14,7 +14,7 @@ public class Reclamo {
     private final SimpleIntegerProperty idHistorial = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idEmpleado = new SimpleIntegerProperty();
 
-    // Datos adicionales para mostrar en tabla (JOIN)
+    // Info extra para la tabla (viene de la BD)
     private final SimpleStringProperty clienteNombre = new SimpleStringProperty();
     private final SimpleStringProperty empleadoNombre = new SimpleStringProperty();
     private final SimpleObjectProperty<LocalDate> fecha = new SimpleObjectProperty<>();
@@ -36,7 +36,6 @@ public class Reclamo {
         this.fecha.set(fecha);
     }
 
-    // Propiedades
     public SimpleIntegerProperty idReclamoProperty() { return idReclamo; }
     public SimpleStringProperty estadoProperty() { return estado; }
     public SimpleStringProperty motivoProperty() { return motivo; }
@@ -48,7 +47,6 @@ public class Reclamo {
     public SimpleStringProperty empleadoNombreProperty() { return empleadoNombre; }
     public SimpleObjectProperty<LocalDate> fechaProperty() { return fecha; }
 
-    // Getters y Setters
     public int getIdReclamo() { return idReclamo.get(); }
     public void setIdReclamo(int v) { idReclamo.set(v); }
     public String getEstado() { return estado.get(); }

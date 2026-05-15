@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Reservacion {
 
-        // ── JavaFX Properties para TableView ──────────────────────────────────
+        // Propiedades para la tabla
         private final SimpleIntegerProperty idReserva       = new SimpleIntegerProperty();
         private final SimpleStringProperty fechaInicio     = new SimpleStringProperty();
         private final SimpleStringProperty  fechaDevolucion = new SimpleStringProperty();
@@ -14,18 +14,17 @@ public class Reservacion {
         private final SimpleDoubleProperty  montoApartado   = new SimpleDoubleProperty();
         private final SimpleDoubleProperty  montoPendiente  = new SimpleDoubleProperty();
         private final SimpleDoubleProperty  descuento       = new SimpleDoubleProperty();
-        private final SimpleStringProperty  cliente         = new SimpleStringProperty(); // JOIN nombre
-        private final SimpleStringProperty  vehiculo        = new SimpleStringProperty(); // JOIN marca+modelo
-        private final SimpleStringProperty  seguro          = new SimpleStringProperty(); // JOIN nombre plan
-        private final SimpleStringProperty  estado          = new SimpleStringProperty(); // calculado
+        private final SimpleStringProperty  cliente         = new SimpleStringProperty(); // viene de la BD
+        private final SimpleStringProperty  vehiculo        = new SimpleStringProperty(); // viene de la BD
+        private final SimpleStringProperty  seguro          = new SimpleStringProperty(); // viene de la BD
+        private final SimpleStringProperty  estado          = new SimpleStringProperty(); // se calcula automáticamente
 
-        // ── IDs raw para operaciones de BD ────────────────────────────────────
+        // IDs de la base de datos
         private int idCliente;
         private int idSeguro;
         private int idContrato;
         private int idVehiculo;
 
-        // ── Constructores ─────────────────────────────────────────────────────
         public Reservacion() {}
 
         public Reservacion(int idReserva, String fechaInicio, String fechaDevolucion,
@@ -49,12 +48,9 @@ public class Reservacion {
             this.estado.set(calcularEstado(fechaDevolucion));
         }
 
-        // ── Método del dominio ────────────────────────────────────────────────
         /**
-         * Determina el estado visual de la reserva:
-         *  - "Activa"    → fecha_devolucion >= hoy y hay pendiente > 0
-         *  - "Completada"→ montoPendiente == 0
-         *  - "Vencida"   → fecha_devolucion < hoy y aún hay pendiente
+         * Define si la reserva está Activa, Completada o Vencida
+         * según la fecha de devolución y el saldo pendiente
          */
         public String calcularEstadoActual() {
             return calcularEstado(fechaDevolucion.get());
@@ -74,7 +70,6 @@ public class Reservacion {
             }
         }
 
-        // ── Properties ────────────────────────────────────────────────────────
         public SimpleIntegerProperty idReservaProperty()       { return idReserva; }
         public SimpleStringProperty  fechaInicioProperty()     { return fechaInicio; }
         public SimpleStringProperty  fechaDevolucionProperty() { return fechaDevolucion; }
@@ -87,7 +82,6 @@ public class Reservacion {
         public SimpleStringProperty  seguroProperty()          { return seguro; }
         public SimpleStringProperty  estadoProperty()          { return estado; }
 
-        // ── Getters / Setters ─────────────────────────────────────────────────
         public int    getIdReserva()                  { return idReserva.get(); }
         public void   setIdReserva(int v)             { idReserva.set(v); }
 

@@ -14,7 +14,7 @@ public class Pedido {
     private final SimpleIntegerProperty idSuministrador = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idContrato = new SimpleIntegerProperty();
 
-    // Datos adicionales
+    // Info extra para la tabla
     private final SimpleStringProperty suministradorNombre = new SimpleStringProperty();
 
     public Pedido() {}
@@ -31,7 +31,6 @@ public class Pedido {
         this.suministradorNombre.set(suministradorNombre != null ? suministradorNombre : "");
     }
 
-    // Propiedades
     public SimpleIntegerProperty idCompraProperty() { return idCompra; }
     public SimpleIntegerProperty cantidadProperty() { return cantidad; }
     public SimpleObjectProperty<LocalDate> fechaProperty() { return fecha; }
@@ -41,7 +40,6 @@ public class Pedido {
     public SimpleIntegerProperty idContratoProperty() { return idContrato; }
     public SimpleStringProperty suministradorNombreProperty() { return suministradorNombre; }
 
-    // Getters y Setters
     public int getIdCompra() { return idCompra.get(); }
     public void setIdCompra(int v) { idCompra.set(v); }
     public int getCantidad() { return cantidad.get(); }
