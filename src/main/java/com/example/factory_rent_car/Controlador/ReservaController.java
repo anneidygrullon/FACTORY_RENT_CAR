@@ -56,7 +56,7 @@ public class ReservaController {
     @FXML private TableColumn<Reservacion, Number> colMontoTotal;
     @FXML private TableColumn<Reservacion, Number> colPendiente;
     @FXML private TableColumn<Reservacion, String> colEstado;
-    @FXML private VBox tableContainer;  // 🔄 Contenedor de toda la tabla (cabecera + tabla + pie)
+    @FXML private VBox tableContainer;
     @FXML private Button btnToggleTable;
 
     // ── Datos internos ────────────────────────────────────────────────────
