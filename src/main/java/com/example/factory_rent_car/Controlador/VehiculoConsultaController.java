@@ -8,12 +8,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javax.swing.*;
 import java.sql.*;
 
 public class VehiculoConsultaController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtBuscar;
     @FXML private TableView<Vehiculo> tablaVehiculos;
@@ -82,14 +83,13 @@ public class VehiculoConsultaController {
                         rs.getString("estado"),
                         rs.getDouble("precio_x_dia"),
                         rs.getInt("fk_id_poliza"),
-                        rs.getInt("fk_pk_id_compra"),
-                        null  // ← campo foto (no se usa en consulta)
+                        rs.getInt("fk_pk_id_compra")
                 );
                 listaVehiculos.add(v);
             }
             tablaVehiculos.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando vehículos: " + e.getMessage());
+            error("Error cargando vehículos: " + e.getMessage());
         }
     }
 
@@ -121,12 +121,12 @@ public class VehiculoConsultaController {
     @FXML
     private void actualizarEstado(ActionEvent event) {
         if (vehiculoSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un vehículo de la tabla.");
+            advertencia("Seleccione un vehículo de la tabla.");
             return;
         }
         String nuevoEstado = cmbEstado.getValue();
         if (nuevoEstado == null || nuevoEstado.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Seleccione un estado válido.");
+            advertencia("Seleccione un estado válido.");
             return;
         }
         try (Connection con = conexion.establecerConexion();
@@ -135,14 +135,14 @@ public class VehiculoConsultaController {
             ps.setInt(2, vehiculoSeleccionado.getIdVehiculo());
             int updated = ps.executeUpdate();
             if (updated > 0) {
-                JOptionPane.showMessageDialog(null, "Estado actualizado correctamente.");
+                informacion("Estado actualizado correctamente.");
                 vehiculoSeleccionado.setEstado(nuevoEstado);
                 tablaVehiculos.refresh();
             } else {
-                JOptionPane.showMessageDialog(null, "No se pudo actualizar.");
+                advertencia("No se pudo actualizar.");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
+            error("Error al actualizar: " + e.getMessage());
         }
     }
 }

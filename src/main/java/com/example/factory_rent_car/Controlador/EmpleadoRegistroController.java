@@ -1,6 +1,7 @@
 package com.example.factory_rent_car.Controlador;
 
 import com.example.factory_rent_car.Database.Conexion;
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 public class EmpleadoRegistroController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtNombre;
     @FXML private TextField txtTelefono;
@@ -51,7 +52,7 @@ public class EmpleadoRegistroController {
                 mapaPuestos.put(nombre, id);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando puestos: " + e.getMessage());
+            error("Error cargando puestos: " + e.getMessage());
         }
     }
 
@@ -72,7 +73,7 @@ public class EmpleadoRegistroController {
                 mapaDirecciones.put(direccion, id);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando direcciones: " + e.getMessage());
+            error("Error cargando direcciones: " + e.getMessage());
         }
     }
 
@@ -91,7 +92,7 @@ public class EmpleadoRegistroController {
 
         String nombre = txtNombre.getText().trim();
         String telefono = txtTelefono.getText().trim();
-        String cedula = txtCedula.getText().trim();
+        String cedula = txtCedula.getText().trim().replaceAll("[^0-9]", "");
         LocalDate fechaNac = dpFechaNacimiento.getValue();
         String nacionalidad = txtNacionalidad.getText().trim();
         int edad = Integer.parseInt(txtEdad.getText().trim());
@@ -102,33 +103,34 @@ public class EmpleadoRegistroController {
         Integer idPuesto = mapaPuestos.get(puestoNombre);
         Integer idDireccion = mapaDirecciones.get(direccionStr);
         if (idPuesto == null || idDireccion == null) {
-            JOptionPane.showMessageDialog(null, "Datos inválidos de puesto o dirección.");
+            advertencia("Datos inválidos de puesto o dirección.");
             return;
         }
 
-        String sql = "INSERT INTO TBL_EMPLEADO (nombre, telefono, cedula, fecha_nacimiento, nacionalidad, edad, fecha_contratacion, fk_pk_id_puesto, fk_pk_id_direccion) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO TBL_EMPLEADO (pk_id_empleado, nombre, telefono, cedula, fecha_nacimiento, nacionalidad, edad, fecha_contratacion, fk_pk_id_puesto, fk_pk_id_direccion) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, nombre);
-            ps.setString(2, telefono);
-            ps.setString(3, cedula);
-            ps.setDate(4, Date.valueOf(fechaNac));
-            ps.setString(5, nacionalidad);
-            ps.setInt(6, edad);
-            ps.setDate(7, Date.valueOf(fechaCont));
-            ps.setInt(8, idPuesto);
-            ps.setInt(9, idDireccion);
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                JOptionPane.showMessageDialog(null, "Empleado registrado con ID: " + rs.getInt(1));
-            } else {
-                JOptionPane.showMessageDialog(null, "Empleado registrado.");
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            int idEmpleado;
+            try (PreparedStatement psNext = con.prepareStatement("SELECT ISNULL(MAX(pk_id_empleado), 0) + 1 AS next_id FROM TBL_EMPLEADO");
+                 ResultSet rsNext = psNext.executeQuery()) {
+                idEmpleado = rsNext.next() ? rsNext.getInt("next_id") : 1;
             }
+            ps.setInt(1, idEmpleado);
+            ps.setString(2, nombre);
+            ps.setString(3, telefono);
+            ps.setString(4, cedula);
+            ps.setDate(5, Date.valueOf(fechaNac));
+            ps.setString(6, nacionalidad);
+            ps.setInt(7, edad);
+            ps.setDate(8, Date.valueOf(fechaCont));
+            ps.setInt(9, idPuesto);
+            ps.setInt(10, idDireccion);
+            ps.executeUpdate();
+            informacion("Empleado registrado con ID: " + idEmpleado);
             limpiar(event);
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al registrar: " + e.getMessage());
+            error("Error al registrar: " + e.getMessage());
         }
     }
 
@@ -146,17 +148,17 @@ public class EmpleadoRegistroController {
     }
 
     private boolean validarCampos() {
-        if (txtNombre.getText().isBlank()) { JOptionPane.showMessageDialog(null, "Nombre obligatorio."); return false; }
-        if (txtTelefono.getText().isBlank()) { JOptionPane.showMessageDialog(null, "Teléfono obligatorio."); return false; }
-        if (txtCedula.getText().isBlank()) { JOptionPane.showMessageDialog(null, "Cédula obligatoria."); return false; }
-        if (dpFechaNacimiento.getValue() == null) { JOptionPane.showMessageDialog(null, "Fecha nacimiento obligatoria."); return false; }
-        if (txtNacionalidad.getText().isBlank()) { JOptionPane.showMessageDialog(null, "Nacionalidad obligatoria."); return false; }
-        if (dpFechaContratacion.getValue() == null) { JOptionPane.showMessageDialog(null, "Fecha contratación obligatoria."); return false; }
-        if (cmbPuesto.getValue() == null) { JOptionPane.showMessageDialog(null, "Seleccione un puesto."); return false; }
-        if (cmbDireccion.getValue() == null) { JOptionPane.showMessageDialog(null, "Seleccione una dirección."); return false; }
+        if (txtNombre.getText().isBlank()) { advertencia("Nombre obligatorio."); return false; }
+        if (txtTelefono.getText().isBlank()) { advertencia("Teléfono obligatorio."); return false; }
+        if (txtCedula.getText().isBlank()) { advertencia("Cédula obligatoria."); return false; }
+        if (dpFechaNacimiento.getValue() == null) { advertencia("Fecha nacimiento obligatoria."); return false; }
+        if (txtNacionalidad.getText().isBlank()) { advertencia("Nacionalidad obligatoria."); return false; }
+        if (dpFechaContratacion.getValue() == null) { advertencia("Fecha contratación obligatoria."); return false; }
+        if (cmbPuesto.getValue() == null) { advertencia("Seleccione un puesto."); return false; }
+        if (cmbDireccion.getValue() == null) { advertencia("Seleccione una dirección."); return false; }
         int edad = Integer.parseInt(txtEdad.getText());
         if (edad < 21) {
-            JOptionPane.showMessageDialog(null, "El empleado debe tener al menos 21 años (check de BD).");
+            advertencia("El empleado debe tener al menos 21 años (check de BD).");
             return false;
         }
         return true;

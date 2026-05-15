@@ -19,8 +19,8 @@
                 <Label text="🚚" style="-fx-font-size: 16px;"/>
             </StackPane>
             <VBox spacing="2">
-                <Label text="Entregas de Vehículos" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
-                <Label text="Gestiona las entregas de vehículos a clientes" style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
+                <Label text="Gestión de Vehículo" style="-fx-text-fill: #0F172A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                <Label text="Gestiona entregas y devoluciones de vehículos" style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
             </VBox>
         </HBox>
 
@@ -42,7 +42,7 @@
             <HBox alignment="CENTER_LEFT" spacing="12"
                   style="-fx-padding: 16 20; -fx-border-color: transparent transparent #F1F5F9 transparent; -fx-border-width: 0 0 1 0;">
                 <Label text="📋" style="-fx-font-size: 16px;"/>
-                <Label text="Lista de Entregas" style="-fx-text-fill: #0F172A; -fx-font-size: 15px; -fx-font-weight: bold;"/>
+                <Label text="Lista de Registros" style="-fx-text-fill: #0F172A; -fx-font-size: 15px; -fx-font-weight: bold;"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="btnToggleTable" text="Ocultar Tabla" onAction="#toggleTableVisibility"
                         style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 6 14; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>
@@ -63,7 +63,7 @@
                 <placeholder>
                     <VBox alignment="CENTER" spacing="8">
                         <Label text="📋" style="-fx-font-size: 32px;"/>
-                        <Label text="No hay registros de entregas" style="-fx-text-fill: #94A3B8; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label text="No hay registros" style="-fx-text-fill: #94A3B8; -fx-font-size: 13px; -fx-font-weight: bold;"/>
                     </VBox>
                 </placeholder>
             </TableView>
@@ -78,7 +78,7 @@
                            style="-fx-background-color: #1565C0; -fx-background-radius: 7;">
                     <Label text="✏" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
                 </StackPane>
-                <Label fx:id="lblTitulo" text="Detalle de Entrega" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label fx:id="lblTitulo" text="Detalle de Gestión" style="-fx-text-fill: #0F172A; -fx-font-size: 14px; -fx-font-weight: bold;"/>
             </HBox>
 
             <VBox spacing="16" style="-fx-padding: 20 24 20 24;">
@@ -91,39 +91,71 @@
                     </columnConstraints>
 
                     <Label text="Reserva ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtIdReserva" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                    <HBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <TextField fx:id="txtIdReserva" prefWidth="80" promptText="ID"
+                                   style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                        <Button onAction="#onBuscarReserva" text="↵"
+                                style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 7; -fx-cursor: hand; -fx-padding: 6 10 6 10;"/>
+                    </HBox>
+
+                    <Label text="Cliente ID:" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <HBox spacing="6" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                        <TextField fx:id="txtIdCliente" prefWidth="70" promptText="ID"
+                                   style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                        <Button onAction="#onBuscarCliente" text="↵"
+                                style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 7; -fx-cursor: hand; -fx-padding: 6 10 6 10;"/>
+                    </HBox>
+
+                    <Label text="Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtCliente" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1"
                                style="-fx-background-color: #F8FAFC; -fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
 
-                    <Label text="Cliente:" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtCliente" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="0"
+                    <Label text="Vehículo ID:" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <HBox spacing="6" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                        <TextField fx:id="txtIdVehiculo" prefWidth="70" promptText="ID"
+                                   style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                        <Button onAction="#onBuscarVehiculo" text="↵"
+                                style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 7; -fx-cursor: hand; -fx-padding: 6 10 6 10;"/>
+                    </HBox>
+
+                    <Label text="Vehículo:" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtVehiculo" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2"
                                style="-fx-background-color: #F8FAFC; -fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
 
-                    <Label text="Vehículo:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtVehiculo" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                    <Label text="Empleado ID:" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <HBox spacing="6" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                        <TextField fx:id="txtIdEmpleado" prefWidth="70" promptText="ID"
+                                   style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                        <Button onAction="#onBuscarEmpleado" text="↵"
+                                style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 7; -fx-cursor: hand; -fx-padding: 6 10 6 10;"/>
+                    </HBox>
+
+                    <Label text="Empleado:" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtEmpleado" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3"
                                style="-fx-background-color: #F8FAFC; -fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
 
-                    <Label text="Empleado:" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtEmpleado" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="1"
-                               style="-fx-background-color: #F8FAFC; -fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
+                    <Label text="Dirección:" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cmbDireccion" GridPane.columnIndex="3" GridPane.rowIndex="3" promptText="Seleccione una dirección" maxWidth="1.7976931348623157E308"/>
 
-                    <Label text="Dirección:" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="cmbDireccion" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3" promptText="Seleccione una dirección" maxWidth="1.7976931348623157E308"/>
+                    <Label text="Fecha:" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <DatePicker fx:id="dpFecha" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
-                    <Label text="Fecha:" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                    <DatePicker fx:id="dpFecha" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                    <Label text="Nivel Combustible:" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtNivelCombustible" GridPane.columnIndex="3" GridPane.rowIndex="3"
+                    <Label text="Nivel Combustible:" GridPane.columnIndex="2" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtNivelCombustible" GridPane.columnIndex="3" GridPane.rowIndex="4"
                                style="-fx-background-radius: 7; -fx-border-color: #E2E8F0; -fx-border-radius: 7; -fx-padding: 8 12; -fx-font-size: 13px;"/>
 
-                    <Label text="Tipo:" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="cmbTipo" GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="Seleccione" maxWidth="1.7976931348623157E308"/>
+                    <Label text="Tipo:" GridPane.columnIndex="0" GridPane.rowIndex="5" style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cmbTipo" GridPane.columnIndex="1" GridPane.rowIndex="5" promptText="Seleccione" maxWidth="1.7976931348623157E308"/>
+
+
                 </GridPane>
 
                 <HBox alignment="CENTER_RIGHT" spacing="12" style="-fx-padding: 4 0 0 0;">
                     <Button text="Actualizar" onAction="#actualizarEntrega"
                             style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
                     <Button text="Marcar como Entregado" onAction="#marcarEntregado"
+                            style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
+                    <Button text="Marcar como Devuelto" onAction="#marcarDevuelto"
                             style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
                     <Button text="Limpiar" onAction="#limpiar"
                             style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>

@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class ReservaController {
         this.mainController = mainController;
     }
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     // ── Formulario ────────────────────────────────────────────────────────
     @FXML private TextField        txtIdCliente;
@@ -132,8 +133,11 @@ public class ReservaController {
                 mapaSegurosCosto.put(label, costo);
                 cmbSeguro.getItems().add(label);
             }
+            if (cmbSeguro.getItems().isEmpty()) {
+                advertencia("No hay planes de seguro registrados en TBL_PLAN_SEGURO.");
+            }
         } catch (SQLException e) {
-            cmbSeguro.getItems().add("⚠ Error cargando seguros");
+            error("Error al cargar seguros:\n" + e.getMessage());
         }
     }
 
@@ -141,7 +145,7 @@ public class ReservaController {
     @FXML
     public void onBuscarCliente(ActionEvent ignored) {
         if (txtIdCliente.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Ingresa el ID del cliente."); return;
+            advertencia("Ingresa el ID del cliente."); return;
         }
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(
@@ -149,11 +153,11 @@ public class ReservaController {
             ps.setInt(1, Integer.parseInt(txtIdCliente.getText().trim()));
             ResultSet rs = ps.executeQuery();
             if (rs.next()) txtNombreCliente.setText(rs.getString("nombre"));
-            else { JOptionPane.showMessageDialog(null, "Cliente no encontrado."); txtNombreCliente.clear(); }
+            else { informacion("Cliente no encontrado."); txtNombreCliente.clear(); }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error BD: " + e.getMessage());
+            error("Error BD: " + e.getMessage());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID de cliente inválido.");
+            advertencia("ID de cliente inválido.");
         }
     }
 
@@ -161,7 +165,7 @@ public class ReservaController {
     @FXML
     public void onBuscarVehiculo(ActionEvent ignored) {
         if (txtIdVehiculo.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Ingresa el ID del vehículo."); return;
+            advertencia("Ingresa el ID del vehículo."); return;
         }
         int idVehiculo = Integer.parseInt(txtIdVehiculo.getText().trim());
         try (Connection con = conexion.establecerConexion();
@@ -173,7 +177,7 @@ public class ReservaController {
                 String estado = rs.getString("estado");
                 // Permitir si es el mismo vehículo en edición
                 if (!"Disponible".equals(estado) && (idReservaSeleccionada == -1 || idVehiculo != idVehiculoOriginal)) {
-                    JOptionPane.showMessageDialog(null, "Vehículo no disponible (estado: " + estado + ")");
+                    advertencia("Vehículo no disponible (estado: " + estado + ")");
                     txtInfoVehiculo.clear();
                     return;
                 }
@@ -183,13 +187,13 @@ public class ReservaController {
                                 " | RD$ " + String.format("%.2f", rs.getDouble("precio_x_dia")) + "/día");
                 recalcularMonto();
             } else {
-                JOptionPane.showMessageDialog(null, "Vehículo no encontrado.");
+                advertencia("Vehículo no encontrado.");
                 txtInfoVehiculo.clear();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error BD: " + e.getMessage());
+            error("Error BD: " + e.getMessage());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID de vehículo inválido.");
+            advertencia("ID de vehículo inválido.");
         }
     }
 
@@ -277,7 +281,7 @@ public class ReservaController {
                 listaReservaciones.add(res);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al cargar reservaciones: " + e.getMessage());
+            error("Error al cargar reservaciones: " + e.getMessage());
         }
         actualizarConteo();
     }
@@ -341,31 +345,35 @@ public class ReservaController {
                         "SELECT precio_x_dia FROM TBL_VEHICULO WHERE id_vehiculo = ?");
                 psVeh.setInt(1, idVehiculo);
                 ResultSet rsVeh = psVeh.executeQuery();
-                if (!rsVeh.next()) { JOptionPane.showMessageDialog(null, "Vehículo no encontrado."); return; }
+                if (!rsVeh.next()) { advertencia("Vehículo no encontrado."); return; }
                 double precioVehiculo = rsVeh.getDouble("precio_x_dia");
                 double subtotal = (precioVehiculo + costoSeguro) * dias;
                 double total    = subtotal - subtotal * (descPct / 100.0);
                 double apartado = parseDouble(txtMontoApartado.getText());
                 double pendiente = Math.max(0, total - apartado);
 
-                // 2. Crear contrato
-                PreparedStatement psCon = con.prepareStatement(
-                        "INSERT INTO TBL_CONTRATO (fecha, condicion) VALUES (?, ?)",
-                        Statement.RETURN_GENERATED_KEYS);
-                psCon.setDate(1, Date.valueOf(dpFechaInicio.getValue()));
-                psCon.setString(2, "Reservación estándar");
-                psCon.executeUpdate();
-                int idContrato = -1;
-                ResultSet kc = psCon.getGeneratedKeys();
-                if (kc.next()) idContrato = kc.getInt(1);
+                // 2. Siguiente ID contrato (no es IDENTITY)
+                PreparedStatement psMaxCon = con.prepareStatement(
+                        "SELECT ISNULL(MAX(pk_id_contrato), 0) + 1 AS next_id FROM TBL_CONTRATO");
+                ResultSet rsMaxCon = psMaxCon.executeQuery();
+                int idContrato = rsMaxCon.next() ? rsMaxCon.getInt("next_id") : 1;
 
-                // 3. Siguiente ID manual
+                // 3. Crear contrato
+                PreparedStatement psCon = con.prepareStatement(
+                        "INSERT INTO TBL_CONTRATO (pk_id_contrato, fecha, condicion, descripcion) VALUES (?, ?, ?, ?)");
+                psCon.setInt(1, idContrato);
+                psCon.setDate(2, Date.valueOf(dpFechaInicio.getValue()));
+                psCon.setString(3, "Reservación estándar");
+                psCon.setString(4, "Contrato generado desde reservación");
+                psCon.executeUpdate();
+
+                // 4. Siguiente ID manual para reservación
                 PreparedStatement psMaxId = con.prepareStatement(
                         "SELECT ISNULL(MAX(pk_id_reserva), 0) + 1 AS next_id FROM TBL_RESERVACION");
                 ResultSet rsMaxId = psMaxId.executeQuery();
                 int nextId = rsMaxId.next() ? rsMaxId.getInt("next_id") : 1;
 
-                // 4. Insertar reservación
+                // 5. Insertar reservación
                 PreparedStatement psRes = con.prepareStatement(
                         "INSERT INTO TBL_RESERVACION " +
                                 "(pk_id_reserva, fecha_inicio, fech_devolucion, monto_total, " +
@@ -384,20 +392,20 @@ public class ReservaController {
                 psRes.setInt(10, idCliente);
                 psRes.executeUpdate();
 
-                // 5. Vincular vehículo
+                // 6. Vincular vehículo
                 PreparedStatement psRV = con.prepareStatement(
                         "INSERT INTO TBL_RESERVA_VEHI (cantidad, fk_pk_id_reserva, fk_id_vehiculo) VALUES (1,?,?)");
                 psRV.setInt(1, nextId);
                 psRV.setInt(2, idVehiculo);
                 psRV.executeUpdate();
 
-                // 6. Marcar vehículo como Reservado
+                // 7. Marcar vehículo como Reservado
                 PreparedStatement psEst = con.prepareStatement(
                         "UPDATE TBL_VEHICULO SET estado = 'Reservado' WHERE id_vehiculo = ?");
                 psEst.setInt(1, idVehiculo);
                 psEst.executeUpdate();
 
-                JOptionPane.showMessageDialog(null,
+                informacion(
                         "✔ Reservación #" + nextId + " registrada correctamente.\n" +
                                 "Total: RD$ " + String.format("%.2f", total) +
                                 "  |  Pendiente: RD$ " + String.format("%.2f", pendiente));
@@ -405,9 +413,9 @@ public class ReservaController {
                 cargarReservaciones();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
+            error("Error al guardar: " + e.getMessage());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Verifica que los IDs y montos sean numéricos.");
+            advertencia("Verifica que los IDs y montos sean numéricos.");
         }
     }
 
@@ -415,7 +423,7 @@ public class ReservaController {
     @FXML
     public void onEditarReserva(ActionEvent ignored) {
         if (idReservaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(null, "Selecciona una reservación de la tabla primero."); return;
+            advertencia("Selecciona una reservación de la tabla primero."); return;
         }
         if (!validarFormulario()) return;
         try {
@@ -433,7 +441,7 @@ public class ReservaController {
                         "SELECT precio_x_dia FROM TBL_VEHICULO WHERE id_vehiculo = ?");
                 psVeh.setInt(1, nuevoIdVehiculo);
                 ResultSet rsVeh = psVeh.executeQuery();
-                if (!rsVeh.next()) { JOptionPane.showMessageDialog(null, "Vehículo no encontrado."); return; }
+                if (!rsVeh.next()) { advertencia("Vehículo no encontrado."); return; }
                 double precioVehiculo = rsVeh.getDouble("precio_x_dia");
                 double subtotal = (precioVehiculo + costoSeguro) * dias;
                 double total = subtotal - subtotal * (descPct / 100.0);
@@ -484,13 +492,13 @@ public class ReservaController {
                     psReserv.executeUpdate();
                 }
 
-                JOptionPane.showMessageDialog(null,
+                informacion(
                         "✔ Reservación #" + idReservaSeleccionada + " actualizada correctamente.");
                 limpiar();
                 cargarReservaciones();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al editar: " + e.getMessage());
+            error("Error al editar: " + e.getMessage());
         }
     }
 
@@ -498,12 +506,9 @@ public class ReservaController {
     @FXML
     public void onEliminarReserva(ActionEvent ignored) {
         if (idReservaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(null, "Selecciona una reservación primero."); return;
+            advertencia("Selecciona una reservación primero."); return;
         }
-        int confirm = JOptionPane.showConfirmDialog(null,
-                "¿Eliminar la reservación #" + idReservaSeleccionada + "?\nEsta acción no se puede deshacer.",
-                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (!confirmar("¿Eliminar la reservación #" + idReservaSeleccionada + "?\nEsta acción no se puede deshacer.")) return;
 
         try (Connection con = conexion.establecerConexion()) {
             // Liberar vehículo
@@ -521,7 +526,7 @@ public class ReservaController {
             // Borrar en orden FK
             String[] sqlsEliminar = {
                     "DELETE FROM TBL_RESERVA_VEHI WHERE fk_pk_id_reserva = ?",
-                    "DELETE FROM TBL_OBJ_RESERVA  WHERE fk_pk_id_reserva = ?",
+                    "DELETE FROM TB_OBJ_RESERVA  WHERE fk_pk_id_reserva = ?",
                     "DELETE FROM TBL_RESERVACION   WHERE pk_id_reserva    = ?"
             };
             for (String sqlDel : sqlsEliminar) {
@@ -530,12 +535,12 @@ public class ReservaController {
                 ps.executeUpdate();
             }
 
-            JOptionPane.showMessageDialog(null, "✔ Reservación eliminada correctamente.");
+            informacion("✔ Reservación eliminada correctamente.");
             limpiar();
             cargarReservaciones();
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al eliminar: " + e.getMessage());
+            error("Error al eliminar: " + e.getMessage());
         }
     }
 
@@ -619,25 +624,25 @@ public class ReservaController {
 
     private boolean validarFormulario() {
         if (txtIdCliente.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID del Cliente es obligatorio."); return false;
+            advertencia("El ID del Cliente es obligatorio."); return false;
         }
         if (txtIdVehiculo.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID del Vehículo es obligatorio."); return false;
+            advertencia("El ID del Vehículo es obligatorio."); return false;
         }
         if (cmbSeguro.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "Selecciona un plan de seguro."); return false;
+            advertencia("Selecciona un plan de seguro."); return false;
         }
         if (dpFechaInicio.getValue() == null || dpFechaDevolucion.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "Las fechas son obligatorias."); return false;
+            advertencia("Las fechas son obligatorias."); return false;
         }
         if (!dpFechaDevolucion.getValue().isAfter(dpFechaInicio.getValue())) {
-            JOptionPane.showMessageDialog(null, "La fecha de devolución debe ser posterior a la de inicio."); return false;
+            advertencia("La fecha de devolución debe ser posterior a la de inicio."); return false;
         }
         try {
             Integer.parseInt(txtIdCliente.getText().trim());
             Integer.parseInt(txtIdVehiculo.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Los IDs deben ser números enteros."); return false;
+            advertencia("Los IDs deben ser números enteros."); return false;
         }
         return true;
     }

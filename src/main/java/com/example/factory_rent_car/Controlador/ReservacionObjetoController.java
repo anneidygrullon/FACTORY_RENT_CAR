@@ -15,6 +15,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
@@ -59,7 +60,7 @@ public class ReservacionObjetoController {
     private double montoTotalOriginal = 0.0;
     private long diasReserva = 0;
 
-    private Conexion conexion = new Conexion();
+    private Conexion conexion = Conexion.getInstance();
 
     @FXML
     public void initialize() {
@@ -84,7 +85,7 @@ public class ReservacionObjetoController {
         colResObjCantidad.setOnEditCommit(event -> {
             int newValue = event.getNewValue();
             if (newValue <= 0) {
-                JOptionPane.showMessageDialog(null, "La cantidad debe ser mayor a 0.");
+                advertencia("La cantidad debe ser mayor a 0.");
                 // recargar la tabla para revertir el valor visual (opcional)
                 tablaObjetosReservados.refresh();
                 return;
@@ -141,21 +142,21 @@ public class ReservacionObjetoController {
                 ));
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando objetos: " + e.getMessage());
+            error("Error cargando objetos: " + e.getMessage());
         }
     }
 
     @FXML
     private void buscarReserva() {
         if (txtReservaId.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de reserva.");
+            advertencia("Ingrese un ID de reserva.");
             return;
         }
         int id;
         try {
             id = Integer.parseInt(txtReservaId.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
         String sql = "SELECT r.pk_id_reserva, c.nombre AS cliente, r.monto_total, r.fecha_inicio, r.fech_devolucion " +
@@ -178,10 +179,10 @@ public class ReservacionObjetoController {
                 recalcularTotales();
             } else {
                 limpiar();
-                JOptionPane.showMessageDialog(null, "Reserva no encontrada.");
+                advertencia("Reserva no encontrada.");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
@@ -190,7 +191,7 @@ public class ReservacionObjetoController {
         if (reservaIdActual == -1) return;
         String sql = "SELECT ors.id_obj_res, ors.fk_pk_id_reserva, ors.fk_pk_id_objeto, " +
                 "o.nombre, o.marca, o.tipo, o.precio, ors.cantidad " +
-                "FROM TBL_OBJ_RESERVA ors " +
+                "FROM TB_OBJ_RESERVA ors " +
                 "JOIN TBL_OBJETO o ON o.pk_id_objeto = ors.fk_pk_id_objeto " +
                 "WHERE ors.fk_pk_id_reserva = ?";
         try (Connection con = conexion.establecerConexion();
@@ -210,13 +211,13 @@ public class ReservacionObjetoController {
                 ));
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando reservados: " + e.getMessage());
+            error("Error cargando reservados: " + e.getMessage());
         }
     }
 
     private void agregarObjeto(ObjetoDisponible objeto) {
         if (reservaIdActual == -1) {
-            JOptionPane.showMessageDialog(null, "Primero debe buscar una reserva válida.");
+            advertencia("Primero debe buscar una reserva válida.");
             return;
         }
         Optional<ReservaObjeto> existente = listaObjetosReservados.stream()
@@ -248,7 +249,7 @@ public class ReservacionObjetoController {
     private void eliminarObjetosSeleccionados() {
         ObservableList<ReservaObjeto> seleccionados = tablaObjetosReservados.getSelectionModel().getSelectedItems();
         if (seleccionados.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Seleccione al menos un objeto.");
+            advertencia("Seleccione al menos un objeto.");
             return;
         }
         listaObjetosReservados.removeAll(seleccionados);
@@ -273,12 +274,12 @@ public class ReservacionObjetoController {
     @FXML
     private void guardarCambios() {
         if (reservaIdActual == -1) {
-            JOptionPane.showMessageDialog(null, "No hay una reserva seleccionada.");
+            advertencia("No hay una reserva seleccionada.");
             return;
         }
         for (ReservaObjeto obj : listaObjetosReservados) {
             if (obj.getCantidad() <= 0) {
-                JOptionPane.showMessageDialog(null, "La cantidad del objeto '" + obj.getNombreObjeto() + "' debe ser mayor a 0.");
+                advertencia("La cantidad del objeto '" + obj.getNombreObjeto() + "' debe ser mayor a 0.");
                 return;
             }
         }
@@ -287,12 +288,12 @@ public class ReservacionObjetoController {
         try {
             con = conexion.establecerConexion();
             con.setAutoCommit(false);
-            PreparedStatement psDelete = con.prepareStatement("DELETE FROM TBL_OBJ_RESERVA WHERE fk_pk_id_reserva = ?");
+            PreparedStatement psDelete = con.prepareStatement("DELETE FROM TB_OBJ_RESERVA WHERE fk_pk_id_reserva = ?");
             psDelete.setInt(1, reservaIdActual);
             psDelete.executeUpdate();
 
             PreparedStatement psInsert = con.prepareStatement(
-                    "INSERT INTO TBL_OBJ_RESERVA (cantidad, fk_pk_id_objeto, fk_pk_id_reserva) VALUES (?, ?, ?)"
+                    "INSERT INTO TB_OBJ_RESERVA (cantidad, fk_pk_id_objeto, fk_pk_id_reserva) VALUES (?, ?, ?)"
             );
             for (ReservaObjeto obj : listaObjetosReservados) {
                 psInsert.setInt(1, obj.getCantidad());
@@ -302,15 +303,15 @@ public class ReservacionObjetoController {
             }
             psInsert.executeBatch();
             con.commit();
-            JOptionPane.showMessageDialog(null, "Objetos guardados correctamente.");
+            informacion("Objetos guardados correctamente.");
             cargarObjetosReservados();
             recalcularTotales();
         } catch (SQLException e) {
             try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            JOptionPane.showMessageDialog(null, "Error SQL al guardar: " + e.getMessage() + "\nCódigo: " + e.getErrorCode());
+            error("Error SQL al guardar: " + e.getMessage() + "\nCódigo: " + e.getErrorCode());
             e.printStackTrace();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error inesperado: " + e.getMessage());
+            error("Error inesperado: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }

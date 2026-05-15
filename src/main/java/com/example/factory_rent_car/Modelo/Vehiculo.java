@@ -17,13 +17,12 @@ public class Vehiculo {
     private final SimpleDoubleProperty precioPorDia = new SimpleDoubleProperty();
     private final SimpleIntegerProperty idPoliza = new SimpleIntegerProperty();
     private final SimpleIntegerProperty idCompra = new SimpleIntegerProperty();
-    private final SimpleStringProperty foto = new SimpleStringProperty(); // ← NUEVO: ruta de la foto
 
     public Vehiculo() {}
 
     public Vehiculo(int idVehiculo, String marca, String modelo, String serie, String numPlaca,
                     String color, double kilometraje, String tipoCombustible, int maxPasajeros,
-                    String estado, double precioPorDia, int idPoliza, int idCompra, String foto) {
+                    String estado, double precioPorDia, int idPoliza, int idCompra) {
         this.idVehiculo.set(idVehiculo);
         this.marca.set(marca != null ? marca : "");
         this.modelo.set(modelo != null ? modelo : "");
@@ -37,7 +36,6 @@ public class Vehiculo {
         this.precioPorDia.set(precioPorDia);
         this.idPoliza.set(idPoliza);
         this.idCompra.set(idCompra);
-        this.foto.set(foto != null ? foto : "");
     }
 
     // Propiedades
@@ -54,7 +52,6 @@ public class Vehiculo {
     public SimpleDoubleProperty precioPorDiaProperty() { return precioPorDia; }
     public SimpleIntegerProperty idPolizaProperty() { return idPoliza; }
     public SimpleIntegerProperty idCompraProperty() { return idCompra; }
-    public SimpleStringProperty fotoProperty() { return foto; } // ← NUEVO
 
     // Getters y Setters estándar
     public int getIdVehiculo() { return idVehiculo.get(); }
@@ -83,6 +80,4 @@ public class Vehiculo {
     public void setIdPoliza(int v) { idPoliza.set(v); }
     public int getIdCompra() { return idCompra.get(); }
     public void setIdCompra(int v) { idCompra.set(v); }
-    public String getFoto() { return foto.get(); }
-    public void setFoto(String v) { foto.set(v); }
 }

@@ -1,17 +1,16 @@
 package com.example.factory_rent_car.Controlador;
 
 import com.example.factory_rent_car.Database.Conexion;
+import com.example.factory_rent_car.Database.UserRoleManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Properties;
 
 public class LoginController {
 
@@ -20,23 +19,9 @@ public class LoginController {
     @FXML private Label lblError;
 
     private Stage stage;
-    private final Properties roles = new Properties();
 
     public void setStage(Stage stage) {
         this.stage = stage;
-    }
-
-    private String obtenerRol(String username) {
-        if (!roles.isEmpty()) {
-            return roles.getProperty(username, "admin");
-        }
-        try (InputStream is = getClass().getResourceAsStream("/com/example/factory_rent_car/roles.properties")) {
-            if (is != null) {
-                roles.load(is);
-                return roles.getProperty(username, "admin");
-            }
-        } catch (Exception ignored) {}
-        return "admin";
     }
 
     @FXML
@@ -49,7 +34,7 @@ public class LoginController {
             return;
         }
 
-        Conexion conexion = new Conexion();
+        Conexion conexion = Conexion.getInstance();
         try (Connection conn = conexion.establecerConexion()) {
             if (conn == null) {
                 lblError.setText("Error de conexión con la base de datos");
@@ -64,7 +49,7 @@ public class LoginController {
 
             if (rs.next()) {
                 String nombreUsuario = rs.getString("nombre");
-                String rol = obtenerRol(nombreUsuario);
+                String rol = UserRoleManager.getRole(nombreUsuario);
                 lblError.setText("");
                 cargarMainLayout(nombreUsuario, rol);
             } else {
@@ -75,6 +60,21 @@ public class LoginController {
             ps.close();
         } catch (Exception e) {
             lblError.setText("Error al validar: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleRegistro() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/factory_rent_car/RegistroUsuario.fxml"));
+            Scene scene = new Scene(loader.load());
+            RegistroUsuarioController controller = loader.getController();
+            controller.setStage(stage);
+            stage.setTitle("Factory Rent Car - Crear Cuenta");
+            stage.setScene(scene);
+        } catch (Exception e) {
+            lblError.setText("Error al cargar registro: " + e.getMessage());
             e.printStackTrace();
         }
     }

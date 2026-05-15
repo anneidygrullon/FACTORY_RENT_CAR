@@ -2,6 +2,7 @@ package com.example.factory_rent_car.Controlador;
 
 import com.example.factory_rent_car.Modelo.Mantenimiento;
 import com.example.factory_rent_car.Database.Conexion;
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 
 public class MantenimientoController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtBuscar;
     @FXML private TableView<Mantenimiento> tablaMantenimientos;
@@ -105,7 +106,7 @@ public class MantenimientoController {
                 "ORDER BY m.pk_id_mantenimiento DESC";
         try (Connection con = conexion.establecerConexion()) {
             if (con == null) {
-                JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
+                error("No se pudo conectar a la base de datos.");
                 return;
             }
             PreparedStatement ps = con.prepareStatement(sql);
@@ -126,7 +127,7 @@ public class MantenimientoController {
             }
             tablaMantenimientos.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando mantenimientos: " + e.getMessage());
+            error("Error cargando mantenimientos: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -159,20 +160,20 @@ public class MantenimientoController {
     private void buscarVehiculo(ActionEvent event) {
         String idText = txtIdVehiculo.getText().trim();
         if (idText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de vehículo.");
+            advertencia("Ingrese un ID de vehículo.");
             return;
         }
         int id;
         try {
             id = Integer.parseInt(idText);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
         String sql = "SELECT marca, modelo, num_placa FROM TBL_VEHICULO WHERE id_vehiculo = ?";
         try (Connection con = conexion.establecerConexion()) {
             if (con == null) {
-                JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
+                error("No se pudo conectar a la base de datos.");
                 return;
             }
             PreparedStatement ps = con.prepareStatement(sql);
@@ -182,11 +183,11 @@ public class MantenimientoController {
                 String info = rs.getString("marca") + " " + rs.getString("modelo") + " - " + rs.getString("num_placa");
                 txtVehiculoInfo.setText(info);
             } else {
-                JOptionPane.showMessageDialog(null, "Vehículo no encontrado.");
+                advertencia("Vehículo no encontrado.");
                 txtVehiculoInfo.clear();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
@@ -214,39 +215,45 @@ public class MantenimientoController {
         try {
             con = conexion.establecerConexion();
             if (con == null) {
-                JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
+                error("No se pudo conectar a la base de datos.");
                 return;
             }
             con.setAutoCommit(false);
 
             // Insertar historial
-            int idHistMantenimiento = -1;
-            String sqlHist = "INSERT INTO TBL_HISTORIAL_MANTENIMIENTO (fecha, descripcion) VALUES (?, ?)";
-            PreparedStatement psHist = con.prepareStatement(sqlHist, Statement.RETURN_GENERATED_KEYS);
-            psHist.setDate(1, Date.valueOf(fechaIngreso));
-            psHist.setString(2, descripcion);
+            int idHistMantenimiento;
+            String sqlNextHist = "SELECT ISNULL(MAX(pk_id_hist_mantenimiento), 0) + 1 AS next_id FROM TBL_HISTORIAL_MANTENIMIENTO";
+            try (PreparedStatement psNext = con.prepareStatement(sqlNextHist);
+                 ResultSet rsNext = psNext.executeQuery()) {
+                idHistMantenimiento = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlHist = "INSERT INTO TBL_HISTORIAL_MANTENIMIENTO (pk_id_hist_mantenimiento, fecha, descripcion) VALUES (?, ?, ?)";
+            PreparedStatement psHist = con.prepareStatement(sqlHist);
+            psHist.setInt(1, idHistMantenimiento);
+            psHist.setDate(2, Date.valueOf(fechaIngreso));
+            psHist.setString(3, descripcion);
             psHist.executeUpdate();
-            ResultSet rsHist = psHist.getGeneratedKeys();
-            if (rsHist.next()) idHistMantenimiento = rsHist.getInt(1);
-            psHist.close();
 
             if (mantenimientoSeleccionado == null) {
-                String sql = "INSERT INTO TBL_MANTENIMIENTO (costo, fecha_salida, fecha_ingreso, tipo, descripcion, fk_id_vehiculo, fk_pk_id_hist_mantenimiento) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
-                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setDouble(1, costo);
-                ps.setDate(2, Date.valueOf(fechaSalida));
-                ps.setDate(3, Date.valueOf(fechaIngreso));
-                ps.setString(4, tipo);
-                ps.setString(5, descripcion);
-                ps.setInt(6, idVehiculo);
-                ps.setInt(7, idHistMantenimiento);
-                ps.executeUpdate();
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Mantenimiento registrado con ID: " + rs.getInt(1));
+                int idMantenimiento;
+                String sqlNextMan = "SELECT ISNULL(MAX(pk_id_mantenimiento), 0) + 1 AS next_id FROM TBL_MANTENIMIENTO";
+                try (PreparedStatement psNext = con.prepareStatement(sqlNextMan);
+                     ResultSet rsNext = psNext.executeQuery()) {
+                    idMantenimiento = rsNext.next() ? rsNext.getInt("next_id") : 1;
                 }
-                ps.close();
+                String sql = "INSERT INTO TBL_MANTENIMIENTO (pk_id_mantenimiento, costo, fecha_salida, fecha_ingreso, tipo, descripcion, fk_id_vehiculo, fk_pk_id_hist_mantenimiento) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setInt(1, idMantenimiento);
+                ps.setDouble(2, costo);
+                ps.setDate(3, Date.valueOf(fechaSalida));
+                ps.setDate(4, Date.valueOf(fechaIngreso));
+                ps.setString(5, tipo);
+                ps.setString(6, descripcion);
+                ps.setInt(7, idVehiculo);
+                ps.setInt(8, idHistMantenimiento);
+                ps.executeUpdate();
+                informacion("Mantenimiento registrado con ID: " + idMantenimiento);
                 actualizarEstadoVehiculo(con, idVehiculo, "En Mantenimiento");
             } else {
                 String sql = "UPDATE TBL_MANTENIMIENTO SET costo=?, fecha_salida=?, fecha_ingreso=?, tipo=?, descripcion=?, fk_id_vehiculo=? WHERE pk_id_mantenimiento=?";
@@ -260,14 +267,14 @@ public class MantenimientoController {
                 ps.setInt(7, mantenimientoSeleccionado.getIdMantenimiento());
                 ps.executeUpdate();
                 ps.close();
-                JOptionPane.showMessageDialog(null, "Mantenimiento actualizado.");
+                informacion("Mantenimiento actualizado.");
             }
             con.commit();
             limpiar();
             cargarMantenimientos();
         } catch (SQLException e) {
             try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
+            error("Error al guardar: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
@@ -286,30 +293,27 @@ public class MantenimientoController {
     @FXML
     private void eliminarMantenimiento(ActionEvent event) {
         if (mantenimientoSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un mantenimiento de la tabla.");
+            advertencia("Seleccione un mantenimiento de la tabla.");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(null,
-                "¿Eliminar el mantenimiento #" + mantenimientoSeleccionado.getIdMantenimiento() + "?",
-                "Confirmar", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (!confirmar("¿Eliminar el mantenimiento #" + mantenimientoSeleccionado.getIdMantenimiento() + "?")) return;
 
         int idVehiculo = mantenimientoSeleccionado.getIdVehiculo();
         try (Connection con = conexion.establecerConexion()) {
             if (con == null) {
-                JOptionPane.showMessageDialog(null, "No se pudo conectar a la base de datos.");
+                error("No se pudo conectar a la base de datos.");
                 return;
             }
             PreparedStatement ps = con.prepareStatement("DELETE FROM TBL_MANTENIMIENTO WHERE pk_id_mantenimiento = ?");
             ps.setInt(1, mantenimientoSeleccionado.getIdMantenimiento());
             ps.executeUpdate();
             ps.close();
-            JOptionPane.showMessageDialog(null, "Mantenimiento eliminado.");
+            informacion("Mantenimiento eliminado.");
             actualizarEstadoVehiculo(con, idVehiculo, "Disponible");
             limpiar();
             cargarMantenimientos();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al eliminar: " + e.getMessage());
+            error("Error al eliminar: " + e.getMessage());
         }
     }
 
@@ -347,6 +351,12 @@ public class MantenimientoController {
     }
 
     @FXML
+    private void nuevo() {
+        limpiar();
+        txtIdVehiculo.requestFocus();
+    }
+
+    @FXML
     private void limpiar() {
         mantenimientoSeleccionado = null;
         txtIdMantenimiento.clear();
@@ -364,43 +374,43 @@ public class MantenimientoController {
 
     private boolean validarFormulario() {
         if (txtIdVehiculo.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID del vehículo es obligatorio.");
+            advertencia("El ID del vehículo es obligatorio.");
             return false;
         }
         if (dpFechaIngreso.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "La fecha de ingreso es obligatoria.");
+            advertencia("La fecha de ingreso es obligatoria.");
             return false;
         }
         if (dpFechaSalida.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "La fecha de salida es obligatoria.");
+            advertencia("La fecha de salida es obligatoria.");
             return false;
         }
         if (dpFechaSalida.getValue().isBefore(dpFechaIngreso.getValue())) {
-            JOptionPane.showMessageDialog(null, "La fecha de salida no puede ser anterior a la fecha de ingreso.");
+            advertencia("La fecha de salida no puede ser anterior a la fecha de ingreso.");
             return false;
         }
         if (txtCosto.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El costo es obligatorio.");
+            advertencia("El costo es obligatorio.");
             return false;
         }
         try {
             Double.parseDouble(txtCosto.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Costo inválido.");
+            advertencia("Costo inválido.");
             return false;
         }
         if (txtDescripcion.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "La descripción es obligatoria.");
+            advertencia("La descripción es obligatoria.");
             return false;
         }
         if (getTipoSeleccionado() == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un tipo de mantenimiento.");
+            advertencia("Seleccione un tipo de mantenimiento.");
             return false;
         }
         try {
             Integer.parseInt(txtIdVehiculo.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID de vehículo inválido.");
+            advertencia("ID de vehículo inválido.");
             return false;
         }
         return true;

@@ -2,6 +2,7 @@ package com.example.factory_rent_car.Controlador;
 
 import com.example.factory_rent_car.Modelo.Limpieza;
 import com.example.factory_rent_car.Database.Conexion;
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 public class LimpiezaController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     // Componentes de búsqueda y tabla
     @FXML private TextField txtBuscar;
@@ -45,6 +46,11 @@ public class LimpiezaController {
     private Limpieza limpiezaSeleccionada;
     private Map<Integer, String> mapaVehiculos = new HashMap<>();
     private Map<Integer, String> mapaEmpleados = new HashMap<>();
+
+    @FXML
+    private void nuevo() {
+        limpiar(null);
+    }
 
     @FXML
     public void initialize() {
@@ -99,7 +105,7 @@ public class LimpiezaController {
             }
             tablaLimpiezas.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando limpiezas: " + e.getMessage());
+            error("Error cargando limpiezas: " + e.getMessage());
         }
     }
 
@@ -107,14 +113,14 @@ public class LimpiezaController {
     private void buscarVehiculo(ActionEvent event) {
         String idText = txtIdVehiculo.getText().trim();
         if (idText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de vehículo.");
+            advertencia("Ingrese un ID de vehículo.");
             return;
         }
         int id;
         try {
             id = Integer.parseInt(idText);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
         String sql = "SELECT marca, modelo, num_placa FROM TBL_VEHICULO WHERE id_vehiculo = ?";
@@ -126,11 +132,11 @@ public class LimpiezaController {
                 String info = rs.getString("marca") + " " + rs.getString("modelo") + " - " + rs.getString("num_placa");
                 txtVehiculoInfo.setText(info);
             } else {
-                JOptionPane.showMessageDialog(null, "Vehículo no encontrado.");
+                advertencia("Vehículo no encontrado.");
                 txtVehiculoInfo.clear();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
@@ -138,14 +144,14 @@ public class LimpiezaController {
     private void buscarEmpleado(ActionEvent event) {
         String idText = txtIdEmpleado.getText().trim();
         if (idText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de empleado.");
+            advertencia("Ingrese un ID de empleado.");
             return;
         }
         int id;
         try {
             id = Integer.parseInt(idText);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
         String sql = "SELECT nombre FROM TBL_EMPLEADO WHERE pk_id_empleado = ?";
@@ -156,11 +162,11 @@ public class LimpiezaController {
             if (rs.next()) {
                 txtEmpleadoInfo.setText(rs.getString("nombre"));
             } else {
-                JOptionPane.showMessageDialog(null, "Empleado no encontrado.");
+                advertencia("Empleado no encontrado.");
                 txtEmpleadoInfo.clear();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
@@ -189,24 +195,27 @@ public class LimpiezaController {
 
         if (limpiezaSeleccionada == null) {
             // Insertar nueva
-            String sql = "INSERT INTO TBL_LIMPIEZA (fecha, tipo, observaciones, fk_id_vehiculo, fk_pk_id_empleado) " +
-                    "VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO TBL_LIMPIEZA (pk_id_limpieza, fecha, tipo, observaciones, fk_id_vehiculo, fk_pk_id_empleado) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
             try (Connection con = conexion.establecerConexion();
-                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setDate(1, Date.valueOf(fecha));
-                ps.setString(2, tipo);
-                ps.setString(3, observaciones);
-                ps.setInt(4, idVehiculo);
-                ps.setInt(5, idEmpleado);
-                ps.executeUpdate();
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Limpieza registrada con ID: " + rs.getInt(1));
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                int idLimpieza;
+                try (PreparedStatement psNext = con.prepareStatement("SELECT ISNULL(MAX(pk_id_limpieza), 0) + 1 AS next_id FROM TBL_LIMPIEZA");
+                     ResultSet rsNext = psNext.executeQuery()) {
+                    idLimpieza = rsNext.next() ? rsNext.getInt("next_id") : 1;
                 }
+                ps.setInt(1, idLimpieza);
+                ps.setDate(2, Date.valueOf(fecha));
+                ps.setString(3, tipo);
+                ps.setString(4, observaciones);
+                ps.setInt(5, idVehiculo);
+                ps.setInt(6, idEmpleado);
+                ps.executeUpdate();
+                informacion("Limpieza registrada con ID: " + idLimpieza);
                 limpiar(event);
                 cargarLimpiezas();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
+                error("Error al guardar: " + e.getMessage());
             }
         } else {
             // Actualizar existente
@@ -221,11 +230,11 @@ public class LimpiezaController {
                 ps.setInt(5, idEmpleado);
                 ps.setInt(6, limpiezaSeleccionada.getIdLimpieza());
                 ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Limpieza actualizada.");
+                informacion("Limpieza actualizada.");
                 limpiar(event);
                 cargarLimpiezas();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
+                error("Error al actualizar: " + e.getMessage());
             }
         }
     }
@@ -233,23 +242,20 @@ public class LimpiezaController {
     @FXML
     private void eliminarLimpieza(ActionEvent event) {
         if (limpiezaSeleccionada == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un registro de la tabla.");
+            advertencia("Seleccione un registro de la tabla.");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(null,
-                "¿Eliminar la limpieza #" + limpiezaSeleccionada.getIdLimpieza() + "?",
-                "Confirmar", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (!confirmar("¿Eliminar la limpieza #" + limpiezaSeleccionada.getIdLimpieza() + "?")) return;
 
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement("DELETE FROM TBL_LIMPIEZA WHERE pk_id_limpieza = ?")) {
             ps.setInt(1, limpiezaSeleccionada.getIdLimpieza());
             ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Limpieza eliminada.");
+            informacion("Limpieza eliminada.");
             limpiar(event);
             cargarLimpiezas();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al eliminar: " + e.getMessage());
+            error("Error al eliminar: " + e.getMessage());
         }
     }
 
@@ -303,26 +309,26 @@ public class LimpiezaController {
 
     private boolean validarCampos() {
         if (txtIdVehiculo.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID del vehículo es obligatorio.");
+            advertencia("El ID del vehículo es obligatorio.");
             return false;
         }
         if (txtIdEmpleado.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID del empleado es obligatorio.");
+            advertencia("El ID del empleado es obligatorio.");
             return false;
         }
         if (dpFecha.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "La fecha es obligatoria.");
+            advertencia("La fecha es obligatoria.");
             return false;
         }
         if (cmbTipo.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un tipo de limpieza.");
+            advertencia("Seleccione un tipo de limpieza.");
             return false;
         }
         try {
             Integer.parseInt(txtIdVehiculo.getText().trim());
             Integer.parseInt(txtIdEmpleado.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Los IDs deben ser números enteros.");
+            advertencia("Los IDs deben ser números enteros.");
             return false;
         }
         return true;

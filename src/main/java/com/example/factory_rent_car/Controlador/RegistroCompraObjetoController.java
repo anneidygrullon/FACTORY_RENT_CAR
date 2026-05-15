@@ -11,9 +11,11 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
+
 public class RegistroCompraObjetoController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtNombre;
     @FXML private TextField txtMarca;
@@ -53,7 +55,7 @@ public class RegistroCompraObjetoController {
                 mapaSuplidores.put(nombre, id);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando suplidores: " + e.getMessage());
+            error("Error cargando suplidores: " + e.getMessage());
         }
     }
 
@@ -89,50 +91,62 @@ public class RegistroCompraObjetoController {
             con.setAutoCommit(false);
 
             // Crear contrato
-            int idContrato = -1;
-            String sqlContrato = "INSERT INTO TBL_CONTRATO (fecha, condicion) VALUES (?, ?)";
-            PreparedStatement psContrato = con.prepareStatement(sqlContrato, Statement.RETURN_GENERATED_KEYS);
-            psContrato.setDate(1, Date.valueOf(fecha));
-            psContrato.setString(2, "Compra de objeto: " + nombre);
+            int idContrato;
+            String sqlNextContrato = "SELECT ISNULL(MAX(pk_id_contrato), 0) + 1 AS next_id FROM TBL_CONTRATO";
+            try (PreparedStatement psNext = con.prepareStatement(sqlNextContrato);
+                 ResultSet rsNext = psNext.executeQuery()) {
+                idContrato = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlContrato = "INSERT INTO TBL_CONTRATO (pk_id_contrato, fecha, condicion) VALUES (?, ?, ?)";
+            PreparedStatement psContrato = con.prepareStatement(sqlContrato);
+            psContrato.setInt(1, idContrato);
+            psContrato.setDate(2, Date.valueOf(fecha));
+            psContrato.setString(3, "Compra de objeto: " + nombre);
             psContrato.executeUpdate();
-            ResultSet rsContrato = psContrato.getGeneratedKeys();
-            if (rsContrato.next()) idContrato = rsContrato.getInt(1);
-            psContrato.close();
 
             // Crear pedido
-            int idCompra = -1;
-            String sqlPedido = "INSERT INTO TBL_PEDIDO (cantidad, fecha, monto_total, estado, fk_id_suministrador, fk_pk_id_contrato) " +
-                    "VALUES (?, ?, ?, 'Completado', ?, ?)";
-            PreparedStatement psPedido = con.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS);
-            psPedido.setInt(1, cantidad);
-            psPedido.setDate(2, Date.valueOf(fecha));
-            psPedido.setDouble(3, montoTotal);
-            psPedido.setInt(4, idSuplidor);
-            psPedido.setInt(5, idContrato);
+            int idCompra;
+            String sqlNextPedido = "SELECT ISNULL(MAX(pk_id_compra), 0) + 1 AS next_id FROM TBL_PEDIDO";
+            try (PreparedStatement psNext = con.prepareStatement(sqlNextPedido);
+                 ResultSet rsNext = psNext.executeQuery()) {
+                idCompra = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlPedido = "INSERT INTO TBL_PEDIDO (pk_id_compra, cantidad, fecha, monto_total, estado, fk_id_suministrador, fk_pk_id_contrato) " +
+                    "VALUES (?, ?, ?, ?, 'Completado', ?, ?)";
+            PreparedStatement psPedido = con.prepareStatement(sqlPedido);
+            psPedido.setInt(1, idCompra);
+            psPedido.setInt(2, cantidad);
+            psPedido.setDate(3, Date.valueOf(fecha));
+            psPedido.setDouble(4, montoTotal);
+            psPedido.setInt(5, idSuplidor);
+            psPedido.setInt(6, idContrato);
             psPedido.executeUpdate();
-            ResultSet rsPedido = psPedido.getGeneratedKeys();
-            if (rsPedido.next()) idCompra = rsPedido.getInt(1);
-            psPedido.close();
 
             // Crear objeto
-            String sqlObjeto = "INSERT INTO TBL_OBJETO (nombre, marca, precio, stock, tipo, fk_pk_id_compra) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+            int idObjeto;
+            String sqlNextObj = "SELECT ISNULL(MAX(pk_id_objeto), 0) + 1 AS next_id FROM TBL_OBJETO";
+            try (PreparedStatement psNext = con.prepareStatement(sqlNextObj);
+                 ResultSet rsNext = psNext.executeQuery()) {
+                idObjeto = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlObjeto = "INSERT INTO TBL_OBJETO (pk_id_objeto, nombre, marca, precio, stock, tipo, fk_pk_id_compra) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement psObjeto = con.prepareStatement(sqlObjeto);
-            psObjeto.setString(1, nombre);
-            psObjeto.setString(2, marca);
-            psObjeto.setDouble(3, precio);
-            psObjeto.setInt(4, cantidad);
-            psObjeto.setString(5, tipo);
-            psObjeto.setInt(6, idCompra);
+            psObjeto.setInt(1, idObjeto);
+            psObjeto.setString(2, nombre);
+            psObjeto.setString(3, marca);
+            psObjeto.setDouble(4, precio);
+            psObjeto.setInt(5, cantidad);
+            psObjeto.setString(6, tipo);
+            psObjeto.setInt(7, idCompra);
             psObjeto.executeUpdate();
-            psObjeto.close();
 
             con.commit();
-            JOptionPane.showMessageDialog(null, "Compra registrada correctamente.\nID del objeto registrado.");
+            informacion("Compra registrada correctamente.\nID del objeto registrado.");
             limpiar(event);
         } catch (SQLException e) {
             try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            JOptionPane.showMessageDialog(null, "Error al registrar: " + e.getMessage());
+            error("Error al registrar: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
@@ -153,34 +167,34 @@ public class RegistroCompraObjetoController {
 
     private boolean validarCampos() {
         if (txtNombre.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El nombre del objeto es obligatorio.");
+            advertencia("El nombre del objeto es obligatorio.");
             return false;
         }
         if (txtPrecio.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El precio es obligatorio.");
+            advertencia("El precio es obligatorio.");
             return false;
         }
         if (txtCantidad.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "La cantidad es obligatoria.");
+            advertencia("La cantidad es obligatoria.");
             return false;
         }
         if (cmbTipo.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un tipo de objeto.");
+            advertencia("Seleccione un tipo de objeto.");
             return false;
         }
         if (cmbSuplidor.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un suplidor.");
+            advertencia("Seleccione un suplidor.");
             return false;
         }
         if (dpFecha.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione una fecha de compra.");
+            advertencia("Seleccione una fecha de compra.");
             return false;
         }
         try {
             Double.parseDouble(txtPrecio.getText().trim());
             Integer.parseInt(txtCantidad.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Precio o cantidad inválidos.");
+            advertencia("Precio o cantidad inválidos.");
             return false;
         }
         return true;
