@@ -314,15 +314,11 @@ public class ClienteController {
             advertencia("La nacionalidad es obligatoria.");
             return false;
         }
-        int edad;
-        try {
-            edad = Integer.parseInt(txtEdad.getText());
-        } catch (NumberFormatException e) {
-            advertencia("Edad inválida.");
-            return false;
-        }
-        if (edad < 21) {
-            advertencia("El cliente debe tener al menos 21 años.");
+        LocalDate nac = dpFechaNacimiento.getValue();
+        int edad = Period.between(nac, LocalDate.now()).getYears();
+        txtEdad.setText(String.valueOf(edad));
+        if (edad < 22) {
+            advertencia("El cliente debe tener al menos 22 años (edad calculada: " + edad + ").");
             return false;
         }
         return true;
