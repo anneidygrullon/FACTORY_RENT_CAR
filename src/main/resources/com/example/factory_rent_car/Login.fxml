@@ -73,6 +73,9 @@
                            -fx-background-radius: 8;
                            -fx-cursor: hand;
                            -fx-effect: dropshadow(gaussian, rgba(74,158,255,0.3), 10, 0, 0, 4);"/>
+
+            <Hyperlink text="¿No tienes cuenta? Crear una" onAction="#handleRegistro"
+                       style="-fx-text-fill: #6a8aaa; -fx-font-size: 12px; -fx-cursor: hand; -fx-border-color: transparent;"/>
         </VBox>
 
         <Line startX="0" endX="280" startY="0" endY="0"

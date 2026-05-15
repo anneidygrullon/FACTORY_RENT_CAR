@@ -77,12 +77,14 @@
             </GridPane>
 
             <HBox alignment="CENTER_RIGHT" spacing="12">
+                <Button text="Nuevo" onAction="#nuevo"
+                        style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20; -fx-cursor: hand;"/>
                 <Button text="Limpiar" onAction="#limpiar"
-                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 8 20; -fx-cursor: hand;"/>
                 <Button text="Guardar" onAction="#guardarDireccion"
-                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28;"/>
+                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 28; -fx-cursor: hand;"/>
                 <Button text="Eliminar" onAction="#eliminarDireccion"
-                        style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20;"/>
+                        style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20; -fx-cursor: hand;"/>
             </HBox>
         </VBox>
     </VBox>

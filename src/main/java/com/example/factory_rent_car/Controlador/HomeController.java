@@ -27,11 +27,8 @@ public class HomeController {
     @FXML private void irAIncidencia(MouseEvent event) {
         if (mainController != null) mainController.navegarA("Registro de Incidencia", mainController.getMenuIncidencias(), "IncidenciaRegistro.fxml");
     }
-    @FXML private void irAEntrega(MouseEvent event) {
-        if (mainController != null) mainController.navegarA("Registro de Entrega", mainController.getMenuEntregas(), "EntregaVehiculo.fxml");
-    }
-    @FXML private void irADevolucion(MouseEvent event) {
-        if (mainController != null) mainController.navegarA("Devolución de Vehículos", mainController.getMenuDevolucion(), "DevolucionVehiculo.fxml");
+    @FXML private void irAGestionVehiculo(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Gestión de Vehículo", mainController.getMenuGestionVehiculo(), "EntregaVehiculo.fxml");
     }
     @FXML private void irAVehiculos(MouseEvent event) {
         if (mainController != null) mainController.navegarA("Consulta de Vehículos", mainController.getMenuVehiculos(), "VehiculoConsulta.fxml");

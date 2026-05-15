@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
-        Conexion objectoconexion = new Conexion();
+        Conexion objectoconexion = Conexion.getInstance();
         try {
             objectoconexion.establecerConexion();
         } catch (SQLException e) {

@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public class PagoController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     // Componentes Tabla Pagos
     @FXML private TextField txtBuscar;
@@ -123,7 +124,7 @@ public class PagoController {
                 mapaMetodosPago.put(tipo, id);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando métodos de pago: " + e.getMessage());
+            error("Error cargando métodos de pago: " + e.getMessage());
         }
     }
 
@@ -139,7 +140,7 @@ public class PagoController {
                 mapaCuentas.put(cuenta, id);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando cuentas: " + e.getMessage());
+            error("Error cargando cuentas: " + e.getMessage());
         }
     }
 
@@ -147,22 +148,16 @@ public class PagoController {
         listaPagos.clear();
         String sql = "SELECT p.id_pago, p.fecha, p.tipo, p.monto, p.fk_id_factura, " +
                 "p.fk_id_metodo_pago, p.fk_id_cuenta, mp.tipo AS metodo_nombre, " +
-                "c.numero + ' - ' + c.banco AS cuenta_info, " +
-                "r.pk_id_reserva AS reserva_id, cl.nombre AS cliente_nombre " +
+                "c.numero + ' - ' + c.banco AS cuenta_info " +
                 "FROM TBL_PAGO p " +
                 "LEFT JOIN TBL_METODO_PAGO mp ON mp.id_metodo_pago = p.fk_id_metodo_pago " +
                 "LEFT JOIN TBL_CUENTA c ON c.id_cuenta = p.fk_id_cuenta " +
-                "LEFT JOIN TBL_FACTURA f ON f.id_factura = p.fk_id_factura " +
-                "LEFT JOIN TBL_DETALLE_FACTURA df ON df.pk_id_det_factura = f.fk_pk_id_det_factura " +
-                "LEFT JOIN TBL_PLAN_SEGURO ps ON ps.pk_id_seguro = df.fk_pk_id_seguro " +
-                "LEFT JOIN TBL_RESERVACION r ON r.pk_id_reserva = df.fk_pk_id_objeto " +
-                "LEFT JOIN TBL_CLIENTE cl ON cl.pk_id_cliente = r.fk_pk_id_cliente " +
                 "ORDER BY p.id_pago DESC";
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Pago p = new Pago(
+                listaPagos.add(new Pago(
                         rs.getInt("id_pago"),
                         rs.getDate("fecha") != null ? rs.getDate("fecha").toLocalDate() : null,
                         rs.getString("tipo"),
@@ -172,49 +167,40 @@ public class PagoController {
                         rs.getInt("fk_id_cuenta"),
                         rs.getString("metodo_nombre"),
                         rs.getString("cuenta_info"),
-                        "Reserva #" + rs.getInt("reserva_id"),
-                        rs.getString("cliente_nombre")
-                );
-                listaPagos.add(p);
+                        "", ""
+                ));
             }
             tablaPagos.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando pagos: " + e.getMessage());
+            error("Error cargando pagos: " + e.getMessage());
         }
     }
 
     private void cargarNotasCredito() {
         listaNotas.clear();
-        String sql = "SELECT n.pk_id_nota, n.tipo, n.motivo, n.fecha, n.descripcion, " +
-                "n.fk_id_devolucion, d.monto, cl.nombre AS cliente_nombre, " +
-                "r.pk_id_reserva AS reserva_id " +
-                "FROM TBL_NOTAS_FINANCIERAS n " +
-                "LEFT JOIN TBL_DEVOLUCION d ON d.id_devolucion = n.fk_id_devolucion " +
-                "LEFT JOIN TBL_RECLAMACION rec ON rec.pk_id_reclamo = d.fk_pk_id_reclamo " +
-                "LEFT JOIN TBL_CLIENTE cl ON cl.pk_id_cliente = rec.fk_pk_id_cliente " +
-                "LEFT JOIN TBL_RESERVACION r ON r.pk_id_reserva = rec.fk_pk_id_reclamo " +
-                "ORDER BY n.pk_id_nota DESC";
+        String sql = "SELECT pk_id_nota, tipo, motivo, fecha, descripcion, fk_id_devolucion " +
+                "FROM TBL_NOTAS_FINANCIERAS ORDER BY pk_id_nota DESC";
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                NotaCredito n = new NotaCredito(
+                int idDev = rs.getInt("fk_id_devolucion");
+                boolean devNull = rs.wasNull();
+                listaNotas.add(new NotaCredito(
                         rs.getInt("pk_id_nota"),
                         rs.getString("tipo"),
                         rs.getString("motivo"),
                         rs.getDate("fecha") != null ? rs.getDate("fecha").toLocalDate() : null,
                         rs.getString("descripcion"),
-                        rs.getInt("fk_id_devolucion"),
-                        rs.getDouble("monto"),
-                        rs.getString("cliente_nombre"),
-                        "Reserva #" + rs.getInt("reserva_id"),
+                        devNull ? 0 : idDev,
+                        0.0, "",
+                        devNull ? "—" : "Devolución #" + idDev,
                         false
-                );
-                listaNotas.add(n);
+                ));
             }
             tablaNotasCredito.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando notas de crédito: " + e.getMessage());
+            error("Error cargando notas de crédito: " + e.getMessage());
         }
     }
 
@@ -222,27 +208,26 @@ public class PagoController {
     private void buscarReserva(ActionEvent event) {
         String idText = txtReservaId.getText().trim();
         if (idText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de reserva.");
+            advertencia("Ingrese un ID de reserva.");
             return;
         }
         int id;
         try {
             id = Integer.parseInt(idText);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
 
         String sql = "SELECT r.pk_id_reserva, r.monto_total, r.monto_apartado, r.monto_pendiente, " +
                 "c.nombre AS cliente_nombre, " +
-                "COALESCE(SUM(n.monto), 0) AS notas_disponibles " +
+                "(SELECT COUNT(*) FROM TBL_NOTAS_FINANCIERAS n WHERE n.fk_id_devolucion IN " +
+                "(SELECT d.id_devolucion FROM TBL_DEVOLUCION d WHERE d.fk_pk_id_reclamo IN " +
+                "(SELECT rec.pk_id_reclamo FROM TBL_RECLAMACION rec WHERE rec.fk_pk_id_cliente = c.pk_id_cliente))) " +
+                "AS notas_disponibles " +
                 "FROM TBL_RESERVACION r " +
                 "LEFT JOIN TBL_CLIENTE c ON c.pk_id_cliente = r.fk_pk_id_cliente " +
-                "LEFT JOIN TBL_NOTAS_FINANCIERAS n ON n.fk_id_devolucion IN " +
-                "(SELECT d.id_devolucion FROM TBL_DEVOLUCION d WHERE d.fk_pk_id_reclamo IN " +
-                "(SELECT rec.pk_id_reclamo FROM TBL_RECLAMACION rec WHERE rec.fk_pk_id_cliente = c.pk_id_cliente)) " +
-                "WHERE r.pk_id_reserva = ? " +
-                "GROUP BY r.pk_id_reserva, r.monto_total, r.monto_apartado, r.monto_pendiente, c.nombre";
+                "WHERE r.pk_id_reserva = ?";
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -263,19 +248,18 @@ public class PagoController {
                 // Cargar notas de crédito disponibles para este cliente
                 cargarNotasCreditoCliente(rs.getInt("pk_id_reserva"));
             } else {
-                JOptionPane.showMessageDialog(null, "Reserva no encontrada.");
+                advertencia("Reserva no encontrada.");
                 limpiarPago();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
     private void cargarNotasCreditoCliente(int reservaId) {
         cmbNotaCredito.getItems().clear();
         mapaNotasCredito.clear();
-        String sql = "SELECT n.pk_id_nota, n.monto " +
-                "FROM TBL_NOTAS_FINANCIERAS n " +
+        String sql = "SELECT n.pk_id_nota FROM TBL_NOTAS_FINANCIERAS n " +
                 "WHERE n.fk_id_devolucion IN " +
                 "(SELECT d.id_devolucion FROM TBL_DEVOLUCION d WHERE d.fk_pk_id_reclamo IN " +
                 "(SELECT rec.pk_id_reclamo FROM TBL_RECLAMACION rec WHERE rec.fk_pk_id_cliente = " +
@@ -285,20 +269,20 @@ public class PagoController {
             ps.setInt(1, reservaId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                String nota = "Nota #" + rs.getInt("pk_id_nota") + " - RD$ " + String.format("%.2f", rs.getDouble("monto"));
+                String nota = "Nota #" + rs.getInt("pk_id_nota");
                 cmbNotaCredito.getItems().add(nota);
                 mapaNotasCredito.put(nota, rs.getInt("pk_id_nota"));
             }
             cmbNotaCredito.getItems().add("Ninguna");
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando notas: " + e.getMessage());
+            error("Error cargando notas: " + e.getMessage());
         }
     }
 
     @FXML
     private void registrarPago(ActionEvent event) {
         if (reservaActualId == -1) {
-            JOptionPane.showMessageDialog(null, "Primero busque una reserva válida.");
+            advertencia("Primero busque una reserva válida.");
             return;
         }
 
@@ -307,11 +291,11 @@ public class PagoController {
         String notaStr = cmbNotaCredito.getValue();
 
         if (metodoPagoStr == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un método de pago.");
+            advertencia("Seleccione un método de pago.");
             return;
         }
         if (cuentaStr == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione una cuenta bancaria.");
+            advertencia("Seleccione una cuenta bancaria.");
             return;
         }
 
@@ -323,7 +307,7 @@ public class PagoController {
             montoAPagar = Double.parseDouble(txtMontoAPagar.getText().trim());
             if (montoAPagar <= 0) throw new NumberFormatException();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Monto a pagar inválido.");
+            advertencia("Monto a pagar inválido.");
             return;
         }
 
@@ -336,7 +320,7 @@ public class PagoController {
         }
 
         if (montoAPagar > montoConNota) {
-            JOptionPane.showMessageDialog(null, "El monto a pagar no puede exceder el pendiente después de aplicar nota de crédito.");
+            advertencia("El monto a pagar no puede exceder el pendiente después de aplicar nota de crédito.");
             return;
         }
 
@@ -369,13 +353,13 @@ public class PagoController {
             psUpdate.executeUpdate();
 
             con.commit();
-            JOptionPane.showMessageDialog(null, "Pago registrado correctamente.");
+            informacion("Pago registrado correctamente.");
             limpiarPago();
             cargarPagos();
 
         } catch (SQLException e) {
             try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            JOptionPane.showMessageDialog(null, "Error al registrar pago: " + e.getMessage());
+            error("Error al registrar pago: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
@@ -418,15 +402,15 @@ public class PagoController {
 
     private double aplicarNotaCredito(int notaId) {
         try (Connection con = conexion.establecerConexion()) {
-            String sql = "SELECT monto FROM TBL_NOTAS_FINANCIERAS WHERE pk_id_nota = ?";
+            String sql = "SELECT pk_id_nota FROM TBL_NOTAS_FINANCIERAS WHERE pk_id_nota = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, notaId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getDouble("monto");
+                return 0;
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al aplicar nota: " + e.getMessage());
+            error("Error al aplicar nota: " + e.getMessage());
         }
         return 0;
     }
@@ -435,14 +419,14 @@ public class PagoController {
     private void buscarReservaNota(ActionEvent event) {
         String idText = txtReservaIdNota.getText().trim();
         if (idText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de reserva.");
+            advertencia("Ingrese un ID de reserva.");
             return;
         }
         int id;
         try {
             id = Integer.parseInt(idText);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
 
@@ -477,11 +461,11 @@ public class PagoController {
                     txtMontoCredito.setText("0.00");
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Reserva no encontrada.");
+                advertencia("Reserva no encontrada.");
                 limpiarNota();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
@@ -489,7 +473,7 @@ public class PagoController {
     private void crearNotaCredito(ActionEvent event) {
         String reservaIdText = txtReservaIdNota.getText().trim();
         if (reservaIdText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Primero busque una reserva válida.");
+            advertencia("Primero busque una reserva válida.");
             return;
         }
         int reservaId = Integer.parseInt(reservaIdText);
@@ -501,11 +485,11 @@ public class PagoController {
         try {
             montoCredito = Double.parseDouble(txtMontoCredito.getText().trim());
             if (montoCredito <= 0) {
-                JOptionPane.showMessageDialog(null, "El monto a acreditar debe ser mayor a cero.");
+                advertencia("El monto a acreditar debe ser mayor a cero.");
                 return;
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Monto inválido.");
+            advertencia("Monto inválido.");
             return;
         }
 
@@ -515,45 +499,62 @@ public class PagoController {
             con.setAutoCommit(false);
 
             // Crear reclamo
-            String sqlReclamo = "INSERT INTO TBL_RECLAMACION (estado, motivo, descripcion, fk_pk_id_cliente, fk_pk_id_hist_reclamo, fk_pk_id_empleado) " +
-                    "VALUES ('Pendiente', ?, ?, ?, 1, 1)";
-            PreparedStatement psReclamo = con.prepareStatement(sqlReclamo, Statement.RETURN_GENERATED_KEYS);
-            psReclamo.setString(1, motivo);
-            psReclamo.setString(2, "Devolución anticipada - Nota de crédito generada");
-            psReclamo.setInt(3, obtenerClienteIdPorReserva(reservaId));
+            int reclamoId;
+            String sqlNextReclamo = "SELECT ISNULL(MAX(pk_id_reclamo), 0) + 1 AS next_id FROM TBL_RECLAMACION";
+            try (PreparedStatement psNext = con.prepareStatement(sqlNextReclamo);
+                 ResultSet rsNext = psNext.executeQuery()) {
+                reclamoId = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlReclamo = "INSERT INTO TBL_RECLAMACION (pk_id_reclamo, estado, motivo, descripcion, fk_pk_id_cliente, fk_pk_id_hist_reclamo, fk_pk_id_empleado) " +
+                    "VALUES (?, 'Pendiente', ?, ?, ?, 1, 1)";
+            PreparedStatement psReclamo = con.prepareStatement(sqlReclamo);
+            psReclamo.setInt(1, reclamoId);
+            psReclamo.setString(2, motivo);
+            psReclamo.setString(3, "Devolución anticipada - Nota de crédito generada");
+            psReclamo.setInt(4, obtenerClienteIdPorReserva(reservaId));
             psReclamo.executeUpdate();
-            ResultSet rsReclamo = psReclamo.getGeneratedKeys();
-            int reclamoId = rsReclamo.next() ? rsReclamo.getInt(1) : -1;
 
             // Crear devolución
-            String sqlDevolucion = "INSERT INTO TBL_DEVOLUCION (fecha, razon, descripcion, fk_pk_id_reclamo) " +
-                    "VALUES (?, ?, ?, ?)";
-            PreparedStatement psDevolucion = con.prepareStatement(sqlDevolucion, Statement.RETURN_GENERATED_KEYS);
-            psDevolucion.setDate(1, Date.valueOf(LocalDate.now()));
-            psDevolucion.setString(2, motivo);
-            psDevolucion.setString(3, "Generación de nota de crédito por devolución anticipada");
-            psDevolucion.setInt(4, reclamoId);
+            int devolucionId;
+            String sqlNextDev = "SELECT ISNULL(MAX(id_devolucion), 0) + 1 AS next_id FROM TBL_DEVOLUCION";
+            try (PreparedStatement psNext = con.prepareStatement(sqlNextDev);
+                 ResultSet rsNext = psNext.executeQuery()) {
+                devolucionId = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlDevolucion = "INSERT INTO TBL_DEVOLUCION (id_devolucion, fecha, razon, descripcion, fk_pk_id_reclamo) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement psDevolucion = con.prepareStatement(sqlDevolucion);
+            psDevolucion.setInt(1, devolucionId);
+            psDevolucion.setDate(2, Date.valueOf(LocalDate.now()));
+            psDevolucion.setString(3, motivo);
+            psDevolucion.setString(4, "Generación de nota de crédito por devolución anticipada");
+            psDevolucion.setInt(5, reclamoId);
             psDevolucion.executeUpdate();
-            ResultSet rsDevolucion = psDevolucion.getGeneratedKeys();
-            int devolucionId = rsDevolucion.next() ? rsDevolucion.getInt(1) : -1;
 
             // Crear nota de crédito
-            String sqlNota = "INSERT INTO TBL_NOTAS_FINANCIERAS (tipo, motivo, fecha, descripcion, fk_id_devolucion) " +
-                    "VALUES ('Crédito', ?, ?, ?, ?)";
+            int notaId;
+            String sqlNextNota = "SELECT ISNULL(MAX(pk_id_nota), 0) + 1 AS next_id FROM TBL_NOTAS_FINANCIERAS";
+            try (PreparedStatement psNext = con.prepareStatement(sqlNextNota);
+                 ResultSet rsNext = psNext.executeQuery()) {
+                notaId = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlNota = "INSERT INTO TBL_NOTAS_FINANCIERAS (pk_id_nota, tipo, motivo, fecha, descripcion, fk_id_devolucion) " +
+                    "VALUES (?, 'Crédito', ?, ?, ?, ?)";
             PreparedStatement psNota = con.prepareStatement(sqlNota);
-            psNota.setString(1, motivo);
-            psNota.setDate(2, Date.valueOf(LocalDate.now()));
-            psNota.setString(3, "Nota de crédito por devolución anticipada");
-            psNota.setInt(4, devolucionId);
+            psNota.setInt(1, notaId);
+            psNota.setString(2, motivo);
+            psNota.setDate(3, Date.valueOf(LocalDate.now()));
+            psNota.setString(4, "Nota de crédito por devolución anticipada");
+            psNota.setInt(5, devolucionId);
             psNota.executeUpdate();
 
             con.commit();
-            JOptionPane.showMessageDialog(null, "Nota de crédito creada exitosamente por RD$ " + String.format("%.2f", montoCredito));
+            informacion("Nota de crédito creada exitosamente por RD$ " + String.format("%.2f", montoCredito));
             limpiarNota();
             cargarNotasCredito();
         } catch (SQLException e) {
             try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            JOptionPane.showMessageDialog(null, "Error al crear nota de crédito: " + e.getMessage());
+            error("Error al crear nota de crédito: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }

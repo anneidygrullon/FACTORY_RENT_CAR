@@ -1,6 +1,7 @@
 package com.example.factory_rent_car.Controlador;
 
 import com.example.factory_rent_car.Database.Conexion;
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -17,7 +18,7 @@ public class IncidenciaRegistroController {
         this.mainController = mainController;
     }
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtIdReserva;
     @FXML private Label lblReservaInfo;
@@ -38,14 +39,14 @@ public class IncidenciaRegistroController {
     private void buscarReserva(ActionEvent event) {
         String idText = txtIdReserva.getText().trim();
         if (idText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de reserva.");
+            advertencia("Ingrese un ID de reserva.");
             return;
         }
         int id;
         try {
             id = Integer.parseInt(idText);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
         String sql = "SELECT pk_id_reserva, c.nombre AS cliente FROM TBL_RESERVACION r " +
@@ -57,11 +58,11 @@ public class IncidenciaRegistroController {
             if (rs.next()) {
                 lblReservaInfo.setText("Reserva #" + id + " - Cliente: " + rs.getString("cliente"));
             } else {
-                JOptionPane.showMessageDialog(null, "Reserva no encontrada.");
+                advertencia("Reserva no encontrada.");
                 lblReservaInfo.setText("");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
@@ -69,14 +70,14 @@ public class IncidenciaRegistroController {
     private void buscarEmpleado(ActionEvent event) {
         String idText = txtIdEmpleado.getText().trim();
         if (idText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de empleado.");
+            advertencia("Ingrese un ID de empleado.");
             return;
         }
         int id;
         try {
             id = Integer.parseInt(idText);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
         String sql = "SELECT nombre FROM TBL_EMPLEADO WHERE pk_id_empleado = ?";
@@ -87,11 +88,11 @@ public class IncidenciaRegistroController {
             if (rs.next()) {
                 lblEmpleadoInfo.setText(rs.getString("nombre"));
             } else {
-                JOptionPane.showMessageDialog(null, "Empleado no encontrado.");
+                advertencia("Empleado no encontrado.");
                 lblEmpleadoInfo.setText("");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
@@ -111,39 +112,45 @@ public class IncidenciaRegistroController {
             con = conexion.establecerConexion();
             con.setAutoCommit(false);
 
-            int idHistorial = -1;
-            String sqlHistorial = "INSERT INTO TBL_HISTORIAL_INCIDENCIA (fecha, descripcion) VALUES (?, ?)";
-            PreparedStatement psHist = con.prepareStatement(sqlHistorial, Statement.RETURN_GENERATED_KEYS);
-            psHist.setDate(1, Date.valueOf(fecha));
-            psHist.setString(2, descripcion);
-            psHist.executeUpdate();
-            ResultSet rsHist = psHist.getGeneratedKeys();
-            if (rsHist.next()) idHistorial = rsHist.getInt(1);
-            psHist.close();
+            int idHistorial;
+            try (PreparedStatement psNext = con.prepareStatement("SELECT ISNULL(MAX(pk_id_hist_incidencia), 0) + 1 AS next_id FROM TBL_HISTORIAL_INCIDENCIA");
+                 ResultSet rsNext = psNext.executeQuery()) {
+                idHistorial = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlHistorial = "INSERT INTO TBL_HISTORIAL_INCIDENCIA (pk_id_hist_incidencia, fecha, descripcion) VALUES (?, ?, ?)";
+            try (PreparedStatement psHist = con.prepareStatement(sqlHistorial)) {
+                psHist.setInt(1, idHistorial);
+                psHist.setDate(2, Date.valueOf(fecha));
+                psHist.setString(3, descripcion);
+                psHist.executeUpdate();
+            }
 
-            String sqlIncidencia = "INSERT INTO TBL_INCIDENCIA (tipo, monto, fecha, descripcion, " +
+            int idIncidencia;
+            try (PreparedStatement psNext = con.prepareStatement("SELECT ISNULL(MAX(pk_id_incidencia), 0) + 1 AS next_id FROM TBL_INCIDENCIA");
+                 ResultSet rsNext = psNext.executeQuery()) {
+                idIncidencia = rsNext.next() ? rsNext.getInt("next_id") : 1;
+            }
+            String sqlIncidencia = "INSERT INTO TBL_INCIDENCIA (pk_id_incidencia, tipo, monto, fecha, descripcion, " +
                     "fk_pk_id_reserva, fk_pk_id_hist_incidencia, fk_pk_id_empleado) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement psInc = con.prepareStatement(sqlIncidencia, Statement.RETURN_GENERATED_KEYS);
-            psInc.setString(1, tipo);
-            psInc.setDouble(2, monto);
-            psInc.setDate(3, Date.valueOf(fecha));
-            psInc.setString(4, descripcion);
-            psInc.setInt(5, idReserva);
-            psInc.setInt(6, idHistorial);
-            psInc.setInt(7, idEmpleado);
-            psInc.executeUpdate();
-            ResultSet rsInc = psInc.getGeneratedKeys();
-            int idIncidencia = -1;
-            if (rsInc.next()) idIncidencia = rsInc.getInt(1);
-            psInc.close();
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement psInc = con.prepareStatement(sqlIncidencia)) {
+                psInc.setInt(1, idIncidencia);
+                psInc.setString(2, tipo);
+                psInc.setDouble(3, monto);
+                psInc.setDate(4, Date.valueOf(fecha));
+                psInc.setString(5, descripcion);
+                psInc.setInt(6, idReserva);
+                psInc.setInt(7, idHistorial);
+                psInc.setInt(8, idEmpleado);
+                psInc.executeUpdate();
+            }
 
             con.commit();
-            JOptionPane.showMessageDialog(null, "Incidencia registrada con ID: " + idIncidencia);
+            informacion("Incidencia registrada con ID: " + idIncidencia);
             limpiar(event);
         } catch (SQLException e) {
             try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            JOptionPane.showMessageDialog(null, "Error al registrar: " + e.getMessage());
+            error("Error al registrar: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try { if (con != null) con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
@@ -164,23 +171,23 @@ public class IncidenciaRegistroController {
 
     private boolean validarCampos() {
         if (txtIdReserva.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID de reserva es obligatorio.");
+            advertencia("El ID de reserva es obligatorio.");
             return false;
         }
         if (txtIdEmpleado.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID de empleado es obligatorio.");
+            advertencia("El ID de empleado es obligatorio.");
             return false;
         }
         if (cmbTipo.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un tipo de incidencia.");
+            advertencia("Seleccione un tipo de incidencia.");
             return false;
         }
         if (txtMonto.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El monto es obligatorio.");
+            advertencia("El monto es obligatorio.");
             return false;
         }
         if (dpFecha.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "La fecha es obligatoria.");
+            advertencia("La fecha es obligatoria.");
             return false;
         }
         try {
@@ -188,7 +195,7 @@ public class IncidenciaRegistroController {
             Integer.parseInt(txtIdEmpleado.getText().trim());
             Double.parseDouble(txtMonto.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "IDs o monto inválidos.");
+            advertencia("IDs o monto inválidos.");
             return false;
         }
         return true;

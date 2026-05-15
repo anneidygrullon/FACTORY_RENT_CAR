@@ -135,12 +135,14 @@
 
                 <!-- Action buttons -->
                 <HBox alignment="CENTER_RIGHT" spacing="12" style="-fx-padding: 4 0 0 0;">
-                    <Button text="Limpiar" onAction="#limpiar"
-                            style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>
-                    <Button text="Guardar" onAction="#guardarMantenimiento"
-                            style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 32; -fx-cursor: hand;"/>
-                    <Button text="Eliminar" onAction="#eliminarMantenimiento"
-                            style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
+                <Button text="Nuevo Registro" onAction="#nuevo"
+                        style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
+                <Button text="Limpiar" onAction="#limpiar"
+                        style="-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand; -fx-border-color: #E2E8F0; -fx-border-radius: 8;"/>
+                <Button text="Guardar" onAction="#guardarMantenimiento"
+                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 32; -fx-cursor: hand;"/>
+                <Button text="Eliminar" onAction="#eliminarMantenimiento"
+                        style="-fx-background-color: #FEF2F2; -fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
                 </HBox>
             </VBox>
         </VBox>

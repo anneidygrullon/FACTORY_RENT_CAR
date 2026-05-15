@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.example.factory_rent_car.Controlador.RegistroUsuarioController"
+           style="-fx-background-color: #0d0d1a;">
+
+    <VBox alignment="CENTER" maxWidth="400" maxHeight="600" spacing="25"
+          style="-fx-background-color: #112060;
+                 -fx-background-radius: 16;
+                 -fx-padding: 40 36 36 36;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 30, 0, 0, 10);">
+
+        <VBox alignment="CENTER" spacing="6">
+            <SVGPath content="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"
+                     fill="white" scaleX="1.8" scaleY="1.8"/>
+            <Label text="FACTORY"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <HBox alignment="CENTER" spacing="8">
+                <Line startX="0" endX="30" startY="0" endY="0"
+                      style="-fx-stroke: #2a5acc; -fx-stroke-width: 1.5;"/>
+                <Label text="RENT CAR"
+                       style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4a9eff;"/>
+                <Line startX="0" endX="30" startY="0" endY="0"
+                      style="-fx-stroke: #2a5acc; -fx-stroke-width: 1.5;"/>
+            </HBox>
+        </VBox>
+
+        <Line startX="0" endX="280" startY="0" endY="0"
+              style="-fx-stroke: #1e3a7a; -fx-stroke-width: 1;"/>
+
+        <VBox spacing="14" alignment="CENTER">
+            <Label text="Crear Cuenta"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #c8d8f0;"/>
+
+            <TextField fx:id="txtUsuario" promptText="Nombre de usuario"
+                       prefHeight="40" maxWidth="320"
+                       style="-fx-background-color: #0a1540;
+                              -fx-border-color: #2a4a8a;
+                              -fx-border-radius: 8;
+                              -fx-background-radius: 8;
+                              -fx-text-fill: white;
+                              -fx-prompt-text-fill: #5a7aaa;
+                              -fx-font-size: 14px;
+                              -fx-padding: 8 14 8 14;"/>
+
+            <PasswordField fx:id="txtContrasena" promptText="Contraseña"
+                           prefHeight="40" maxWidth="320"
+                           style="-fx-background-color: #0a1540;
+                                  -fx-border-color: #2a4a8a;
+                                  -fx-border-radius: 8;
+                                  -fx-background-radius: 8;
+                                  -fx-text-fill: white;
+                                  -fx-prompt-text-fill: #5a7aaa;
+                                  -fx-font-size: 14px;
+                                  -fx-padding: 8 14 8 14;"/>
+
+            <PasswordField fx:id="txtConfirmar" promptText="Confirmar contraseña"
+                           prefHeight="40" maxWidth="320"
+                           style="-fx-background-color: #0a1540;
+                                  -fx-border-color: #2a4a8a;
+                                  -fx-border-radius: 8;
+                                  -fx-background-radius: 8;
+                                  -fx-text-fill: white;
+                                  -fx-prompt-text-fill: #5a7aaa;
+                                  -fx-font-size: 14px;
+                                  -fx-padding: 8 14 8 14;"/>
+
+            <ComboBox fx:id="cmbRol" promptText="Seleccione rol" maxWidth="320" prefHeight="40"
+                      style="-fx-background-color: #0a1540;
+                             -fx-border-color: #2a4a8a;
+                             -fx-border-radius: 8;
+                             -fx-background-radius: 8;
+                             -fx-text-fill: white;
+                             -fx-font-size: 14px;
+                             -fx-padding: 4 10;"/>
+
+            <Label fx:id="lblError" text="" wrapText="true" maxWidth="320"
+                   style="-fx-text-fill: #ff6b6b; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+
+            <Button text="CREAR CUENTA" maxWidth="320" prefHeight="42"
+                    onAction="#handleRegistrar"
+                    style="-fx-background-color: #2E7D32;
+                           -fx-text-fill: white;
+                           -fx-font-size: 14px;
+                           -fx-font-weight: bold;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(gaussian, rgba(46,125,50,0.3), 10, 0, 0, 4);"/>
+
+            <Hyperlink text="¿Ya tienes cuenta? Iniciar sesión" onAction="#handleVolver"
+                       style="-fx-text-fill: #6a8aaa; -fx-font-size: 12px; -fx-cursor: hand; -fx-border-color: transparent;"/>
+        </VBox>
+
+        <Line startX="0" endX="280" startY="0" endY="0"
+              style="-fx-stroke: #1e3a7a; -fx-stroke-width: 1;"/>
+
+        <Label text="Tu camino, nuestra prioridad."
+               style="-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #6a8aaa;"/>
+    </VBox>
+</StackPane>

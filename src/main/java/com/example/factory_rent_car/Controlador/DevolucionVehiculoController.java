@@ -2,22 +2,28 @@ package com.example.factory_rent_car.Controlador;
 
 import com.example.factory_rent_car.Modelo.ControlVehi;
 import com.example.factory_rent_car.Database.Conexion;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
+
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DevolucionVehiculoController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtBuscar;
     @FXML private TableView<ControlVehi> tablaDevoluciones;
@@ -39,7 +45,7 @@ public class DevolucionVehiculoController {
     @FXML private ComboBox<String> cmbDireccion;
     @FXML private DatePicker dpFecha;
     @FXML private TextField txtNivelCombustible;
-    @FXML private TextField txtTipo; // fijo en "Entrada"
+    @FXML private TextField txtTipo;
 
     private final ObservableList<ControlVehi> listaControles = FXCollections.observableArrayList();
     private ControlVehi controlSeleccionado;
@@ -47,10 +53,8 @@ public class DevolucionVehiculoController {
 
     @FXML
     public void initialize() {
-        cargarDirecciones();
         txtTipo.setText("Entrada");
 
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idControlProperty().asObject());
         colFecha.setCellValueFactory(c -> c.getValue().fechaProperty());
         colCliente.setCellValueFactory(c -> c.getValue().clienteNombreProperty());
@@ -68,74 +72,97 @@ public class DevolucionVehiculoController {
         tableContainer.setVisible(true);
         btnToggleTable.setText("📋 Ocultar Tabla");
 
+        cargarDirecciones();
         cargarDevoluciones();
     }
 
     private void cargarDirecciones() {
-        mapaDirecciones.clear();
-        cmbDireccion.getItems().clear();
-        String sql = "SELECT d.pk_id_direccion, d.calle_avenida, d.num_edificio_casa, c.nombre AS ciudad " +
-                "FROM TBL_DIRECCION d " +
-                "LEFT JOIN TBL_CIUDAD c ON c.pk_id_ciudad = d.fk_pk_id_ciudad " +
-                "ORDER BY d.pk_id_direccion";
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                int id = rs.getInt("pk_id_direccion");
-                String direccion = rs.getString("calle_avenida") +
-                        (rs.getString("num_edificio_casa") != null ? " " + rs.getString("num_edificio_casa") : "") +
-                        ", " + rs.getString("ciudad");
-                cmbDireccion.getItems().add(direccion);
-                mapaDirecciones.put(direccion, id);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                Map<String, Integer> tempMap = new HashMap<>();
+                List<String> tempList = new ArrayList<>();
+                String sql = "SELECT d.pk_id_direccion, d.calle_avenida, d.num_edificio_casa, c.nombre AS ciudad " +
+                        "FROM TBL_DIRECCION d " +
+                        "LEFT JOIN TBL_CIUDAD c ON c.pk_id_ciudad = d.fk_pk_id_ciudad " +
+                        "ORDER BY d.pk_id_direccion";
+                try (Connection con = conexion.establecerConexion();
+                     PreparedStatement ps = con.prepareStatement(sql);
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int id = rs.getInt("pk_id_direccion");
+                        String dir = rs.getString("calle_avenida") +
+                                (rs.getString("num_edificio_casa") != null ? " " + rs.getString("num_edificio_casa") : "") +
+                                ", " + rs.getString("ciudad");
+                        tempList.add(dir);
+                        tempMap.put(dir, id);
+                    }
+                } catch (SQLException e) {
+                    Platform.runLater(() -> error("Error cargando direcciones: " + e.getMessage()));
+                }
+                Platform.runLater(() -> {
+                    mapaDirecciones.clear();
+                    mapaDirecciones.putAll(tempMap);
+                    cmbDireccion.getItems().setAll(tempList);
+                });
+                return null;
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando direcciones: " + e.getMessage());
-        }
+        };
+        new Thread(task).start();
     }
 
     private void cargarDevoluciones() {
-        listaControles.clear();
-        String sql = "SELECT cv.id_control, cv.fecha, cv.nivel_combustible, cv.tipo, " +
-                "cv.fk_pk_id_direccion, cv.fk_pk_id_reserva, cv.fk_pk_id_empleado, " +
-                "c.nombre AS cliente_nombre, " +
-                "v.marca + ' ' + v.modelo AS vehiculo_info, " +
-                "e.nombre AS empleado_nombre, " +
-                "d.calle_avenida + ' ' + ISNULL(d.num_edificio_casa, '') + ', ' + ci.nombre AS direccion_completa " +
-                "FROM TBL_CONTROL_VEHI cv " +
-                "LEFT JOIN TBL_RESERVACION r ON r.pk_id_reserva = cv.fk_pk_id_reserva " +
-                "LEFT JOIN TBL_CLIENTE c ON c.pk_id_cliente = r.fk_pk_id_cliente " +
-                "LEFT JOIN TBL_RESERVA_VEHI rv ON rv.fk_pk_id_reserva = r.pk_id_reserva " +
-                "LEFT JOIN TBL_VEHICULO v ON v.id_vehiculo = rv.fk_id_vehiculo " +
-                "LEFT JOIN TBL_EMPLEADO e ON e.pk_id_empleado = cv.fk_pk_id_empleado " +
-                "LEFT JOIN TBL_DIRECCION d ON d.pk_id_direccion = cv.fk_pk_id_direccion " +
-                "LEFT JOIN TBL_CIUDAD ci ON ci.pk_id_ciudad = d.fk_pk_id_ciudad " +
-                "WHERE cv.tipo = 'Entrada' " +
-                "ORDER BY cv.id_control DESC";
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                ControlVehi cv = new ControlVehi(
-                        rs.getInt("id_control"),
-                        rs.getDate("fecha") != null ? rs.getDate("fecha").toLocalDate() : null,
-                        rs.getDouble("nivel_combustible"),
-                        rs.getString("tipo"),
-                        rs.getInt("fk_pk_id_direccion"),
-                        rs.getInt("fk_pk_id_reserva"),
-                        rs.getInt("fk_pk_id_empleado"),
-                        rs.getString("cliente_nombre"),
-                        rs.getString("vehiculo_info"),
-                        rs.getString("empleado_nombre"),
-                        rs.getString("direccion_completa")
-                );
-                listaControles.add(cv);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                List<ControlVehi> tempList = new ArrayList<>();
+                String sql = "SELECT cv.id_control, cv.fecha, cv.nivel_combustible, cv.tipo, " +
+                        "cv.fk_pk_id_direccion, cv.fk_pk_id_reserva, cv.fk_pk_id_empleado, " +
+                        "c.nombre AS cliente_nombre, " +
+                        "v.marca + ' ' + v.modelo AS vehiculo_info, " +
+                        "e.nombre AS empleado_nombre, " +
+                        "d.calle_avenida + ' ' + ISNULL(d.num_edificio_casa, '') + ', ' + ci.nombre AS direccion_completa " +
+                        "FROM TBLCONTROL_VEHI cv " +
+                        "LEFT JOIN TBL_RESERVACION r ON r.pk_id_reserva = cv.fk_pk_id_reserva " +
+                        "LEFT JOIN TBL_CLIENTE c ON c.pk_id_cliente = r.fk_pk_id_cliente " +
+                        "LEFT JOIN TBL_RESERVA_VEHI rv ON rv.fk_pk_id_reserva = r.pk_id_reserva " +
+                        "LEFT JOIN TBL_VEHICULO v ON v.id_vehiculo = rv.fk_id_vehiculo " +
+                        "LEFT JOIN TBL_EMPLEADO e ON e.pk_id_empleado = cv.fk_pk_id_empleado " +
+                        "LEFT JOIN TBL_DIRECCION d ON d.pk_id_direccion = cv.fk_pk_id_direccion " +
+                        "LEFT JOIN TBL_CIUDAD ci ON ci.pk_id_ciudad = d.fk_pk_id_ciudad " +
+                        "WHERE cv.tipo = 'Entrada' " +
+                        "ORDER BY cv.id_control DESC";
+                try (Connection con = conexion.establecerConexion();
+                     PreparedStatement ps = con.prepareStatement(sql);
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        tempList.add(new ControlVehi(
+                                rs.getInt("id_control"),
+                                rs.getDate("fecha") != null ? rs.getDate("fecha").toLocalDate() : null,
+                                rs.getDouble("nivel_combustible"),
+                                rs.getString("tipo"),
+                                rs.getInt("fk_pk_id_direccion"),
+                                rs.getInt("fk_pk_id_reserva"),
+                                rs.getInt("fk_pk_id_empleado"),
+                                rs.getString("cliente_nombre"),
+                                rs.getString("vehiculo_info"),
+                                rs.getString("empleado_nombre"),
+                                rs.getString("direccion_completa")
+                        ));
+                    }
+                } catch (SQLException e) {
+                    Platform.runLater(() -> error("Error cargando devoluciones: " + e.getMessage()));
+                }
+                List<ControlVehi> finalList = tempList;
+                Platform.runLater(() -> {
+                    listaControles.setAll(finalList);
+                    tablaDevoluciones.refresh();
+                    System.out.println("Devoluciones cargadas: " + finalList.size());
+                });
+                return null;
             }
-            tablaDevoluciones.refresh();
-            System.out.println("Devoluciones cargadas: " + listaControles.size());
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando devoluciones: " + e.getMessage());
-        }
+        };
+        new Thread(task).start();
     }
 
     private void cargarEnFormulario(ControlVehi cv) {
@@ -192,7 +219,7 @@ public class DevolucionVehiculoController {
     @FXML
     private void actualizarDevolucion(ActionEvent event) {
         if (controlSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un registro de la tabla.");
+            advertencia("Seleccione un registro de la tabla.");
             return;
         }
         try {
@@ -201,7 +228,7 @@ public class DevolucionVehiculoController {
             String direccionSeleccionada = cmbDireccion.getValue();
             Integer idDireccion = mapaDirecciones.get(direccionSeleccionada);
 
-            String sql = "UPDATE TBL_CONTROL_VEHI SET fecha=?, nivel_combustible=?, fk_pk_id_direccion=? WHERE id_control=?";
+            String sql = "UPDATE TBLCONTROL_VEHI SET fecha=?, nivel_combustible=?, fk_pk_id_direccion=? WHERE id_control=?";
             try (Connection con = conexion.establecerConexion();
                  PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setDate(1, Date.valueOf(fecha));
@@ -210,18 +237,18 @@ public class DevolucionVehiculoController {
                 else ps.setNull(3, Types.INTEGER);
                 ps.setInt(4, controlSeleccionado.getIdControl());
                 ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Devolución actualizada.");
+                informacion("Devolución actualizada.");
                 cargarDevoluciones();
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
     @FXML
     private void marcarDevuelto(ActionEvent event) {
         if (controlSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un registro de la tabla.");
+            advertencia("Seleccione un registro de la tabla.");
             return;
         }
         int idVehiculo = -1;
@@ -232,11 +259,11 @@ public class DevolucionVehiculoController {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) idVehiculo = rs.getInt("fk_id_vehiculo");
             else {
-                JOptionPane.showMessageDialog(null, "No se encontró el vehículo de esta reserva.");
+                advertencia("No se encontró el vehículo de esta reserva.");
                 return;
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al obtener vehículo: " + e.getMessage());
+            error("Error al obtener vehículo: " + e.getMessage());
             return;
         }
 
@@ -246,12 +273,12 @@ public class DevolucionVehiculoController {
             ps.setInt(1, idVehiculo);
             int filas = ps.executeUpdate();
             if (filas > 0) {
-                JOptionPane.showMessageDialog(null, "Vehículo marcado como DISPONIBLE correctamente.");
+                informacion("Vehículo marcado como DISPONIBLE correctamente.");
             } else {
-                JOptionPane.showMessageDialog(null, "No se pudo actualizar el estado.");
+                advertencia("No se pudo actualizar el estado.");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar estado: " + e.getMessage());
+            error("Error al actualizar estado: " + e.getMessage());
         }
     }
 

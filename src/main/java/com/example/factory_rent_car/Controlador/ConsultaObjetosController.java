@@ -9,12 +9,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
+
 import javax.swing.*;
 import java.sql.*;
 
 public class ConsultaObjetosController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtBuscar;
     @FXML private TableView<Objeto> tablaObjetos;
@@ -87,24 +89,24 @@ public class ConsultaObjetosController {
             }
             tablaObjetos.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando objetos: " + e.getMessage());
+            error("Error cargando objetos: " + e.getMessage());
         }
     }
 
     @FXML
     private void actualizarEstado(ActionEvent event) {
         if (objetoSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un objeto de la tabla.");
+            advertencia("Seleccione un objeto de la tabla.");
             return;
         }
         String nuevoEstado = cmbEstado.getValue();
         if (nuevoEstado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un estado.");
+            advertencia("Seleccione un estado.");
             return;
         }
 
         objetoSeleccionado.setEstado(nuevoEstado);
-        JOptionPane.showMessageDialog(null, "Estado actualizado a: " + nuevoEstado);
+        informacion("Estado actualizado a: " + nuevoEstado);
         tablaObjetos.refresh();
     }
 

@@ -2,6 +2,7 @@ package com.example.factory_rent_car.Controlador;
 
 import com.example.factory_rent_car.Modelo.Incidencia;
 import com.example.factory_rent_car.Database.Conexion;
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,7 +23,7 @@ public class IncidenciaConsultaController {
         this.mainController = mainController;
     }
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtBuscar;
     @FXML private TableView<Incidencia> tablaIncidencias;
@@ -33,12 +34,10 @@ public class IncidenciaConsultaController {
     @FXML private TableColumn<Incidencia, String> colDescripcion;
     @FXML private TableColumn<Incidencia, String> colReserva;
     @FXML private TableColumn<Incidencia, String> colEmpleado;
-    @FXML private TableColumn<Incidencia, String> colEstado;
 
     @FXML private VBox tableContainer;
     @FXML private Button btnToggleTable;
     @FXML private TextField txtIncidenciaInfo;
-    @FXML private ComboBox<String> cmbEstado;
 
     private final ObservableList<Incidencia> listaIncidencias = FXCollections.observableArrayList();
     private Incidencia incidenciaSeleccionada;
@@ -53,10 +52,6 @@ public class IncidenciaConsultaController {
         colDescripcion.setCellValueFactory(c -> c.getValue().descripcionProperty());
         colReserva.setCellValueFactory(c -> c.getValue().reservaInfoProperty());
         colEmpleado.setCellValueFactory(c -> c.getValue().empleadoNombreProperty());
-        colEstado.setCellValueFactory(c -> c.getValue().estadoProperty());
-
-        // Cargar opciones de estado
-        cmbEstado.getItems().addAll("Pendiente", "En proceso", "Resuelto", "Cerrado");
 
         tablaIncidencias.setItems(listaIncidencias);
         tablaIncidencias.getSelectionModel().selectedItemProperty().addListener(
@@ -64,7 +59,6 @@ public class IncidenciaConsultaController {
                     if (newVal != null) {
                         incidenciaSeleccionada = newVal;
                         txtIncidenciaInfo.setText("ID: " + newVal.getIdIncidencia() + " - " + newVal.getTipo());
-                        cmbEstado.setValue(newVal.getEstado());
                     }
                 });
 
@@ -80,7 +74,7 @@ public class IncidenciaConsultaController {
                 "i.fk_pk_id_reserva, i.fk_pk_id_hist_incidencia, i.fk_pk_id_empleado, " +
                 "r.pk_id_reserva AS reserva_id, " +
                 "e.nombre AS empleado_nombre, " +
-                "hi.estado AS estado_incidencia " +
+                "'Pendiente' AS estado_incidencia " +
                 "FROM TBL_INCIDENCIA i " +
                 "LEFT JOIN TBL_RESERVACION r ON r.pk_id_reserva = i.fk_pk_id_reserva " +
                 "LEFT JOIN TBL_EMPLEADO e ON e.pk_id_empleado = i.fk_pk_id_empleado " +
@@ -108,34 +102,11 @@ public class IncidenciaConsultaController {
             }
             tablaIncidencias.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando incidencias: " + e.getMessage());
+            error("Error cargando incidencias: " + e.getMessage());
         }
     }
 
-    @FXML
-    private void actualizarEstado(ActionEvent event) {
-        if (incidenciaSeleccionada == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione una incidencia de la tabla.");
-            return;
-        }
-        String nuevoEstado = cmbEstado.getValue();
-        if (nuevoEstado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un estado.");
-            return;
-        }
 
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement ps = con.prepareStatement("UPDATE TBL_HISTORIAL_INCIDENCIA SET estado = ? WHERE pk_id_hist_incidencia = ?")) {
-            ps.setString(1, nuevoEstado);
-            ps.setInt(2, incidenciaSeleccionada.getIdHistorial());
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Estado actualizado a: " + nuevoEstado);
-            incidenciaSeleccionada.setEstado(nuevoEstado);
-            tablaIncidencias.refresh();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
-        }
-    }
 
     @FXML
     private void buscar(ActionEvent event) {

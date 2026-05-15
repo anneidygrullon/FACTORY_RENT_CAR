@@ -9,6 +9,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
+
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
@@ -17,7 +19,7 @@ import java.util.Map;
 
 public class EmpleadoConsultaController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtBuscar;
     @FXML private TableView<Empleado> tablaEmpleados;
@@ -91,7 +93,7 @@ public class EmpleadoConsultaController {
                 mapaSueldosPorPuesto.put(nombre, sueldo);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando puestos: " + e.getMessage());
+            error("Error cargando puestos: " + e.getMessage());
         }
 
         // Cargar departamentos
@@ -106,7 +108,7 @@ public class EmpleadoConsultaController {
                 mapaDepartamentos.put(nombre, id);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando departamentos: " + e.getMessage());
+            error("Error cargando departamentos: " + e.getMessage());
         }
 
         // Listener para cuando se seleccione un puesto: actualizar el sueldo automáticamente
@@ -155,7 +157,7 @@ public class EmpleadoConsultaController {
             }
             tablaEmpleados.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando empleados: " + e.getMessage());
+            error("Error cargando empleados: " + e.getMessage());
         }
     }
 
@@ -204,7 +206,7 @@ public class EmpleadoConsultaController {
     @FXML
     private void actualizarEmpleado(ActionEvent event) {
         if (empleadoSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un empleado de la tabla.");
+            advertencia("Seleccione un empleado de la tabla.");
             return;
         }
         String nuevoPuestoNombre = cmbPuesto.getValue();
@@ -213,14 +215,14 @@ public class EmpleadoConsultaController {
         try {
             nuevoSueldo = Double.parseDouble(txtSueldo.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Sueldo inválido.");
+            advertencia("Sueldo inválido.");
             return;
         }
 
         Integer idPuesto = mapaPuestos.get(nuevoPuestoNombre);
         Integer idDepto = mapaDepartamentos.get(nuevoDeptoNombre);
         if (idPuesto == null || idDepto == null) {
-            JOptionPane.showMessageDialog(null, "Datos inválidos de puesto o departamento.");
+            advertencia("Datos inválidos de puesto o departamento.");
             return;
         }
 
@@ -240,13 +242,13 @@ public class EmpleadoConsultaController {
             ps.setInt(2, empleadoSeleccionado.getIdEmpleado());
             int filas = ps.executeUpdate();
             if (filas > 0) {
-                JOptionPane.showMessageDialog(null, "Empleado actualizado correctamente.");
+                informacion("Empleado actualizado correctamente.");
                 cargarEmpleados(); // recargar tabla
             } else {
-                JOptionPane.showMessageDialog(null, "No se pudo actualizar.");
+                advertencia("No se pudo actualizar.");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 

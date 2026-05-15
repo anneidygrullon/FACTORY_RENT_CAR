@@ -9,6 +9,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
+
 import javax.swing.*;
 import java.sql.*;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import java.util.Map;
 
 public class DireccionController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     // Componentes de búsqueda y tabla
     @FXML private TextField txtBuscar;
@@ -77,7 +79,7 @@ public class DireccionController {
                 mapaCiudades.put(nombre, id);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando ciudades: " + e.getMessage());
+            error("Error cargando ciudades: " + e.getMessage());
         }
     }
 
@@ -106,7 +108,7 @@ public class DireccionController {
             tablaDirecciones.refresh();
             System.out.println("Direcciones cargadas: " + listaDirecciones.size());
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando direcciones: " + e.getMessage());
+            error("Error cargando direcciones: " + e.getMessage());
         }
     }
 
@@ -133,30 +135,33 @@ public class DireccionController {
 
         Integer idCiudad = mapaCiudades.get(ciudadNombre);
         if (idCiudad == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione una ciudad válida.");
+            advertencia("Seleccione una ciudad válida.");
             return;
         }
 
         if (direccionSeleccionada == null) {
-            // Insertar nueva dirección
-            String sql = "INSERT INTO TBL_DIRECCION (calle_avenida, num_edificio_casa, codigo_postal, referencia, fk_pk_id_ciudad) " +
-                    "VALUES (?, ?, ?, ?, ?)";
+            // Insertar nueva dirección (pk no es IDENTITY)
+            String sqlNextId = "SELECT ISNULL(MAX(pk_id_direccion), 0) + 1 AS next_id FROM TBL_DIRECCION";
+            String sqlInsert = "INSERT INTO TBL_DIRECCION (pk_id_direccion, calle_avenida, num_edificio_casa, codigo_postal, referencia, fk_pk_id_ciudad) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
             try (Connection con = conexion.establecerConexion();
-                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, calle);
-                ps.setString(2, numero);
-                ps.setString(3, codigoPostal);
-                ps.setString(4, referencia);
-                ps.setInt(5, idCiudad);
-                ps.executeUpdate();
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Dirección registrada con ID: " + rs.getInt(1));
+                 PreparedStatement psNext = con.prepareStatement(sqlNextId);
+                 ResultSet rsNext = psNext.executeQuery()) {
+                int nextId = rsNext.next() ? rsNext.getInt("next_id") : 1;
+                try (PreparedStatement ps = con.prepareStatement(sqlInsert)) {
+                    ps.setInt(1, nextId);
+                    ps.setString(2, calle);
+                    ps.setString(3, numero);
+                    ps.setString(4, codigoPostal);
+                    ps.setString(5, referencia);
+                    ps.setInt(6, idCiudad);
+                    ps.executeUpdate();
+                    informacion("Dirección registrada con ID: " + nextId);
                 }
                 limpiar(event);
                 cargarDirecciones();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
+                error("Error al guardar: " + e.getMessage());
             }
         } else {
             // Actualizar dirección existente
@@ -171,11 +176,11 @@ public class DireccionController {
                 ps.setInt(5, idCiudad);
                 ps.setInt(6, direccionSeleccionada.getIdDireccion());
                 ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Dirección actualizada.");
+                informacion("Dirección actualizada.");
                 limpiar(event);
                 cargarDirecciones();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
+                error("Error al actualizar: " + e.getMessage());
             }
         }
     }
@@ -183,24 +188,21 @@ public class DireccionController {
     @FXML
     private void eliminarDireccion(ActionEvent event) {
         if (direccionSeleccionada == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione una dirección de la tabla.");
+            advertencia("Seleccione una dirección de la tabla.");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(null,
-                "¿Eliminar la dirección #" + direccionSeleccionada.getIdDireccion() + "?\n" +
-                        "Esta acción no se puede deshacer.",
-                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (!confirmar("¿Eliminar la dirección #" + direccionSeleccionada.getIdDireccion() + "?\n" +
+                "Esta acción no se puede deshacer.")) return;
 
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement("DELETE FROM TBL_DIRECCION WHERE pk_id_direccion = ?")) {
             ps.setInt(1, direccionSeleccionada.getIdDireccion());
             ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Dirección eliminada.");
+            informacion("Dirección eliminada.");
             limpiar(event);
             cargarDirecciones();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al eliminar: " + e.getMessage());
+            error("Error al eliminar: " + e.getMessage());
         }
     }
 
@@ -238,6 +240,12 @@ public class DireccionController {
     }
 
     @FXML
+    private void nuevo(ActionEvent event) {
+        limpiar(event);
+        txtCalle.requestFocus();
+    }
+
+    @FXML
     private void limpiar(ActionEvent event) {
         direccionSeleccionada = null;
         txtIdDireccion.clear();
@@ -252,11 +260,11 @@ public class DireccionController {
 
     private boolean validarFormulario() {
         if (txtCalle.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "La calle/avenida es obligatoria.");
+            advertencia("La calle/avenida es obligatoria.");
             return false;
         }
         if (cmbCiudad.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione una ciudad.");
+            advertencia("Seleccione una ciudad.");
             return false;
         }
         return true;

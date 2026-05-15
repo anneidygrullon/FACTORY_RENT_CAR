@@ -5,19 +5,29 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Conexion {
+    private static Conexion instancia;
     private Connection connection = null;
 
-    private String usuario = "Anneidy3";
-    private String contrase = "Anthony";
-    private String db = "FACTORYY";
-    private String server = "26.32.251.97";  // Ejemplo: IP de la PC servidor
-    private String puerto = "1433";
+    private final String usuario = "Anneidy3";
+    private final String contrase = "Anthony";
+    private final String db = "FACTORYY";
+    private final String server = "26.32.251.97";
+    private final String puerto = "1433";
+
+    private Conexion() {}
+
+    public static Conexion getInstance() {
+        if (instancia == null) {
+            instancia = new Conexion();
+        }
+        return instancia;
+    }
 
     public Connection establecerConexion() throws SQLException {
         String cadena = "jdbc:sqlserver://" + server + ":" + puerto + ";"
                 + "databaseName=" + db + ";"
                 + "encrypt=false;"
-                + "loginTimeout=30;";
+                                    + "loginTimeout=5;";
 
         System.out.println("Conectando a: " + server);
         connection = DriverManager.getConnection(cadena, usuario, contrase);

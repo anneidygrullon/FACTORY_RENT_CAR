@@ -11,6 +11,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
+
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
@@ -19,7 +21,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ClienteController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     private MainLayoutController mainController;
 
@@ -124,7 +126,7 @@ public class ClienteController {
             // Forzar actualización visual
             tablaClientes.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al cargar clientes: " + e.getMessage());
+            error("Error al cargar clientes: " + e.getMessage());
         }
     }
 
@@ -170,7 +172,7 @@ public class ClienteController {
         try {
             edad = Integer.parseInt(txtEdad.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Edad inválida.");
+            advertencia("Edad inválida.");
             return;
         }
         LocalDate fechaNac = dpFechaNacimiento.getValue();
@@ -183,29 +185,31 @@ public class ClienteController {
 
         if (clienteSeleccionadoId == -1) {
             // Insertar nuevo
-            String sql = "INSERT INTO TBL_CLIENTE (nombre, edad, fecha_nacimiento, correo_electronico, telefono, " +
-                    "identificacion, licencia, nacionalidad, num_pasaporte) VALUES (?,?,?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO TBL_CLIENTE (pk_id_cliente, nombre, edad, fecha_nacimiento, correo_electronico, telefono, " +
+                    "identificacion, licencia, nacionalidad, num_pasaporte) VALUES (?,?,?,?,?,?,?,?,?,?)";
             try (Connection con = conexion.establecerConexion();
-                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, nombre);
-                ps.setInt(2, edad);
-                ps.setDate(3, Date.valueOf(fechaNac));
-                ps.setString(4, correo);
-                ps.setString(5, telefono);
-                ps.setString(6, identificacion);
-                ps.setString(7, licencia);
-                ps.setString(8, nacionalidad);
-                ps.setString(9, pasaporte);
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                int idCliente;
+                try (PreparedStatement psNext = con.prepareStatement("SELECT ISNULL(MAX(pk_id_cliente), 0) + 1 AS next_id FROM TBL_CLIENTE");
+                     ResultSet rsNext = psNext.executeQuery()) {
+                    idCliente = rsNext.next() ? rsNext.getInt("next_id") : 1;
+                }
+                ps.setInt(1, idCliente);
+                ps.setString(2, nombre);
+                ps.setInt(3, edad);
+                ps.setDate(4, Date.valueOf(fechaNac));
+                ps.setString(5, correo);
+                ps.setString(6, telefono);
+                ps.setString(7, identificacion);
+                ps.setString(8, licencia);
+                ps.setString(9, nacionalidad);
+                ps.setString(10, pasaporte);
                 ps.executeUpdate();
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next())
-                    JOptionPane.showMessageDialog(null, "Cliente agregado con ID: " + rs.getInt(1));
-                else
-                    JOptionPane.showMessageDialog(null, "Cliente agregado.");
+                informacion("Cliente agregado con ID: " + idCliente);
                 limpiarFormulario(event);
                 cargarClientes();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
+                error("Error al guardar: " + e.getMessage());
             }
         } else {
             // Actualizar existente
@@ -224,13 +228,13 @@ public class ClienteController {
                 ps.setString(9, pasaporte);
                 ps.setInt(10, clienteSeleccionadoId);
                 if (ps.executeUpdate() > 0)
-                    JOptionPane.showMessageDialog(null, "Cliente actualizado.");
+                    informacion("Cliente actualizado.");
                 else
-                    JOptionPane.showMessageDialog(null, "No se pudo actualizar.");
+                    advertencia("No se pudo actualizar.");
                 limpiarFormulario(event);
                 cargarClientes();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
+                error("Error al actualizar: " + e.getMessage());
             }
         }
     }
@@ -238,23 +242,20 @@ public class ClienteController {
     @FXML
     private void eliminarCliente(ActionEvent event) {
         if (clienteSeleccionadoId == -1) {
-            JOptionPane.showMessageDialog(null, "Seleccione un cliente de la tabla.");
+            advertencia("Seleccione un cliente de la tabla.");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(null,
-                "¿Eliminar el cliente #" + clienteSeleccionadoId + "?",
-                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (!confirmar("¿Eliminar el cliente #" + clienteSeleccionadoId + "?")) return;
 
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement("DELETE FROM TBL_CLIENTE WHERE pk_id_cliente = ?")) {
             ps.setInt(1, clienteSeleccionadoId);
             ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Cliente eliminado.");
+            informacion("Cliente eliminado.");
             limpiarFormulario(event);
             cargarClientes();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al eliminar: " + e.getMessage());
+            error("Error al eliminar: " + e.getMessage());
         }
     }
 
@@ -290,38 +291,38 @@ public class ClienteController {
 
     private boolean validarFormulario() {
         if (txtNombre.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El nombre es obligatorio.");
+            advertencia("El nombre es obligatorio.");
             return false;
         }
         if (dpFechaNacimiento.getValue() == null) {
-            JOptionPane.showMessageDialog(null, "La fecha de nacimiento es obligatoria.");
+            advertencia("La fecha de nacimiento es obligatoria.");
             return false;
         }
         if (txtCorreo.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El correo electrónico es obligatorio.");
+            advertencia("El correo electrónico es obligatorio.");
             return false;
         }
         if (txtTelefono.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El teléfono es obligatorio.");
+            advertencia("El teléfono es obligatorio.");
             return false;
         }
         if (txtLicencia.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El número de licencia es obligatorio.");
+            advertencia("El número de licencia es obligatorio.");
             return false;
         }
         if (txtNacionalidad.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "La nacionalidad es obligatoria.");
+            advertencia("La nacionalidad es obligatoria.");
             return false;
         }
         int edad;
         try {
             edad = Integer.parseInt(txtEdad.getText());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Edad inválida.");
+            advertencia("Edad inválida.");
             return false;
         }
         if (edad < 21) {
-            JOptionPane.showMessageDialog(null, "El cliente debe tener al menos 21 años.");
+            advertencia("El cliente debe tener al menos 21 años.");
             return false;
         }
         return true;
@@ -341,8 +342,8 @@ public class ClienteController {
         if (mainController != null) mainController.navegarA("Registro de Incidencia", mainController.getMenuIncidencias(), "IncidenciaRegistro.fxml");
     }
     @FXML
-    private void irAEntrega(MouseEvent event) {
-        if (mainController != null) mainController.navegarA("Registro de Entrega", mainController.getMenuEntregas(), "EntregaVehiculo.fxml");
+    private void irAGestionVehiculo(MouseEvent event) {
+        if (mainController != null) mainController.navegarA("Gestión de Vehículo", mainController.getMenuGestionVehiculo(), "EntregaVehiculo.fxml");
     }
 
     // ── EFECTOS HOVER PARA TARJETAS ────────────────────────────────────

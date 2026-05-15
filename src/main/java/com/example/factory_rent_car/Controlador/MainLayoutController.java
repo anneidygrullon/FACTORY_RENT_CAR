@@ -24,7 +24,11 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
+import com.example.factory_rent_car.Util.PermisoStrategy;
+import com.example.factory_rent_car.Util.PermisoStrategyFactory;
 
 public class MainLayoutController implements Initializable {
 
@@ -40,8 +44,7 @@ public class MainLayoutController implements Initializable {
     // ── SIDEBAR — menú items (principales) ───────────────────
     @FXML private HBox menuInicio;
     @FXML private HBox menuReservacion;
-    @FXML private HBox menuEntregas;
-    @FXML private HBox menuDevolucion;
+    @FXML private HBox menuGestionVehiculo;
     @FXML private HBox menuPagos;
     @FXML private HBox menuVehiculos;
     @FXML private HBox menuMantenimiento;
@@ -52,6 +55,7 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox menuRegistros;
     @FXML private HBox menuClientes;
     @FXML private HBox menuSuplidores;
+    @FXML private HBox menuVenta;
 
     // ── SUBMENÚ RESERVACIÓN ──────────────────────────────────
     @FXML private VBox subMenuReservacion;
@@ -63,7 +67,6 @@ public class MainLayoutController implements Initializable {
     @FXML private VBox subMenuVehiculos;
     @FXML private Label vehiculosArrow;
     @FXML private HBox subMenuVehiculoConsulta;
-    @FXML private HBox subMenuVehiculoRegistro;
 
     // ── SUBMENÚ REGISTROS ────────────────────────────────────
     @FXML private VBox subMenuRegistros;
@@ -71,11 +74,12 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox subMenuEmpleadoConsulta;
     @FXML private HBox subMenuEmpleadoRegistro;
     @FXML private HBox subMenuConsultaDepartamento;
+    @FXML private HBox subMenuConsultaUsuario;
 
-    // ── SUBMENÚ ENTREGAS ─────────────────────────────────────
-    @FXML private VBox subMenuEntregas;
-    @FXML private Label entregasArrow;
-    @FXML private HBox subMenuRegistroEntrega;
+    // ── SUBMENÚ GESTIÓN DE VEHÍCULO ─────────────────────────
+    @FXML private VBox subMenuGestionVehiculo;
+    @FXML private Label gestionVehiculoArrow;
+    @FXML private HBox subMenuGestionVehiculoItem;
     @FXML private HBox subMenuRegistroDireccion;
 
     // ── SUBMENÚ COMPRAS ──────────────────────────────────────
@@ -97,6 +101,19 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox subMenuIncidenciaConsulta;
     @FXML private HBox subMenuIncidenciaRegistro;
 
+    // ── SUBMENÚ VENTA ─────────────────────────────────────────
+    @FXML private VBox subMenuVenta;
+    @FXML private Label ventaArrow;
+    @FXML private HBox subMenuVentaConsulta;
+    @FXML private HBox subMenuVentaRegistro;
+
+    // ── SUBMENÚ PAGOS ────────────────────────────────────────
+    @FXML private VBox subMenuPagos;
+    @FXML private Label pagosArrow;
+    @FXML private HBox subMenuPagoConsulta;
+    @FXML private HBox subMenuPagoRegistro;
+    @FXML private HBox subMenuNotaCredito;
+
     // ── CONTENIDO PRINCIPAL ──────────────────────────────────
     @FXML private StackPane contentArea;
 
@@ -105,10 +122,12 @@ public class MainLayoutController implements Initializable {
     private boolean subMenuReservacionVisible = false;
     private boolean subMenuVehiculosVisible = false;
     private boolean subMenuRegistrosVisible = false;
-    private boolean subMenuEntregasVisible = false;
+    private boolean subMenuGestionVehiculoVisible = false;
     private boolean subMenuComprasVisible = false;
     private boolean subMenuReclamosVisible = false;
     private boolean subMenuIncidenciasVisible = false;
+    private boolean subMenuPagosVisible = false;
+    private boolean subMenuVentaVisible = false;
 
     private static final String BASE = "/com/example/factory_rent_car/";
 
@@ -127,9 +146,9 @@ public class MainLayoutController implements Initializable {
         subMenuRegistros.setManaged(false);
         registrosArrow.setText("❯");
 
-        subMenuEntregas.setVisible(false);
-        subMenuEntregas.setManaged(false);
-        entregasArrow.setText("❯");
+        subMenuGestionVehiculo.setVisible(false);
+        subMenuGestionVehiculo.setManaged(false);
+        gestionVehiculoArrow.setText("❯");
 
         subMenuCompras.setVisible(false);
         subMenuCompras.setManaged(false);
@@ -142,6 +161,14 @@ public class MainLayoutController implements Initializable {
         subMenuIncidencias.setVisible(false);
         subMenuIncidencias.setManaged(false);
         incidenciasArrow.setText("❯");
+
+        subMenuPagos.setVisible(false);
+        subMenuPagos.setManaged(false);
+        pagosArrow.setText("❯");
+
+        subMenuVenta.setVisible(false);
+        subMenuVenta.setManaged(false);
+        ventaArrow.setText("❯");
 
         activarMenu(menuInicio);
         mostrarHome();
@@ -183,33 +210,33 @@ public class MainLayoutController implements Initializable {
         reservacionArrow.setText("❯");
     }
 
-    // ================= Submenú Entregas =================
-    @FXML private void toggleSubMenuEntregas(MouseEvent e) {
-        subMenuEntregasVisible = !subMenuEntregasVisible;
-        subMenuEntregas.setVisible(subMenuEntregasVisible);
-        subMenuEntregas.setManaged(subMenuEntregasVisible);
-        entregasArrow.setText(subMenuEntregasVisible ? "❯" : "❮");
+    // ================= Submenú Gestión de Vehículo =================
+    @FXML private void toggleSubMenuGestionVehiculo(MouseEvent e) {
+        subMenuGestionVehiculoVisible = !subMenuGestionVehiculoVisible;
+        subMenuGestionVehiculo.setVisible(subMenuGestionVehiculoVisible);
+        subMenuGestionVehiculo.setManaged(subMenuGestionVehiculoVisible);
+        gestionVehiculoArrow.setText(subMenuGestionVehiculoVisible ? "❯" : "❮");
     }
 
-    @FXML private void handleSubMenuRegistroEntrega(MouseEvent e) {
-        activarMenu(menuEntregas);
-        sectionTitle.setText("Registro de Entrega");
+    @FXML private void handleSubMenuGestionVehiculo(MouseEvent e) {
+        activarMenu(menuGestionVehiculo);
+        sectionTitle.setText("Gestión de Vehículo");
         cargarFxml("EntregaVehiculo.fxml");
-        cerrarSubMenuEntregas();
+        cerrarSubMenuGestionVehiculo();
     }
 
     @FXML private void handleSubMenuRegistroDireccion(MouseEvent e) {
-        activarMenu(menuEntregas);
-        sectionTitle.setText("Registro de Dirección");
+        activarMenu(menuGestionVehiculo);
+        sectionTitle.setText("Dirección");
         cargarFxml("Direccion.fxml");
-        cerrarSubMenuEntregas();
+        cerrarSubMenuGestionVehiculo();
     }
 
-    private void cerrarSubMenuEntregas() {
-        subMenuEntregasVisible = false;
-        subMenuEntregas.setVisible(false);
-        subMenuEntregas.setManaged(false);
-        entregasArrow.setText("❯");
+    private void cerrarSubMenuGestionVehiculo() {
+        subMenuGestionVehiculoVisible = false;
+        subMenuGestionVehiculo.setVisible(false);
+        subMenuGestionVehiculo.setManaged(false);
+        gestionVehiculoArrow.setText("❯");
     }
 
     // ================= Submenú Vehículos =================
@@ -224,13 +251,6 @@ public class MainLayoutController implements Initializable {
         activarMenu(menuVehiculos);
         sectionTitle.setText("Consulta de Vehículos");
         cargarFxml("VehiculoConsulta.fxml");
-        cerrarSubMenuVehiculos();
-    }
-
-    @FXML private void handleSubMenuVehiculoRegistro(MouseEvent e) {
-        activarMenu(menuVehiculos);
-        sectionTitle.setText("Registro de Vehículos");
-        cargarFxml("VehiculoRegistro.fxml");
         cerrarSubMenuVehiculos();
     }
 
@@ -267,6 +287,13 @@ public class MainLayoutController implements Initializable {
         activarMenu(menuRegistros);
         sectionTitle.setText("Consulta de Departamentos");
         cargarFxml("ConsultaDepartamento.fxml");
+        cerrarSubMenuRegistros();
+    }
+
+    @FXML private void handleSubMenuConsultaUsuario(MouseEvent e) {
+        activarMenu(menuRegistros);
+        sectionTitle.setText("Usuarios del Sistema");
+        cargarFxml("UsuarioConsulta.fxml");
         cerrarSubMenuRegistros();
     }
 
@@ -371,17 +398,40 @@ public class MainLayoutController implements Initializable {
         incidenciasArrow.setText("❯");
     }
 
-    // ================= Otros menús (sin submenú) =================
-    @FXML private void handleMenuDevolucion(MouseEvent e) {
-        activarMenu(menuDevolucion);
-        sectionTitle.setText("Devolución de Vehículos");
-        cargarFxml("DevolucionVehiculo.fxml");
+    // ================= Submenú Pagos =================
+    @FXML private void toggleSubMenuPagos(MouseEvent e) {
+        subMenuPagosVisible = !subMenuPagosVisible;
+        subMenuPagos.setVisible(subMenuPagosVisible);
+        subMenuPagos.setManaged(subMenuPagosVisible);
+        pagosArrow.setText(subMenuPagosVisible ? "❯" : "❮");
     }
 
-    @FXML private void handleMenuPagos(MouseEvent e) {
+    @FXML private void handleSubMenuPagoConsulta(MouseEvent e) {
         activarMenu(menuPagos);
-        sectionTitle.setText("Pagos");
-        cargarFxml("Pago.fxml");
+        sectionTitle.setText("Consulta de Pagos");
+        cargarFxml("PagoConsulta.fxml");
+        cerrarSubMenuPagos();
+    }
+
+    @FXML private void handleSubMenuPagoRegistro(MouseEvent e) {
+        activarMenu(menuPagos);
+        sectionTitle.setText("Registro de Pago");
+        cargarFxml("PagoRegistro.fxml");
+        cerrarSubMenuPagos();
+    }
+
+    @FXML private void handleSubMenuNotaCredito(MouseEvent e) {
+        activarMenu(menuPagos);
+        sectionTitle.setText("Notas de Crédito");
+        cargarFxml("NotaCredito.fxml");
+        cerrarSubMenuPagos();
+    }
+
+    private void cerrarSubMenuPagos() {
+        subMenuPagosVisible = false;
+        subMenuPagos.setVisible(false);
+        subMenuPagos.setManaged(false);
+        pagosArrow.setText("❯");
     }
 
     @FXML private void handleMenuMantenimiento(MouseEvent e) {
@@ -406,6 +456,35 @@ public class MainLayoutController implements Initializable {
         activarMenu(menuSuplidores);
         sectionTitle.setText("Suplidores");
         cargarFxml("Suministrador.fxml");
+    }
+
+    // ================= Submenú Venta =================
+    @FXML private void toggleSubMenuVenta(MouseEvent e) {
+        subMenuVentaVisible = !subMenuVentaVisible;
+        subMenuVenta.setVisible(subMenuVentaVisible);
+        subMenuVenta.setManaged(subMenuVentaVisible);
+        ventaArrow.setText(subMenuVentaVisible ? "❯" : "❮");
+    }
+
+    @FXML private void handleSubMenuVentaConsulta(MouseEvent e) {
+        activarMenu(menuVenta);
+        sectionTitle.setText("Consulta de Ventas");
+        cargarFxml("VentaConsulta.fxml");
+        cerrarSubMenuVenta();
+    }
+
+    @FXML private void handleSubMenuVentaRegistro(MouseEvent e) {
+        activarMenu(menuVenta);
+        sectionTitle.setText("Registro de Venta");
+        cargarFxml("VentaRegistro.fxml");
+        cerrarSubMenuVenta();
+    }
+
+    private void cerrarSubMenuVenta() {
+        subMenuVentaVisible = false;
+        subMenuVenta.setVisible(false);
+        subMenuVenta.setManaged(false);
+        ventaArrow.setText("❯");
     }
 
     // ── HOVER ────────────────────────────────────────────────
@@ -563,9 +642,8 @@ public class MainLayoutController implements Initializable {
     // ── GETTERS PARA LOS MENÚS (necesarios para navegación desde Home) ──
     public HBox getMenuInicio()        { return menuInicio; }
     public HBox getMenuReservacion()   { return menuReservacion; }
-    public HBox getMenuEntregas()      { return menuEntregas; }
-    public HBox getMenuDevolucion()    { return menuDevolucion; }
-    public HBox getMenuPagos()         { return menuPagos; }
+    public HBox getMenuGestionVehiculo() { return menuGestionVehiculo; }
+    public HBox getMenuPagos()           { return menuPagos; }
     public HBox getMenuVehiculos()     { return menuVehiculos; }
     public HBox getMenuMantenimiento() { return menuMantenimiento; }
     public HBox getMenuLimpieza()      { return menuLimpieza; }
@@ -575,6 +653,10 @@ public class MainLayoutController implements Initializable {
     public HBox getMenuRegistros()     { return menuRegistros; }
     public HBox getMenuClientes()      { return menuClientes; }
     public HBox getMenuSuplidores()    { return menuSuplidores; }
+    public HBox getMenuVenta()         { return menuVenta; }
+    public HBox getSubMenuPagoConsulta() { return subMenuPagoConsulta; }
+    public HBox getSubMenuPagoRegistro() { return subMenuPagoRegistro; }
+    public HBox getSubMenuNotaCredito()  { return subMenuNotaCredito; }
 
     private String nombreUsuario;
     private String rolUsuario;
@@ -598,32 +680,23 @@ public class MainLayoutController implements Initializable {
     }
 
     private void aplicarPermisos(String rol) {
-        if (rol == null) rol = "admin";
-        switch (rol) {
-            case "admin":
-            case "gerente":
-                // Acceso completo — no ocultar nada
-                break;
-
-            case "chofer":
-                ocultar(menuPagos, menuMantenimiento, menuLimpieza,
-                        menuCompras, menuRegistros, menuSuplidores);
-                ocultar(subMenuVehiculoRegistro);
-                break;
-
-            case "carwasher":
-                ocultar(menuReservacion, menuEntregas, menuDevolucion, menuPagos,
-                        menuMantenimiento, menuIncidencias, menuCompras,
-                        menuReclamos, menuRegistros, menuClientes, menuSuplidores);
-                ocultar(subMenuVehiculoRegistro);
-                break;
-
-            case "mecanico":
-                ocultar(menuReservacion, menuEntregas, menuDevolucion, menuPagos,
-                        menuLimpieza, menuIncidencias, menuCompras,
-                        menuReclamos, menuRegistros, menuClientes, menuSuplidores);
-                ocultar(subMenuVehiculoRegistro);
-                break;
+        PermisoStrategy strategy = PermisoStrategyFactory.getStrategy(rol);
+        Map<String, Node> menuMap = new HashMap<>();
+        menuMap.put("menuReservacion", menuReservacion);
+        menuMap.put("menuGestionVehiculo", menuGestionVehiculo);
+        menuMap.put("menuPagos", menuPagos);
+        menuMap.put("menuMantenimiento", menuMantenimiento);
+        menuMap.put("menuLimpieza", menuLimpieza);
+        menuMap.put("menuIncidencias", menuIncidencias);
+        menuMap.put("menuCompras", menuCompras);
+        menuMap.put("menuReclamos", menuReclamos);
+        menuMap.put("menuRegistros", menuRegistros);
+        menuMap.put("menuClientes", menuClientes);
+        menuMap.put("menuSuplidores", menuSuplidores);
+        menuMap.put("menuVenta", menuVenta);
+        for (String nombre : strategy.getMenusOcultar()) {
+            Node n = menuMap.get(nombre);
+            if (n != null) ocultar(n);
         }
     }
 

@@ -379,7 +379,7 @@
                        style="-fx-text-fill: #475569; -fx-font-size: 11px; -fx-font-weight: bold;" />
 
                 <!-- Fila 3: campos inferiores -->
-                <TextField fx:id="txtNombreCliente" editable="false"
+                <TextField fx:id="txtNombreCliente"
                            GridPane.columnIndex="0" GridPane.rowIndex="3"
                            promptText="Nombre del cliente"
                            maxWidth="1.7976931348623157E308"

@@ -9,12 +9,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
+
 import javax.swing.*;
 import java.sql.*;
 
 public class ConsultaDepartamentoController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     // Componentes de búsqueda y tabla
     @FXML private TextField txtBuscar;
@@ -69,7 +71,7 @@ public class ConsultaDepartamentoController {
             tablaDepartamentos.refresh();
             System.out.println("Departamentos cargados: " + listaDepartamentos.size());
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando departamentos: " + e.getMessage());
+            error("Error cargando departamentos: " + e.getMessage());
         }
     }
 
@@ -98,12 +100,12 @@ public class ConsultaDepartamentoController {
                 ps.executeUpdate();
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Departamento registrado con ID: " + rs.getInt(1));
+                    informacion("Departamento registrado con ID: " + rs.getInt(1));
                 }
                 limpiar(event);
                 cargarDepartamentos();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
+                error("Error al guardar: " + e.getMessage());
             }
         } else {
             // Actualizar departamento existente
@@ -114,11 +116,11 @@ public class ConsultaDepartamentoController {
                 ps.setString(2, telefono);
                 ps.setInt(3, departamentoSeleccionado.getIdDepartamento());
                 ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Departamento actualizado.");
+                informacion("Departamento actualizado.");
                 limpiar(event);
                 cargarDepartamentos();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
+                error("Error al actualizar: " + e.getMessage());
             }
         }
     }
@@ -126,24 +128,21 @@ public class ConsultaDepartamentoController {
     @FXML
     private void eliminarDepartamento(ActionEvent event) {
         if (departamentoSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un departamento de la tabla.");
+            advertencia("Seleccione un departamento de la tabla.");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(null,
-                "¿Eliminar el departamento #" + departamentoSeleccionado.getIdDepartamento() + "?\n" +
-                        "Esta acción no se puede deshacer.",
-                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (!confirmar("¿Eliminar el departamento #" + departamentoSeleccionado.getIdDepartamento() + "?\n" +
+                "Esta acción no se puede deshacer.")) return;
 
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement("DELETE FROM TBL_DEPARTAMENTO WHERE pk_id_dept = ?")) {
             ps.setInt(1, departamentoSeleccionado.getIdDepartamento());
             ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Departamento eliminado.");
+            informacion("Departamento eliminado.");
             limpiar(event);
             cargarDepartamentos();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al eliminar: " + e.getMessage());
+            error("Error al eliminar: " + e.getMessage());
         }
     }
 
@@ -191,11 +190,11 @@ public class ConsultaDepartamentoController {
 
     private boolean validarFormulario() {
         if (txtNombre.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El nombre del departamento es obligatorio.");
+            advertencia("El nombre del departamento es obligatorio.");
             return false;
         }
         if (txtTelefono.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El teléfono es obligatorio.");
+            advertencia("El teléfono es obligatorio.");
             return false;
         }
         return true;

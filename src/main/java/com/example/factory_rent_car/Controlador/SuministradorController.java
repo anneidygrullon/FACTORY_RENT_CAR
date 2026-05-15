@@ -8,12 +8,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javax.swing.*;
 import java.sql.*;
 
 public class SuministradorController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtBuscar;
     @FXML private TableView<Suministrador> tablaSuministradores;
@@ -103,7 +104,7 @@ public class SuministradorController {
         } catch (SQLException e) {
             System.err.println("Error SQL: " + e.getMessage());
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error al cargar suplidores: " + e.getMessage());
+            error("Error al cargar suplidores: " + e.getMessage());
         }
     }
 
@@ -135,14 +136,14 @@ public class SuministradorController {
     @FXML
     private void verificarDireccion(ActionEvent event) {
         if (txtIdDireccion.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Ingrese un ID de dirección.");
+            advertencia("Ingrese un ID de dirección.");
             return;
         }
         int idDir;
         try {
             idDir = Integer.parseInt(txtIdDireccion.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID inválido.");
+            advertencia("ID inválido.");
             return;
         }
         String sql = "SELECT d.calle_avenida, d.num_edificio_casa, c.nombre AS ciudad " +
@@ -157,13 +158,13 @@ public class SuministradorController {
                         (rs.getString("num_edificio_casa") != null ? " " + rs.getString("num_edificio_casa") : "") +
                         ", " + rs.getString("ciudad");
                 txtDireccionVista.setText(direccion);
-                JOptionPane.showMessageDialog(null, "Dirección válida.");
+                informacion("Dirección válida.");
             } else {
                 txtDireccionVista.clear();
-                JOptionPane.showMessageDialog(null, "Dirección no encontrada.");
+                advertencia("Dirección no encontrada.");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            error("Error: " + e.getMessage());
         }
     }
 
@@ -180,29 +181,33 @@ public class SuministradorController {
         try {
             idDireccion = Integer.parseInt(txtIdDireccion.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "ID de dirección debe ser numérico.");
+            advertencia("ID de dirección debe ser numérico.");
             return;
         }
 
         if (suministradorSeleccionadoId == -1) {
-            String sql = "INSERT INTO TBL_SUMINISTRADOR (tipo, nombre, correo_electronico, telefono, rnc, fk_pk_id_direccion) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO TBL_SUMINISTRADOR (id_suministrador, tipo, nombre, correo_electronico, telefono, rnc, fk_pk_id_direccion) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (Connection con = conexion.establecerConexion();
-                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, tipo);
-                ps.setString(2, nombre);
-                ps.setString(3, correo);
-                ps.setString(4, telefono);
-                ps.setString(5, rnc);
-                ps.setInt(6, idDireccion);
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                int idS;
+                try (PreparedStatement psNext = con.prepareStatement("SELECT ISNULL(MAX(id_suministrador), 0) + 1 AS next_id FROM TBL_SUMINISTRADOR");
+                     ResultSet rsNext = psNext.executeQuery()) {
+                    idS = rsNext.next() ? rsNext.getInt("next_id") : 1;
+                }
+                ps.setInt(1, idS);
+                ps.setString(2, tipo);
+                ps.setString(3, nombre);
+                ps.setString(4, correo);
+                ps.setString(5, telefono);
+                ps.setString(6, rnc);
+                ps.setInt(7, idDireccion);
                 ps.executeUpdate();
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) JOptionPane.showMessageDialog(null, "Suplidor agregado con ID: " + rs.getInt(1));
-                else JOptionPane.showMessageDialog(null, "Suplidor agregado.");
+                informacion("Suplidor agregado con ID: " + idS);
                 limpiarFormulario(event);
                 cargarSuministradores();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al guardar: " + e.getMessage());
+                error("Error al guardar: " + e.getMessage());
             }
         } else {
             String sql = "UPDATE TBL_SUMINISTRADOR SET tipo=?, nombre=?, correo_electronico=?, telefono=?, rnc=?, fk_pk_id_direccion=? " +
@@ -217,11 +222,11 @@ public class SuministradorController {
                 ps.setInt(6, idDireccion);
                 ps.setInt(7, suministradorSeleccionadoId);
                 ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Suplidor actualizado.");
+                informacion("Suplidor actualizado.");
                 limpiarFormulario(event);
                 cargarSuministradores();
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
+                error("Error al actualizar: " + e.getMessage());
             }
         }
     }
@@ -229,23 +234,20 @@ public class SuministradorController {
     @FXML
     private void eliminarSuministrador(ActionEvent event) {
         if (suministradorSeleccionadoId == -1) {
-            JOptionPane.showMessageDialog(null, "Seleccione un suplidor de la tabla.");
+            advertencia("Seleccione un suplidor de la tabla.");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(null,
-                "¿Eliminar el suplidor #" + suministradorSeleccionadoId + "?",
-                "Confirmar", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (!confirmar("¿Eliminar el suplidor #" + suministradorSeleccionadoId + "?")) return;
 
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement("DELETE FROM TBL_SUMINISTRADOR WHERE id_suministrador = ?")) {
             ps.setInt(1, suministradorSeleccionadoId);
             ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Suplidor eliminado.");
+            informacion("Suplidor eliminado.");
             limpiarFormulario(event);
             cargarSuministradores();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al eliminar: " + e.getMessage());
+            error("Error al eliminar: " + e.getMessage());
         }
     }
 
@@ -277,29 +279,29 @@ public class SuministradorController {
 
     private boolean validarFormulario() {
         if (txtTipo.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El tipo es obligatorio.");
+            advertencia("El tipo es obligatorio.");
             return false;
         }
         if (txtNombre.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El nombre es obligatorio.");
+            advertencia("El nombre es obligatorio.");
             return false;
         }
         if (txtCorreo.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El correo electrónico es obligatorio.");
+            advertencia("El correo electrónico es obligatorio.");
             return false;
         }
         if (txtTelefono.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El teléfono es obligatorio.");
+            advertencia("El teléfono es obligatorio.");
             return false;
         }
         if (txtIdDireccion.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "El ID de dirección es obligatorio.");
+            advertencia("El ID de dirección es obligatorio.");
             return false;
         }
         try {
             Integer.parseInt(txtIdDireccion.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "El ID de dirección debe ser numérico.");
+            advertencia("El ID de dirección debe ser numérico.");
             return false;
         }
         return true;

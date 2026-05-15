@@ -9,12 +9,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import javax.swing.*;
 import java.sql.*;
 
 public class ReclamoConsultaController {
 
-    Conexion conexion = new Conexion();
+    Conexion conexion = Conexion.getInstance();
 
     @FXML private TextField txtBuscar;
     @FXML private TableView<Reclamo> tablaReclamos;
@@ -94,19 +95,19 @@ public class ReclamoConsultaController {
             }
             tablaReclamos.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error cargando reclamos: " + e.getMessage());
+            error("Error cargando reclamos: " + e.getMessage());
         }
     }
 
     @FXML
     private void actualizarEstado(ActionEvent event) {
         if (reclamoSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un reclamo de la tabla.");
+            advertencia("Seleccione un reclamo de la tabla.");
             return;
         }
         String nuevoEstado = cmbEstado.getValue();
         if (nuevoEstado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un estado.");
+            advertencia("Seleccione un estado.");
             return;
         }
 
@@ -115,11 +116,11 @@ public class ReclamoConsultaController {
             ps.setString(1, nuevoEstado);
             ps.setInt(2, reclamoSeleccionado.getIdReclamo());
             ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Estado actualizado a: " + nuevoEstado);
+            informacion("Estado actualizado a: " + nuevoEstado);
             reclamoSeleccionado.setEstado(nuevoEstado);
             tablaReclamos.refresh();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar: " + e.getMessage());
+            error("Error al actualizar: " + e.getMessage());
         }
     }
 
