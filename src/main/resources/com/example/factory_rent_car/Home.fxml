@@ -43,6 +43,23 @@
             </VBox>
         </HBox>
 
+        <HBox maxWidth="1100" spacing="20" HBox.hgrow="ALWAYS">
+            <VBox spacing="0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0, 0, 4);" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 14 18 0 18;">
+                    <Label text="📊" style="-fx-font-size: 15px;" />
+                    <Label text="Vehículos por Estado" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #1E3A5F;" />
+                </HBox>
+                <StackPane fx:id="chartVehiculos" prefHeight="210" style="-fx-padding: 4 6 6 6;" />
+            </VBox>
+            <VBox spacing="0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0, 0, 4);" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 14 18 0 18;">
+                    <Label text="📈" style="-fx-font-size: 15px;" />
+                    <Label text="Reservaciones del Año" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #1E3A5F;" />
+                </HBox>
+                <StackPane fx:id="chartReservaciones" prefHeight="210" style="-fx-padding: 4 6 6 6;" />
+            </VBox>
+        </HBox>
+
         <VBox maxWidth="1100" spacing="16" VBox.vgrow="ALWAYS">
             <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0F172A;" text="Acceso Rápido" />
 
