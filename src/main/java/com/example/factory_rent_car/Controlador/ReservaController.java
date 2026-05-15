@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
+import static com.example.factory_rent_car.Util.EmailService.*;
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
@@ -65,6 +66,7 @@ public class ReservaController {
     private int                                  idVehiculoOriginal    = -1; // para edición
     private final LinkedHashMap<String, Integer> mapaSegurosId         = new LinkedHashMap<>();
     private final LinkedHashMap<String, Double>  mapaSegurosCosto      = new LinkedHashMap<>();
+    private String correoCliente;
 
     // ── Inicializar ───────────────────────────────────────────────────────
     @FXML
@@ -149,11 +151,17 @@ public class ReservaController {
         }
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(
-                     "SELECT nombre FROM TBL_CLIENTE WHERE pk_id_cliente = ?")) {
+                     "SELECT nombre, correo_electronico FROM TBL_CLIENTE WHERE pk_id_cliente = ?")) {
             ps.setInt(1, Integer.parseInt(txtIdCliente.getText().trim()));
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) txtNombreCliente.setText(rs.getString("nombre"));
-            else { informacion("Cliente no encontrado."); txtNombreCliente.clear(); }
+            if (rs.next()) {
+                txtNombreCliente.setText(rs.getString("nombre"));
+                correoCliente = rs.getString("correo_electronico");
+            } else {
+                informacion("Cliente no encontrado.");
+                txtNombreCliente.clear();
+                correoCliente = null;
+            }
         } catch (SQLException e) {
             error("Error BD: " + e.getMessage());
         } catch (NumberFormatException e) {
@@ -405,10 +413,45 @@ public class ReservaController {
                 psEst.setInt(1, idVehiculo);
                 psEst.executeUpdate();
 
+                // 8. Obtener email si no se buscó antes
+                if (correoCliente == null || correoCliente.isBlank()) {
+                    try (PreparedStatement psEmail = con.prepareStatement(
+                            "SELECT correo_electronico FROM TBL_CLIENTE WHERE pk_id_cliente = ?")) {
+                        psEmail.setInt(1, idCliente);
+                        ResultSet rsEmail = psEmail.executeQuery();
+                        if (rsEmail.next()) correoCliente = rsEmail.getString("correo_electronico");
+                    }
+                }
+
                 informacion(
                         "✔ Reservación #" + nextId + " registrada correctamente.\n" +
                                 "Total: RD$ " + String.format("%.2f", total) +
                                 "  |  Pendiente: RD$ " + String.format("%.2f", pendiente));
+
+                if (correoCliente != null && !correoCliente.isBlank()) {
+                    String asunto = "Confirmación de Reservación #" + nextId;
+                    String cuerpo = """
+                            Hola %s,
+
+                            Tu reservación #%d ha sido confirmada.
+
+                            Vehículo: %s
+                            Fecha inicio: %s
+                            Fecha devolución: %s
+                            Seguro: %s
+                            Total: RD$ %.2f
+                            Pendiente: RD$ %.2f
+
+                            Gracias por preferirnos.
+                            Factory Rent Car
+                            """.formatted(
+                            txtNombreCliente.getText(), nextId,
+                            txtInfoVehiculo.getText(),
+                            dpFechaInicio.getValue(), dpFechaDevolucion.getValue(),
+                            seguroLabel, total, pendiente);
+                    enviarAsync(correoCliente, asunto, cuerpo, null, null);
+                }
+
                 limpiar();
                 cargarReservaciones();
             }
@@ -573,6 +616,7 @@ public class ReservaController {
         lblTituloFormulario.setText("Nueva Reservación");
         idReservaSeleccionada = -1;
         idVehiculoOriginal = -1;
+        correoCliente = null;
         tablaReservaciones.getSelectionModel().clearSelection();
         tablaReservaciones.setItems(listaReservaciones);
     }
