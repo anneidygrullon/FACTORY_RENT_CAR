@@ -9,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
 import java.sql.*;
 
 public class VentaConsultaController {

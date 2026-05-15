@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.sql.Connection;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;

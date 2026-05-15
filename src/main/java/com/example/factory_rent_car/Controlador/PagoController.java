@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -22,7 +21,7 @@ public class PagoController {
 
     Conexion conexion = Conexion.getInstance();
 
-    // Componentes Tabla Pagos
+    // Tabla de pagos
     @FXML private TextField txtBuscar;
     @FXML private TableView<Pago> tablaPagos;
     @FXML private TableColumn<Pago, Integer> colIdPago;
@@ -36,7 +35,7 @@ public class PagoController {
     @FXML private VBox tableContainerPagos;
     @FXML private Button btnToggleTablePagos;
 
-    // Componentes Tabla Notas de Crédito
+    // Tabla de notas de crédito
     @FXML private TableView<NotaCredito> tablaNotasCredito;
     @FXML private TableColumn<NotaCredito, Integer> colIdNota;
     @FXML private TableColumn<NotaCredito, LocalDate> colFechaNota;
@@ -48,7 +47,7 @@ public class PagoController {
     @FXML private VBox tableContainerNotas;
     @FXML private Button btnToggleTableNotas;
 
-    // Componentes Registro de Pago
+    // Formulario de registro de pago
     @FXML private TextField txtReservaId;
     @FXML private TextField txtCliente;
     @FXML private TextField txtMontoTotal;
@@ -60,7 +59,7 @@ public class PagoController {
     @FXML private ComboBox<String> cmbMetodoPago;
     @FXML private ComboBox<String> cmbCuenta;
 
-    // Componentes Nota de Crédito
+    // Formulario de nota de crédito
     @FXML private TextField txtReservaIdNota;
     @FXML private TextField txtClienteNota;
     @FXML private TextField txtTotalPagado;
@@ -79,7 +78,7 @@ public class PagoController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas Pagos
+        // Columnas de la tabla de pagos
         colIdPago.setCellValueFactory(c -> c.getValue().idPagoProperty().asObject());
         colFechaPago.setCellValueFactory(c -> c.getValue().fechaProperty());
         colClientePago.setCellValueFactory(c -> c.getValue().clienteNombreProperty());
@@ -89,7 +88,7 @@ public class PagoController {
         colMontoPago.setCellValueFactory(c -> c.getValue().montoProperty().asObject());
         colTipoPago.setCellValueFactory(c -> c.getValue().tipoProperty());
 
-        // Configurar columnas Notas de Crédito
+        // Columnas de la tabla de notas de crédito
         colIdNota.setCellValueFactory(c -> c.getValue().idNotaProperty().asObject());
         colFechaNota.setCellValueFactory(c -> c.getValue().fechaProperty());
         colClienteNota.setCellValueFactory(c -> c.getValue().clienteNombreProperty());
@@ -245,7 +244,7 @@ public class PagoController {
                 txtNotasDisponibles.setText(String.format("%.2f", notas));
                 txtMontoAPagar.setText(String.format("%.2f", pendiente));
 
-                // Cargar notas de crédito disponibles para este cliente
+                // Ver qué notas de crédito tiene este cliente
                 cargarNotasCreditoCliente(rs.getInt("pk_id_reserva"));
             } else {
                 advertencia("Reserva no encontrada.");
@@ -329,10 +328,9 @@ public class PagoController {
             con = conexion.establecerConexion();
             con.setAutoCommit(false);
 
-            // Obtener o crear factura
+            // Buscar o crear la factura
             int facturaId = obtenerFacturaId(con, reservaActualId);
 
-            // Registrar pago
             String sqlPago = "INSERT INTO TBL_PAGO (fecha, tipo, monto, fk_id_factura, fk_id_metodo_pago, fk_id_cuenta) " +
                     "VALUES (?, 'Pago', ?, ?, ?, ?)";
             PreparedStatement psPago = con.prepareStatement(sqlPago, Statement.RETURN_GENERATED_KEYS);
@@ -343,7 +341,7 @@ public class PagoController {
             psPago.setInt(5, cuentaId);
             psPago.executeUpdate();
 
-            // Actualizar monto pendiente de la reserva
+            // Restar lo pagado del monto pendiente
             double nuevoPendiente = montoPendienteActual - montoAPagar;
             if (nuevoPendiente < 0) nuevoPendiente = 0;
             String sqlUpdateReserva = "UPDATE TBL_RESERVACION SET monto_pendiente = ? WHERE pk_id_reserva = ?";
@@ -367,7 +365,7 @@ public class PagoController {
     }
 
     private int obtenerFacturaId(Connection con, int reservaId) throws SQLException {
-        // Buscar factura existente para esta reserva
+        // Primero vemos si ya hay una factura
         String sqlFind = "SELECT f.id_factura FROM TBL_FACTURA f " +
                 "JOIN TBL_DETALLE_FACTURA df ON df.pk_id_det_factura = f.fk_pk_id_det_factura " +
                 "WHERE df.fk_pk_id_objeto = ?";
@@ -378,7 +376,6 @@ public class PagoController {
             return rs.getInt("id_factura");
         }
 
-        // Crear detalle de factura
         String sqlDetalle = "INSERT INTO TBL_DETALLE_FACTURA (cantidad, fk_pk_id_objeto, fk_pk_id_seguro) " +
                 "VALUES (1, ?, (SELECT fk_pk_id_seguro FROM TBL_RESERVACION WHERE pk_id_reserva = ?))";
         PreparedStatement psDetalle = con.prepareStatement(sqlDetalle, Statement.RETURN_GENERATED_KEYS);
@@ -388,7 +385,6 @@ public class PagoController {
         ResultSet rsDetalle = psDetalle.getGeneratedKeys();
         int detalleId = rsDetalle.next() ? rsDetalle.getInt(1) : -1;
 
-        // Crear factura
         String sqlFactura = "INSERT INTO TBL_FACTURA (monto_total, fecha, fk_pk_id_det_factura) " +
                 "VALUES ((SELECT monto_total FROM TBL_RESERVACION WHERE pk_id_reserva = ?), ?, ?)";
         PreparedStatement psFactura = con.prepareStatement(sqlFactura, Statement.RETURN_GENERATED_KEYS);
@@ -444,13 +440,13 @@ public class PagoController {
                 double totalPagado = rs.getDouble("monto_total") - rs.getDouble("monto_pendiente");
                 txtTotalPagado.setText(String.format("%.2f", totalPagado));
 
-                // Calcular días no utilizados (si la reserva terminó antes)
+                // Calcular los días que sobran si la reserva aún no termina
                 LocalDate fechaFin = rs.getDate("fech_devolucion").toLocalDate();
                 LocalDate hoy = LocalDate.now();
                 if (hoy.isBefore(fechaFin)) {
                     long diasNoUsados = ChronoUnit.DAYS.between(hoy, fechaFin);
                     txtDiasNoUsados.setText(String.valueOf(diasNoUsados));
-                    // Calcular monto a acreditar (proporcional por día)
+                    // Calcular el monto proporcional por los días no usados
                     double total = rs.getDouble("monto_total");
                     long diasTotales = ChronoUnit.DAYS.between(rs.getDate("fecha_inicio").toLocalDate(), fechaFin);
                     double montoPorDia = total / diasTotales;
@@ -498,7 +494,6 @@ public class PagoController {
             con = conexion.establecerConexion();
             con.setAutoCommit(false);
 
-            // Crear reclamo
             int reclamoId;
             String sqlNextReclamo = "SELECT ISNULL(MAX(pk_id_reclamo), 0) + 1 AS next_id FROM TBL_RECLAMACION";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextReclamo);
@@ -514,7 +509,6 @@ public class PagoController {
             psReclamo.setInt(4, obtenerClienteIdPorReserva(reservaId));
             psReclamo.executeUpdate();
 
-            // Crear devolución
             int devolucionId;
             String sqlNextDev = "SELECT ISNULL(MAX(id_devolucion), 0) + 1 AS next_id FROM TBL_DEVOLUCION";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextDev);
@@ -531,7 +525,6 @@ public class PagoController {
             psDevolucion.setInt(5, reclamoId);
             psDevolucion.executeUpdate();
 
-            // Crear nota de crédito
             int notaId;
             String sqlNextNota = "SELECT ISNULL(MAX(pk_id_nota), 0) + 1 AS next_id FROM TBL_NOTAS_FINANCIERAS";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextNota);

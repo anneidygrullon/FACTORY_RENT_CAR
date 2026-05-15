@@ -9,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
 import java.sql.*;
 
 public class SuministradorController {
@@ -40,7 +39,7 @@ public class SuministradorController {
 
     @FXML
     public void initialize() {
-        // Configuración DIRECTA de columnas (más robusta que PropertyValueFactory)
+        // Configuración directa de columnas usando lambda
         colId.setCellValueFactory(cellData -> cellData.getValue().idSuministradorProperty().asObject());
         colTipo.setCellValueFactory(cellData -> cellData.getValue().tipoProperty());
         colNombre.setCellValueFactory(cellData -> cellData.getValue().nombreProperty());
@@ -51,7 +50,7 @@ public class SuministradorController {
 
         tablaSuministradores.setItems(listaSuministradores);
 
-        // Listener para selección de fila
+        // Cuando seleccionan una fila, cargamos los datos en el formulario
         tablaSuministradores.getSelectionModel().selectedItemProperty().addListener(
                 (obs, old, newVal) -> {
                     if (newVal != null) cargarEnFormulario(newVal);
@@ -94,7 +93,7 @@ public class SuministradorController {
             }
             System.out.println("Suplidores cargados: " + contador);
 
-            // Forzar actualización visual de la tabla
+            // Refrescamos la tabla para que se vean los cambios
             tablaSuministradores.refresh();
 
             if (contador == 0) {

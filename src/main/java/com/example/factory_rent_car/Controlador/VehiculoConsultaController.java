@@ -9,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
 import java.sql.*;
 
 public class VehiculoConsultaController {
@@ -35,7 +34,6 @@ public class VehiculoConsultaController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idVehiculoProperty().asObject());
         colMarca.setCellValueFactory(c -> c.getValue().marcaProperty());
         colModelo.setCellValueFactory(c -> c.getValue().modeloProperty());

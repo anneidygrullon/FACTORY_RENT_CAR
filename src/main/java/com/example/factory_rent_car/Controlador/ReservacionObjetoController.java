@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -64,7 +64,6 @@ public class ReservacionObjetoController {
 
     @FXML
     public void initialize() {
-        // Objetos disponibles
         colObjId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colObjNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colObjMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
@@ -73,20 +72,19 @@ public class ReservacionObjetoController {
         colObjTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
         agregarBotonAgregar();
 
-        // Objetos reservados
         colResObjId.setCellValueFactory(c -> c.getValue().idObjetoProperty().asObject());
         colResObjNombre.setCellValueFactory(c -> c.getValue().nombreObjetoProperty());
         colResObjMarca.setCellValueFactory(c -> c.getValue().marcaObjetoProperty());
         colResObjPrecio.setCellValueFactory(c -> c.getValue().precioUnitarioProperty().asObject());
         colResObjCantidad.setCellValueFactory(c -> c.getValue().cantidadProperty().asObject());
 
-        // Configuración de edición de cantidad CON VALIDACIÓN
+        // Edición de cantidad con validación
         colResObjCantidad.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         colResObjCantidad.setOnEditCommit(event -> {
             int newValue = event.getNewValue();
             if (newValue <= 0) {
                 advertencia("La cantidad debe ser mayor a 0.");
-                // recargar la tabla para revertir el valor visual (opcional)
+                // Recarga la tabla para revertir el valor
                 tablaObjetosReservados.refresh();
                 return;
             }
@@ -331,7 +329,7 @@ public class ReservacionObjetoController {
         listaObjetosReservados.clear();
     }
 
-    // ── NAVEGACIÓN RÁPIDA ──────────────────────────────────────────────
+    // Navegación rápida
     @FXML
     private void irAReservaObjeto(MouseEvent event) {
         if (mainController != null) mainController.navegarA("Reservación de Objetos", mainController.getMenuReservacion(), "ReservacionObjeto.fxml");
@@ -349,7 +347,7 @@ public class ReservacionObjetoController {
         if (mainController != null) mainController.navegarA("Clientes", mainController.getMenuClientes(), "Clientes.fxml");
     }
 
-    // ── EFECTOS HOVER ──────────────────────────────────────────────────
+    // Efectos hover
     @FXML
     private void onCardEnter(MouseEvent event) {
         VBox card = (VBox) event.getSource();
@@ -363,7 +361,7 @@ public class ReservacionObjetoController {
         card.setCursor(javafx.scene.Cursor.DEFAULT);
     }
 
-    // Clase interna para objetos disponibles
+    // Clase para objetos disponibles
     public static class ObjetoDisponible {
         private final SimpleIntegerProperty id;
         private final SimpleStringProperty nombre, marca, tipo;

@@ -9,7 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-import javax.swing.*;
 import java.sql.*;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;

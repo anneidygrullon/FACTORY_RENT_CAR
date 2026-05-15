@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
 import static com.example.factory_rent_car.Util.EmailService.*;
-import javax.swing.*;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -29,7 +29,7 @@ public class ReservaController {
 
     Conexion conexion = Conexion.getInstance();
 
-    // ── Formulario ────────────────────────────────────────────────────────
+    // Formulario
     @FXML private TextField        txtIdCliente;
     @FXML private TextField        txtNombreCliente;
     @FXML private TextField        txtIdVehiculo;
@@ -47,7 +47,7 @@ public class ReservaController {
     @FXML private Label            lblConteo;
     @FXML private Label            lblTituloFormulario;
 
-    // ── Tabla y Contenedor ────────────────────────────────────────────────
+    // Tabla y Contenedor
     @FXML private TableView<Reservacion>           tablaReservaciones;
     @FXML private TableColumn<Reservacion, Number> colId;
     @FXML private TableColumn<Reservacion, String> colCliente;
@@ -60,7 +60,7 @@ public class ReservaController {
     @FXML private VBox tableContainer;
     @FXML private Button btnToggleTable;
 
-    // ── Datos internos ────────────────────────────────────────────────────
+    // Datos internos
     private final ObservableList<Reservacion>    listaReservaciones    = FXCollections.observableArrayList();
     private int                                  idReservaSeleccionada = -1;
     private int                                  idVehiculoOriginal    = -1; // para edición
@@ -68,7 +68,7 @@ public class ReservaController {
     private final LinkedHashMap<String, Double>  mapaSegurosCosto      = new LinkedHashMap<>();
     private String correoCliente;
 
-    // ── Inicializar ───────────────────────────────────────────────────────
+    // Inicializar
     @FXML
     public void initialize() {
         dpFechaInicio.setValue(LocalDate.now());
@@ -102,7 +102,6 @@ public class ReservaController {
         tablaReservaciones.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSel, newSel) -> { if (newSel != null) cargarEnFormulario(newSel); });
 
-        // Eventos de recálculo
         dpFechaInicio.valueProperty().addListener((o, ov, nv) -> recalcularMonto());
         dpFechaDevolucion.valueProperty().addListener((o, ov, nv) -> recalcularMonto());
         cmbSeguro.valueProperty().addListener((o, ov, nv) -> recalcularMonto());
@@ -112,12 +111,11 @@ public class ReservaController {
         cargarSeguros();
         cargarReservaciones();
 
-        // Por defecto tabla visible
         tableContainer.setVisible(true);
         btnToggleTable.setText("📋 Ocultar Tabla");
     }
 
-    // ── Cargar seguros con costo diario ───────────────────────────────────
+    // Cargar seguros con costo diario
     private void cargarSeguros() {
         mapaSegurosId.clear();
         mapaSegurosCosto.clear();
@@ -143,7 +141,7 @@ public class ReservaController {
         }
     }
 
-    // ── Buscar cliente ────────────────────────────────────────────────────
+    // Buscar cliente
     @FXML
     public void onBuscarCliente(ActionEvent ignored) {
         if (txtIdCliente.getText().isBlank()) {
@@ -169,7 +167,7 @@ public class ReservaController {
         }
     }
 
-    // ── Buscar vehículo con validación de disponibilidad ──────────────────
+    // Buscar vehículo con validación de disponibilidad
     @FXML
     public void onBuscarVehiculo(ActionEvent ignored) {
         if (txtIdVehiculo.getText().isBlank()) {
@@ -183,7 +181,7 @@ public class ReservaController {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String estado = rs.getString("estado");
-                // Permitir si es el mismo vehículo en edición
+                // Permitir si es el mismo vehículo
                 if (!"Disponible".equals(estado) && (idReservaSeleccionada == -1 || idVehiculo != idVehiculoOriginal)) {
                     advertencia("Vehículo no disponible (estado: " + estado + ")");
                     txtInfoVehiculo.clear();
@@ -205,7 +203,7 @@ public class ReservaController {
         }
     }
 
-    // ── Recálculo total incluyendo seguro diario ──────────────────────────
+    // Recálculo total incluyendo seguro diario
     private void recalcularMonto() {
         if (dpFechaInicio.getValue() == null || dpFechaDevolucion.getValue() == null) return;
         if (txtIdVehiculo.getText().isBlank() || cmbSeguro.getValue() == null) return;
@@ -240,11 +238,11 @@ public class ReservaController {
             actualizarEtiquetaEstado(pendiente, dpFechaDevolucion.getValue().toString());
 
         } catch (SQLException | NumberFormatException ignored) {
-            // silencioso
+            // Error silencioso
         }
     }
 
-    // ── Cargar todas las reservas ─────────────────────────────────────────
+    // Cargar todas las reservas
     @FXML
     public void cargarReservaciones() {
         listaReservaciones.clear();
@@ -294,7 +292,7 @@ public class ReservaController {
         actualizarConteo();
     }
 
-    // ── Filtrar / Buscar ──────────────────────────────────────────────────
+    // Filtrar / Buscar
     @FXML
     public void fnBuscar(ActionEvent ignored) {
         String busqueda = txtBuscar.getText().trim().toLowerCase();
@@ -334,7 +332,7 @@ public class ReservaController {
             lblConteo.setText(tablaReservaciones.getItems().size() + " registro(s)");
     }
 
-    // ── Guardar nueva reserva ─────────────────────────────────────────────
+    // Guardar nueva reserva
     @FXML
     public void onGuardarReserva(ActionEvent ignored) {
         if (!validarFormulario()) return;
@@ -348,7 +346,6 @@ public class ReservaController {
             long   dias    = ChronoUnit.DAYS.between(dpFechaInicio.getValue(), dpFechaDevolucion.getValue());
 
             try (Connection con = conexion.establecerConexion()) {
-                // 1. Precio del vehículo
                 PreparedStatement psVeh = con.prepareStatement(
                         "SELECT precio_x_dia FROM TBL_VEHICULO WHERE id_vehiculo = ?");
                 psVeh.setInt(1, idVehiculo);
@@ -360,13 +357,12 @@ public class ReservaController {
                 double apartado = parseDouble(txtMontoApartado.getText());
                 double pendiente = Math.max(0, total - apartado);
 
-                // 2. Siguiente ID contrato (no es IDENTITY)
+                // Siguiente ID del contrato
                 PreparedStatement psMaxCon = con.prepareStatement(
                         "SELECT ISNULL(MAX(pk_id_contrato), 0) + 1 AS next_id FROM TBL_CONTRATO");
                 ResultSet rsMaxCon = psMaxCon.executeQuery();
                 int idContrato = rsMaxCon.next() ? rsMaxCon.getInt("next_id") : 1;
 
-                // 3. Crear contrato
                 PreparedStatement psCon = con.prepareStatement(
                         "INSERT INTO TBL_CONTRATO (pk_id_contrato, fecha, condicion, descripcion) VALUES (?, ?, ?, ?)");
                 psCon.setInt(1, idContrato);
@@ -375,13 +371,12 @@ public class ReservaController {
                 psCon.setString(4, "Contrato generado desde reservación");
                 psCon.executeUpdate();
 
-                // 4. Siguiente ID manual para reservación
+                // Siguiente ID para la reservación
                 PreparedStatement psMaxId = con.prepareStatement(
                         "SELECT ISNULL(MAX(pk_id_reserva), 0) + 1 AS next_id FROM TBL_RESERVACION");
                 ResultSet rsMaxId = psMaxId.executeQuery();
                 int nextId = rsMaxId.next() ? rsMaxId.getInt("next_id") : 1;
 
-                // 5. Insertar reservación
                 PreparedStatement psRes = con.prepareStatement(
                         "INSERT INTO TBL_RESERVACION " +
                                 "(pk_id_reserva, fecha_inicio, fech_devolucion, monto_total, " +
@@ -400,20 +395,18 @@ public class ReservaController {
                 psRes.setInt(10, idCliente);
                 psRes.executeUpdate();
 
-                // 6. Vincular vehículo
                 PreparedStatement psRV = con.prepareStatement(
                         "INSERT INTO TBL_RESERVA_VEHI (cantidad, fk_pk_id_reserva, fk_id_vehiculo) VALUES (1,?,?)");
                 psRV.setInt(1, nextId);
                 psRV.setInt(2, idVehiculo);
                 psRV.executeUpdate();
 
-                // 7. Marcar vehículo como Reservado
                 PreparedStatement psEst = con.prepareStatement(
                         "UPDATE TBL_VEHICULO SET estado = 'Reservado' WHERE id_vehiculo = ?");
                 psEst.setInt(1, idVehiculo);
                 psEst.executeUpdate();
 
-                // 8. Obtener email si no se buscó antes
+                // Obtener email si no se buscó antes
                 if (correoCliente == null || correoCliente.isBlank()) {
                     try (PreparedStatement psEmail = con.prepareStatement(
                             "SELECT correo_electronico FROM TBL_CLIENTE WHERE pk_id_cliente = ?")) {
@@ -479,7 +472,6 @@ public class ReservaController {
             long dias = ChronoUnit.DAYS.between(dpFechaInicio.getValue(), dpFechaDevolucion.getValue());
 
             try (Connection con = conexion.establecerConexion()) {
-                // Precio vehículo
                 PreparedStatement psVeh = con.prepareStatement(
                         "SELECT precio_x_dia FROM TBL_VEHICULO WHERE id_vehiculo = ?");
                 psVeh.setInt(1, nuevoIdVehiculo);
@@ -491,7 +483,6 @@ public class ReservaController {
                 double apartado = parseDouble(txtMontoApartado.getText());
                 double pendiente = Math.max(0, total - apartado);
 
-                // Actualizar reservación
                 PreparedStatement psUpd = con.prepareStatement(
                         "UPDATE TBL_RESERVACION SET fecha_inicio=?, fech_devolucion=?, monto_total=?, " +
                                 "monto_apartado=?, monto_pendiente=?, descuento=?, " +
@@ -509,7 +500,6 @@ public class ReservaController {
 
                 // Manejar cambio de vehículo
                 if (nuevoIdVehiculo != idVehiculoOriginal) {
-                    // Liberar vehículo anterior
                     PreparedStatement psOldVeh = con.prepareStatement(
                             "SELECT fk_id_vehiculo FROM TBL_RESERVA_VEHI WHERE fk_pk_id_reserva = ?");
                     psOldVeh.setInt(1, idReservaSeleccionada);
@@ -521,14 +511,12 @@ public class ReservaController {
                         psLib.setInt(1, oldVeh);
                         psLib.executeUpdate();
                     }
-                    // Actualizar TBL_RESERVA_VEHI
                     PreparedStatement psUpdVeh = con.prepareStatement(
                             "UPDATE TBL_RESERVA_VEHI SET fk_id_vehiculo = ? WHERE fk_pk_id_reserva = ?");
                     psUpdVeh.setInt(1, nuevoIdVehiculo);
                     psUpdVeh.setInt(2, idReservaSeleccionada);
                     psUpdVeh.executeUpdate();
 
-                    // Reservar nuevo vehículo
                     PreparedStatement psReserv = con.prepareStatement(
                             "UPDATE TBL_VEHICULO SET estado = 'Reservado' WHERE id_vehiculo = ?");
                     psReserv.setInt(1, nuevoIdVehiculo);
@@ -545,7 +533,7 @@ public class ReservaController {
         }
     }
 
-    // ── Eliminar reserva ──────────────────────────────────────────────────
+    // Eliminar reserva
     @FXML
     public void onEliminarReserva(ActionEvent ignored) {
         if (idReservaSeleccionada == -1) {
@@ -554,7 +542,6 @@ public class ReservaController {
         if (!confirmar("¿Eliminar la reservación #" + idReservaSeleccionada + "?\nEsta acción no se puede deshacer.")) return;
 
         try (Connection con = conexion.establecerConexion()) {
-            // Liberar vehículo
             PreparedStatement psVehId = con.prepareStatement(
                     "SELECT fk_id_vehiculo FROM TBL_RESERVA_VEHI WHERE fk_pk_id_reserva = ?");
             psVehId.setInt(1, idReservaSeleccionada);
@@ -566,7 +553,7 @@ public class ReservaController {
                 psLib.executeUpdate();
             }
 
-            // Borrar en orden FK
+            // Borrar en orden por las llaves foráneas
             String[] sqlsEliminar = {
                     "DELETE FROM TBL_RESERVA_VEHI WHERE fk_pk_id_reserva = ?",
                     "DELETE FROM TB_OBJ_RESERVA  WHERE fk_pk_id_reserva = ?",
@@ -587,7 +574,7 @@ public class ReservaController {
         }
     }
 
-    // ── Toggle Mostrar/Ocultar Tabla ──────────────────────────────────────
+    // Toggle Mostrar/Ocultar Tabla
     @FXML
     public void toggleTableVisibility(ActionEvent event) {
         boolean visible = tableContainer.isVisible();
@@ -596,7 +583,7 @@ public class ReservaController {
         btnToggleTable.setText(visible ? "📋 Mostrar Tabla" : "📋 Ocultar Tabla");
     }
 
-    // ── Limpiar formulario ────────────────────────────────────────────────
+    // Limpiar formulario
     @FXML
     public void limpiar() {
         txtIdCliente.clear();
@@ -621,7 +608,7 @@ public class ReservaController {
         tablaReservaciones.setItems(listaReservaciones);
     }
 
-    // ── Cargar fila seleccionada al formulario (edición) ──────────────────
+    // Cargar fila seleccionada al formulario (edición)
     private void cargarEnFormulario(Reservacion r) {
         idReservaSeleccionada = r.getIdReserva();
         idVehiculoOriginal = r.getIdVehiculo();
@@ -651,7 +638,7 @@ public class ReservaController {
         actualizarEtiquetaEstado(r.getMontoPendiente(), r.getFechaDevolucion());
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────
+    // Helpers
     private void actualizarEtiquetaEstado(double pendiente, String fechaDev) {
         if (lblEstado == null) return;
         try {
@@ -697,7 +684,7 @@ public class ReservaController {
         catch (NumberFormatException e) { return 0; }
     }
 
-    // ── NAVEGACIÓN RÁPIDA ──────────────────────────────────────────────
+    // Navegación rápida
     @FXML
     private void irAReservaVehiculo(MouseEvent event) {
         if (mainController != null) mainController.navegarA("Reservación de Vehículos", mainController.getMenuReservacion(), "Reserva.fxml");
@@ -715,7 +702,7 @@ public class ReservaController {
         if (mainController != null) mainController.navegarA("Clientes", mainController.getMenuClientes(), "Clientes.fxml");
     }
 
-    // ── EFECTOS HOVER ──────────────────────────────────────────────────
+    // Efectos hover
     @FXML
     private void onCardEnter(MouseEvent event) {
         VBox card = (VBox) event.getSource();
