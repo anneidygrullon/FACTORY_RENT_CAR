@@ -13,7 +13,6 @@ import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
 
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.Period;
@@ -29,7 +28,6 @@ public class ClienteController {
         this.mainController = mainController;
     }
 
-    // Componentes FXML
     @FXML private TextField txtBuscar;
     @FXML private TableView<Cliente> tablaClientes;
     @FXML private TableColumn<Cliente, Integer> colId;
@@ -61,7 +59,7 @@ public class ClienteController {
 
     @FXML
     public void initialize() {
-        // Configuración DIRECTA de columnas (más robusta que PropertyValueFactory)
+        // Configuración directa de columnas
         colId.setCellValueFactory(cellData -> cellData.getValue().idClienteProperty().asObject());
         colNombre.setCellValueFactory(cellData -> cellData.getValue().nombreProperty());
         colEdad.setCellValueFactory(cellData -> cellData.getValue().edadProperty().asObject());
@@ -77,11 +75,9 @@ public class ClienteController {
         tablaClientes.getSelectionModel().selectedItemProperty().addListener(
                 (obs, old, newVal) -> { if (newVal != null) cargarEnFormulario(newVal); });
 
-        // Ocultar/mostrar tabla
         tableContainer.setVisible(true);
         btnToggleTable.setText("📋 Ocultar Tabla");
 
-        // Calcular edad automáticamente
         dpFechaNacimiento.valueProperty().addListener((obs, old, newDate) -> calcularEdad());
 
         cargarClientes();
@@ -123,7 +119,6 @@ public class ClienteController {
                 listaClientes.add(c);
             }
             System.out.println("Clientes cargados: " + contador);
-            // Forzar actualización visual
             tablaClientes.refresh();
         } catch (SQLException e) {
             error("Error al cargar clientes: " + e.getMessage());
@@ -184,7 +179,6 @@ public class ClienteController {
         String pasaporte = txtPasaporte.getText().trim().isEmpty() ? null : txtPasaporte.getText().trim();
 
         if (clienteSeleccionadoId == -1) {
-            // Insertar nuevo
             String sql = "INSERT INTO TBL_CLIENTE (pk_id_cliente, nombre, edad, fecha_nacimiento, correo_electronico, telefono, " +
                     "identificacion, licencia, nacionalidad, num_pasaporte) VALUES (?,?,?,?,?,?,?,?,?,?)";
             try (Connection con = conexion.establecerConexion();
@@ -212,7 +206,6 @@ public class ClienteController {
                 error("Error al guardar: " + e.getMessage());
             }
         } else {
-            // Actualizar existente
             String sql = "UPDATE TBL_CLIENTE SET nombre=?, edad=?, fecha_nacimiento=?, correo_electronico=?, telefono=?, " +
                     "identificacion=?, licencia=?, nacionalidad=?, num_pasaporte=? WHERE pk_id_cliente=?";
             try (Connection con = conexion.establecerConexion();
@@ -324,7 +317,7 @@ public class ClienteController {
         return true;
     }
 
-    // ── NAVEGACIÓN RÁPIDA ──────────────────────────────────────────────
+    // Navegación rápida
     @FXML
     private void irAClientes(MouseEvent event) {
         if (mainController != null) mainController.navegarA("Clientes", mainController.getMenuClientes(), "Clientes.fxml");
@@ -342,7 +335,7 @@ public class ClienteController {
         if (mainController != null) mainController.navegarA("Gestión de Vehículo", mainController.getMenuGestionVehiculo(), "EntregaVehiculo.fxml");
     }
 
-    // ── EFECTOS HOVER PARA TARJETAS ────────────────────────────────────
+    // Efectos hover para tarjetas
     @FXML
     private void onCardEnter(MouseEvent event) {
         VBox card = (VBox) event.getSource();

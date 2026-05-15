@@ -34,14 +34,14 @@ public class MainLayoutController implements Initializable {
 
     private static final String PROFILES_DIR = "profiles";
 
-    // ── TOP BAR ──────────────────────────────────────────────
+    // Top bar
     @FXML private Label sectionTitle;
     @FXML private Label lblUsuario;
     @FXML private Label lblRol;
     @FXML private ImageView profileImageView;
     @FXML private HBox userArea;
 
-    // ── SIDEBAR — menú items (principales) ───────────────────
+    // Sidebar — menú items (principales)
     @FXML private HBox menuInicio;
     @FXML private HBox menuReservacion;
     @FXML private HBox menuGestionVehiculo;
@@ -57,18 +57,18 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox menuSuplidores;
     @FXML private HBox menuVenta;
 
-    // ── SUBMENÚ RESERVACIÓN ──────────────────────────────────
+    // Submenú reservación
     @FXML private VBox subMenuReservacion;
     @FXML private Label reservacionArrow;
     @FXML private HBox subMenuReservaVehiculo;
     @FXML private HBox subMenuReservaObjeto;
 
-    // ── SUBMENÚ VEHÍCULOS ────────────────────────────────────
+    // Submenú vehículos
     @FXML private VBox subMenuVehiculos;
     @FXML private Label vehiculosArrow;
     @FXML private HBox subMenuVehiculoConsulta;
 
-    // ── SUBMENÚ REGISTROS ────────────────────────────────────
+    // Submenú registros
     @FXML private VBox subMenuRegistros;
     @FXML private Label registrosArrow;
     @FXML private HBox subMenuEmpleadoConsulta;
@@ -76,48 +76,48 @@ public class MainLayoutController implements Initializable {
     @FXML private HBox subMenuConsultaDepartamento;
     @FXML private HBox subMenuConsultaUsuario;
 
-    // ── SUBMENÚ GESTIÓN DE VEHÍCULO ─────────────────────────
+    // Submenú gestión de vehículo
     @FXML private VBox subMenuGestionVehiculo;
     @FXML private Label gestionVehiculoArrow;
     @FXML private HBox subMenuGestionVehiculoItem;
     @FXML private HBox subMenuRegistroDireccion;
 
-    // ── SUBMENÚ COMPRAS ──────────────────────────────────────
+    // Submenú compras
     @FXML private VBox subMenuCompras;
     @FXML private Label comprasArrow;
     @FXML private HBox subMenuCompraObjeto;
     @FXML private HBox subMenuConsultaObjetos;
     @FXML private HBox subMenuCompraVehiculo;
 
-    // ── SUBMENÚ RECLAMOS ─────────────────────────────────────
+    // Submenú reclamos
     @FXML private VBox subMenuReclamos;
     @FXML private Label reclamosArrow;
     @FXML private HBox subMenuReclamoConsulta;
     @FXML private HBox subMenuReclamoRegistro;
 
-    // ── SUBMENÚ INCIDENCIAS ──────────────────────────────────
+    // Submenú incidencias
     @FXML private VBox subMenuIncidencias;
     @FXML private Label incidenciasArrow;
     @FXML private HBox subMenuIncidenciaConsulta;
     @FXML private HBox subMenuIncidenciaRegistro;
 
-    // ── SUBMENÚ VENTA ─────────────────────────────────────────
+    // Submenú venta
     @FXML private VBox subMenuVenta;
     @FXML private Label ventaArrow;
     @FXML private HBox subMenuVentaConsulta;
     @FXML private HBox subMenuVentaRegistro;
 
-    // ── SUBMENÚ PAGOS ────────────────────────────────────────
+    // Submenú pagos
     @FXML private VBox subMenuPagos;
     @FXML private Label pagosArrow;
     @FXML private HBox subMenuPagoConsulta;
     @FXML private HBox subMenuPagoRegistro;
     @FXML private HBox subMenuNotaCredito;
 
-    // ── CONTENIDO PRINCIPAL ──────────────────────────────────
+    // Contenido principal
     @FXML private StackPane contentArea;
 
-    // ── Estado ───────────────────────────────────────────────
+    // Estado
     private HBox menuActivo;
     private boolean subMenuReservacionVisible = false;
     private boolean subMenuVehiculosVisible = false;
@@ -133,7 +133,6 @@ public class MainLayoutController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Inicializar submenús cerrados
         subMenuReservacion.setVisible(false);
         subMenuReservacion.setManaged(false);
         reservacionArrow.setText("❯");
@@ -174,7 +173,7 @@ public class MainLayoutController implements Initializable {
         mostrarHome();
     }
 
-    // ── HANDLERS DEL MENÚ PRINCIPAL ──────────────────────────
+    // Handlers del menú principal
     @FXML private void handleMenuInicio(MouseEvent e) {
         activarMenu(menuInicio);
         sectionTitle.setText("Inicio");
@@ -487,7 +486,7 @@ public class MainLayoutController implements Initializable {
         ventaArrow.setText("❯");
     }
 
-    // ── HOVER ────────────────────────────────────────────────
+    // Hover
     @FXML private void onMenuEnter(MouseEvent e) {
         HBox item = (HBox) e.getSource();
         if (item == menuActivo) return;
@@ -513,7 +512,7 @@ public class MainLayoutController implements Initializable {
         item.setStyle("-fx-padding: 8 14 8 16; -fx-cursor: hand;");
     }
 
-    // ── HOVER TOP BAR ─────────────────────────────────────────
+    // Hover top bar
     @FXML private void onNotificationEnter(MouseEvent e) {
         StackPane s = (StackPane) e.getSource();
         s.setStyle("-fx-cursor: hand; -fx-padding: 6; -fx-background-radius: 8; -fx-background-color: rgba(255,255,255,0.1);");
@@ -537,19 +536,19 @@ public class MainLayoutController implements Initializable {
         s.setStyle("-fx-cursor: hand; -fx-padding: 6; -fx-background-radius: 8; -fx-background-color: rgba(255,255,255,0.05);");
     }
 
-    // ── Inyecta el MainLayoutController en los controladores que lo necesiten ──
+    // Inyecta el MainLayoutController en los controladores
     private void injectMainController(Object controller) {
         try {
             Method method = controller.getClass().getMethod("setMainController", MainLayoutController.class);
             method.invoke(controller, this);
         } catch (NoSuchMethodException e) {
-            // El controlador no necesita inyección
+            // El controlador no requiere inyección
         } catch (Exception e) {
             System.err.println("Error inyectando MainController: " + e.getMessage());
         }
     }
 
-    // ── CARGA DE VISTAS (con inyección automática del controlador principal) ──
+    // Carga de vistas (con inyección automática del controlador principal)
     private void cargarFxml(String fxmlName) {
         try {
             URL resource = getClass().getResource(BASE + fxmlName);
@@ -583,7 +582,7 @@ public class MainLayoutController implements Initializable {
             FXMLLoader loader = new FXMLLoader(resource);
             Node home = loader.load();
 
-            // Inyectar referencia del MainLayoutController al HomeController
+            // Le pasamos la referencia del MainLayoutController al HomeController
             HomeController homeController = loader.getController();
             homeController.setMainController(this);
 
@@ -613,14 +612,14 @@ public class MainLayoutController implements Initializable {
         contentArea.getChildren().setAll(ph);
     }
 
-    // ── API PÚBLICA para navegación externa ──────────────────
+    // API pública para navegación externa
     public void navegarA(String titulo, HBox menuItem, String fxmlName) {
         sectionTitle.setText(titulo);
         activarMenu(menuItem);
         cargarFxml(fxmlName);
     }
 
-    // ── ACTIVAR MENÚ (estilo) ────────────────────────────────
+    // Activar menú (estilo)
     private void activarMenu(HBox nuevoActivo) {
         if (menuActivo != null && menuActivo != nuevoActivo) {
             menuActivo.setStyle(
@@ -639,7 +638,7 @@ public class MainLayoutController implements Initializable {
         );
     }
 
-    // ── GETTERS PARA LOS MENÚS (necesarios para navegación desde Home) ──
+    // Getters para los menús (necesarios para navegación desde Home)
     public HBox getMenuInicio()        { return menuInicio; }
     public HBox getMenuReservacion()   { return menuReservacion; }
     public HBox getMenuGestionVehiculo() { return menuGestionVehiculo; }

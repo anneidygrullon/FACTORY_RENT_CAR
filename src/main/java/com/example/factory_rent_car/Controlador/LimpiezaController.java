@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ public class LimpiezaController {
 
     Conexion conexion = Conexion.getInstance();
 
-    // Componentes de búsqueda y tabla
+    // Campos de búsqueda y tabla
     @FXML private TextField txtBuscar;
     @FXML private TableView<Limpieza> tablaLimpiezas;
     @FXML private TableColumn<Limpieza, Integer> colId;
@@ -54,7 +53,6 @@ public class LimpiezaController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idLimpiezaProperty().asObject());
         colFecha.setCellValueFactory(c -> c.getValue().fechaProperty());
         colVehiculo.setCellValueFactory(c -> c.getValue().vehiculoInfoProperty());
@@ -62,7 +60,7 @@ public class LimpiezaController {
         colObservaciones.setCellValueFactory(c -> c.getValue().observacionesProperty());
         colEmpleado.setCellValueFactory(c -> c.getValue().empleadoNombreProperty());
 
-        // Cargar opciones de tipo de limpieza
+        // Tipos de limpieza disponibles
         cmbTipo.getItems().addAll("Interior", "Exterior", "Completa", "Tapicería", "Motor");
 
         tablaLimpiezas.setItems(listaLimpiezas);
@@ -194,7 +192,7 @@ public class LimpiezaController {
         String observaciones = txtObservaciones.getText().trim();
 
         if (limpiezaSeleccionada == null) {
-            // Insertar nueva
+
             String sql = "INSERT INTO TBL_LIMPIEZA (pk_id_limpieza, fecha, tipo, observaciones, fk_id_vehiculo, fk_pk_id_empleado) " +
                     "VALUES (?, ?, ?, ?, ?, ?)";
             try (Connection con = conexion.establecerConexion();
@@ -218,7 +216,7 @@ public class LimpiezaController {
                 error("Error al guardar: " + e.getMessage());
             }
         } else {
-            // Actualizar existente
+
             String sql = "UPDATE TBL_LIMPIEZA SET fecha=?, tipo=?, observaciones=?, fk_id_vehiculo=?, fk_pk_id_empleado=? " +
                     "WHERE pk_id_limpieza=?";
             try (Connection con = conexion.establecerConexion();

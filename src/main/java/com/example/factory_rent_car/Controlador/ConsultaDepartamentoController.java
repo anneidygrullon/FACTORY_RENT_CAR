@@ -11,14 +11,12 @@ import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
 
-import javax.swing.*;
 import java.sql.*;
 
 public class ConsultaDepartamentoController {
 
     Conexion conexion = Conexion.getInstance();
 
-    // Componentes de búsqueda y tabla
     @FXML private TextField txtBuscar;
     @FXML private TableView<Departamento> tablaDepartamentos;
     @FXML private TableColumn<Departamento, Integer> colId;
@@ -37,7 +35,6 @@ public class ConsultaDepartamentoController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idDepartamentoProperty().asObject());
         colNombre.setCellValueFactory(c -> c.getValue().nombreProperty());
         colTelefono.setCellValueFactory(c -> c.getValue().telefonoProperty());
@@ -91,7 +88,7 @@ public class ConsultaDepartamentoController {
         String telefono = txtTelefono.getText().trim();
 
         if (departamentoSeleccionado == null) {
-            // Insertar nuevo departamento
+            // Nuevo departamento
             String sql = "INSERT INTO TBL_DEPARTAMENTO (nombre, telefono) VALUES (?, ?)";
             try (Connection con = conexion.establecerConexion();
                  PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -108,7 +105,7 @@ public class ConsultaDepartamentoController {
                 error("Error al guardar: " + e.getMessage());
             }
         } else {
-            // Actualizar departamento existente
+            // Actualizar departamento
             String sql = "UPDATE TBL_DEPARTAMENTO SET nombre=?, telefono=? WHERE pk_id_dept=?";
             try (Connection con = conexion.establecerConexion();
                  PreparedStatement ps = con.prepareStatement(sql)) {

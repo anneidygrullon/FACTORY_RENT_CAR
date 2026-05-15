@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.DatePicker;
 
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.Period;
@@ -36,7 +35,7 @@ public class EmpleadoRegistroController {
         cargarPuestos();
         cargarDirecciones();
 
-        // Calcular edad automáticamente al seleccionar fecha de nacimiento
+        // Al cambiar la fecha de nacimiento se calcula la edad sola
         dpFechaNacimiento.valueProperty().addListener((obs, old, newDate) -> calcularEdad());
     }
 

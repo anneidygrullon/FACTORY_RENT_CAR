@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -44,7 +43,6 @@ public class IncidenciaConsultaController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idIncidenciaProperty().asObject());
         colFecha.setCellValueFactory(c -> c.getValue().fechaProperty());
         colTipo.setCellValueFactory(c -> c.getValue().tipoProperty());
@@ -142,7 +140,7 @@ public class IncidenciaConsultaController {
         btnToggleTable.setText(visible ? "📋 Mostrar Tabla" : "📋 Ocultar Tabla");
     }
 
-    // ── NAVEGACIÓN RÁPIDA ──────────────────────────────────────────────
+    // Navegación rápida
     @FXML
     private void irAConsultarIncidencias(MouseEvent event) {
         if (mainController != null) mainController.navegarA("Consulta de Incidencias", mainController.getMenuIncidencias(), "IncidenciaConsulta.fxml");
@@ -160,7 +158,7 @@ public class IncidenciaConsultaController {
         if (mainController != null) mainController.navegarA("Reservación de Vehículos", mainController.getMenuReservacion(), "Reserva.fxml");
     }
 
-    // ── EFECTOS HOVER ──────────────────────────────────────────────────
+    // Efectos hover
     @FXML
     private void onCardEnter(MouseEvent event) {
         VBox card = (VBox) event.getSource();

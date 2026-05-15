@@ -12,7 +12,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -22,7 +21,7 @@ public class NotaCreditoController {
     private MainLayoutController mainController;
     Conexion conexion = Conexion.getInstance();
 
-    // Componentes Tabla Notas de Crédito
+    // Tabla de notas de crédito
     @FXML private TableView<NotaCredito> tablaNotasCredito;
     @FXML private TableColumn<NotaCredito, Integer> colIdNota;
     @FXML private TableColumn<NotaCredito, LocalDate> colFechaNota;
@@ -34,7 +33,7 @@ public class NotaCreditoController {
     @FXML private VBox tableContainerNotas;
     @FXML private Button btnToggleTableNotas;
 
-    // Componentes Nota de Crédito
+    // Formulario de nota de crédito
     @FXML private TextField txtReservaIdNota;
     @FXML private TextField txtClienteNota;
     @FXML private TextField txtTotalPagado;

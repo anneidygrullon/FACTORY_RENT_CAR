@@ -12,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -179,7 +178,7 @@ public class EntregaVehiculoController {
         txtNivelCombustible.setText(String.valueOf(cv.getNivelCombustible()));
         cmbTipo.setValue(cv.getTipo());
 
-        // Seleccionar la dirección en el ComboBox que coincida con la almacenada
+        // Selecciona en el ComboBox la dirección guardada
         String direccionActual = cv.getDireccionCompleta();
         if (direccionActual != null && !direccionActual.isEmpty()) {
             cmbDireccion.setValue(direccionActual);
@@ -188,7 +187,7 @@ public class EntregaVehiculoController {
         }
     }
 
-    // ── BÚSQUEDA POR ID (como en Reserva) ──────────────────────────────
+    // Búsqueda por ID
     @FXML
     private void onBuscarReserva(ActionEvent ignored) {
         if (txtIdReserva.getText().isBlank()) {

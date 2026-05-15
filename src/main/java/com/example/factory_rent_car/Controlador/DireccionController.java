@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
 
-import javax.swing.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,7 @@ public class DireccionController {
 
     Conexion conexion = Conexion.getInstance();
 
-    // Componentes de búsqueda y tabla
+    // Campos de búsqueda y tabla
     @FXML private TextField txtBuscar;
     @FXML private TableView<Direccion> tablaDirecciones;
     @FXML private TableColumn<Direccion, Integer> colId;
@@ -46,7 +45,6 @@ public class DireccionController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idDireccionProperty().asObject());
         colCalle.setCellValueFactory(c -> c.getValue().calleAvenidaProperty());
         colNumero.setCellValueFactory(c -> c.getValue().numEdificioCasaProperty());
@@ -140,7 +138,7 @@ public class DireccionController {
         }
 
         if (direccionSeleccionada == null) {
-            // Insertar nueva dirección (pk no es IDENTITY)
+            // La pk no es IDENTITY, así que calculamos el siguiente ID
             String sqlNextId = "SELECT ISNULL(MAX(pk_id_direccion), 0) + 1 AS next_id FROM TBL_DIRECCION";
             String sqlInsert = "INSERT INTO TBL_DIRECCION (pk_id_direccion, calle_avenida, num_edificio_casa, codigo_postal, referencia, fk_pk_id_ciudad) " +
                     "VALUES (?, ?, ?, ?, ?, ?)";
@@ -164,7 +162,7 @@ public class DireccionController {
                 error("Error al guardar: " + e.getMessage());
             }
         } else {
-            // Actualizar dirección existente
+
             String sql = "UPDATE TBL_DIRECCION SET calle_avenida=?, num_edificio_casa=?, codigo_postal=?, referencia=?, fk_pk_id_ciudad=? " +
                     "WHERE pk_id_direccion=?";
             try (Connection con = conexion.establecerConexion();

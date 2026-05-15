@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -53,7 +52,6 @@ public class MantenimientoController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idMantenimientoProperty().asObject());
         colVehiculo.setCellValueFactory(c -> c.getValue().vehiculoInfoProperty());
         colTipo.setCellValueFactory(c -> c.getValue().tipoProperty());
@@ -72,11 +70,11 @@ public class MantenimientoController {
         tableContainer.setVisible(true);
         btnToggleTable.setText("📋 Ocultar Tabla");
 
-        // Listener para calcular días automáticamente
+        // Calcula los días automáticamente al cambiar las fechas
         dpFechaIngreso.valueProperty().addListener((obs, old, newVal) -> calcularDias());
         dpFechaSalida.valueProperty().addListener((obs, old, newVal) -> calcularDias());
 
-        // Inicializar ToggleGroup
+
         tipoGroup = new ToggleGroup();
         rbMotivo.setToggleGroup(tipoGroup);
         rbIncidencia.setToggleGroup(tipoGroup);
@@ -220,7 +218,7 @@ public class MantenimientoController {
             }
             con.setAutoCommit(false);
 
-            // Insertar historial
+            // Guarda primero en el historial de mantenimiento
             int idHistMantenimiento;
             String sqlNextHist = "SELECT ISNULL(MAX(pk_id_hist_mantenimiento), 0) + 1 AS next_id FROM TBL_HISTORIAL_MANTENIMIENTO";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextHist);

@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
 
-import javax.swing.*;
 import java.sql.*;
 
 public class ConsultaObjetosController {
@@ -38,7 +37,6 @@ public class ConsultaObjetosController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idObjetoProperty().asObject());
         colNombre.setCellValueFactory(c -> c.getValue().nombreProperty());
         colMarca.setCellValueFactory(c -> c.getValue().marcaProperty());
@@ -47,10 +45,9 @@ public class ConsultaObjetosController {
         colTipo.setCellValueFactory(c -> c.getValue().tipoProperty());
         colEstado.setCellValueFactory(c -> c.getValue().estadoProperty());
 
-        // Cargar opciones de estado
         cmbEstado.getItems().addAll("Disponible", "Agotado", "En uso", "Dañado");
 
-        // Listener para selección de objeto
+        // Cuando seleccionan un objeto, mostramos su info
         tablaObjetos.setItems(listaObjetos);
         tablaObjetos.getSelectionModel().selectedItemProperty().addListener(
                 (obs, old, newVal) -> {
@@ -61,7 +58,7 @@ public class ConsultaObjetosController {
                     }
                 });
 
-        // Configurar tabla ocultable
+        // La tabla se puede ocultar/mostrar con un botón
         tableContainer.setVisible(true);
         btnToggleTable.setText("📋 Ocultar Tabla");
 

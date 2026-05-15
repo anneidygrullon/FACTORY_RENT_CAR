@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
 
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -79,7 +78,7 @@ public class EmpleadoConsultaController {
     }
 
     private void cargarPuestosYDepartamentos() {
-        // Cargar puestos
+
         String sqlPuestos = "SELECT pk_id_puesto, nombre, sueldo FROM TBL_PUESTO";
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(sqlPuestos);
@@ -96,7 +95,7 @@ public class EmpleadoConsultaController {
             error("Error cargando puestos: " + e.getMessage());
         }
 
-        // Cargar departamentos
+
         String sqlDeptos = "SELECT pk_id_dept, nombre FROM TBL_DEPARTAMENTO";
         try (Connection con = conexion.establecerConexion();
              PreparedStatement ps = con.prepareStatement(sqlDeptos);
@@ -111,7 +110,7 @@ public class EmpleadoConsultaController {
             error("Error cargando departamentos: " + e.getMessage());
         }
 
-        // Listener para cuando se seleccione un puesto: actualizar el sueldo automáticamente
+        // Al seleccionar un puesto se actualiza el sueldo automáticamente
         cmbPuesto.valueProperty().addListener((obs, old, newPuesto) -> {
             if (newPuesto != null && mapaSueldosPorPuesto.containsKey(newPuesto)) {
                 txtSueldo.setText(String.valueOf(mapaSueldosPorPuesto.get(newPuesto)));
@@ -226,14 +225,7 @@ public class EmpleadoConsultaController {
             return;
         }
 
-        // Primero, necesitamos actualizar el puesto (si cambia) y también el departamento asociado al puesto.
-        // Pero la tabla EMPLEADO solo tiene FK a PUESTO. El departamento pertenece al puesto.
-        // Por lo tanto, al cambiar el puesto, automáticamente cambiamos el departamento y el sueldo.
-        // Si el usuario selecciona un departamento diferente, debemos buscar un puesto que pertenezca a ese departamento.
-        // Para simplificar, vamos a actualizar directamente el puesto (que ya incluye departamento y sueldo).
-        // Si el usuario quiere cambiar departamento, debe seleccionar un puesto que pertenezca a ese departamento.
-        // Para ello, al seleccionar departamento, filtramos los puestos posibles.
-        // Pero ya que tenemos los datos cargados, podemos actualizar el registro directamente.
+        // Al cambiar el puesto se actualiza también el sueldo. El departamento se asigna según el puesto elegido.
 
         String sqlUpdate = "UPDATE TBL_EMPLEADO SET fk_pk_id_puesto = ? WHERE pk_id_empleado = ?";
         try (Connection con = conexion.establecerConexion();
@@ -243,7 +235,7 @@ public class EmpleadoConsultaController {
             int filas = ps.executeUpdate();
             if (filas > 0) {
                 informacion("Empleado actualizado correctamente.");
-                cargarEmpleados(); // recargar tabla
+                cargarEmpleados();
             } else {
                 advertencia("No se pudo actualizar.");
             }
