@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -103,7 +102,7 @@ public class ReclamoRegistroController {
         try (Connection con = conexion.establecerConexion()) {
             con.setAutoCommit(false);
 
-            // Insertar historial de reclamo (con fecha actual)
+            // Guardar el historial con la fecha de hoy
             int idHistorial;
             String sqlNextHist = "SELECT ISNULL(MAX(pk_id_hist_reclamo), 0) + 1 AS next_id FROM TBL_HISTORIAL_RECLAMOS";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextHist);
@@ -118,7 +117,6 @@ public class ReclamoRegistroController {
             psHistorial.setDate(4, Date.valueOf(LocalDate.now()));
             psHistorial.executeUpdate();
 
-            // Insertar reclamo
             int idReclamo;
             String sqlNextReclamo = "SELECT ISNULL(MAX(pk_id_reclamo), 0) + 1 AS next_id FROM TBL_RECLAMACION";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextReclamo);

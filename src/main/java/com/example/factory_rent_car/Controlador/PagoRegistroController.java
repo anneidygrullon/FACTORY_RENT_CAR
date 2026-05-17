@@ -7,7 +7,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;

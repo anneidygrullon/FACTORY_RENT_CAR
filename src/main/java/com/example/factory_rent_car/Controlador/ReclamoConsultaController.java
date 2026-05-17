@@ -10,7 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import static com.example.factory_rent_car.Util.MensajeFactory.*;
-import javax.swing.*;
 import java.sql.*;
 
 public class ReclamoConsultaController {
@@ -37,7 +36,6 @@ public class ReclamoConsultaController {
 
     @FXML
     public void initialize() {
-        // Configurar columnas
         colId.setCellValueFactory(c -> c.getValue().idReclamoProperty().asObject());
         colFecha.setCellValueFactory(c -> c.getValue().fechaProperty());
         colCliente.setCellValueFactory(c -> c.getValue().clienteNombreProperty());
@@ -46,7 +44,6 @@ public class ReclamoConsultaController {
         colEstado.setCellValueFactory(c -> c.getValue().estadoProperty());
         colEmpleado.setCellValueFactory(c -> c.getValue().empleadoNombreProperty());
 
-        // Cargar opciones de estado
         cmbEstado.getItems().addAll("Pendiente", "En revisión", "Resuelto", "Rechazado");
 
         tablaReclamos.setItems(listaReclamos);

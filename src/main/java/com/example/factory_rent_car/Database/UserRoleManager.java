@@ -10,7 +10,7 @@ public class UserRoleManager {
     private static final Path FILE_PATH = Paths.get(System.getProperty("user.home"), FILE_NAME);
 
     public static String getRole(String username) {
-        // First check classpath roles.properties
+        // Primero revisa el roles.properties del classpath
         try (InputStream is = UserRoleManager.class.getResourceAsStream("/com/example/factory_rent_car/roles.properties")) {
             if (is != null) {
                 Properties props = new Properties();
@@ -20,7 +20,7 @@ public class UserRoleManager {
             }
         } catch (Exception ignored) {}
 
-        // Then check external file
+        // Luego intenta con el archivo externo
         if (Files.exists(FILE_PATH)) {
             try (InputStream is = Files.newInputStream(FILE_PATH)) {
                 Properties props = new Properties();

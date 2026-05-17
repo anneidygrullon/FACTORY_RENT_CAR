@@ -5,7 +5,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-import javax.swing.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -30,13 +29,12 @@ public class RegistroCompraObjetoController {
 
     @FXML
     public void initialize() {
-        // Cargar tipos de objeto
         cmbTipo.getItems().addAll("Mantenimiento", "Reserva", "Limpieza");
 
-        // Cargar suplidores desde la base de datos
+        // Traer los suplidores de la base
         cargarSuplidores();
 
-        // Calcular monto total automáticamente
+        // Calcular el total automático al cambiar precio o cantidad
         txtPrecio.textProperty().addListener((obs, old, newVal) -> calcularMontoTotal());
         txtCantidad.textProperty().addListener((obs, old, newVal) -> calcularMontoTotal());
     }
@@ -90,7 +88,6 @@ public class RegistroCompraObjetoController {
             con = conexion.establecerConexion();
             con.setAutoCommit(false);
 
-            // Crear contrato
             int idContrato;
             String sqlNextContrato = "SELECT ISNULL(MAX(pk_id_contrato), 0) + 1 AS next_id FROM TBL_CONTRATO";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextContrato);
@@ -104,7 +101,6 @@ public class RegistroCompraObjetoController {
             psContrato.setString(3, "Compra de objeto: " + nombre);
             psContrato.executeUpdate();
 
-            // Crear pedido
             int idCompra;
             String sqlNextPedido = "SELECT ISNULL(MAX(pk_id_compra), 0) + 1 AS next_id FROM TBL_PEDIDO";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextPedido);
@@ -122,7 +118,6 @@ public class RegistroCompraObjetoController {
             psPedido.setInt(6, idContrato);
             psPedido.executeUpdate();
 
-            // Crear objeto
             int idObjeto;
             String sqlNextObj = "SELECT ISNULL(MAX(pk_id_objeto), 0) + 1 AS next_id FROM TBL_OBJETO";
             try (PreparedStatement psNext = con.prepareStatement(sqlNextObj);
